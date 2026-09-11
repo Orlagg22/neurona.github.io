@@ -2,7 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#010204" />
     <title>Neural Cathedral</title>
     <style>
       :root {
@@ -39,6 +43,9 @@
         color: white;
         user-select: none;
         transition: background-color 0.6s ease;
+        touch-action: none;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
       }
 
       body.dusk {
@@ -54,6 +61,51 @@
         top: 0;
         left: 0;
         z-index: 1;
+        touch-action: none;
+      }
+
+      button {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        font-family: inherit;
+      }
+
+      /* ---------- Mobile HUD collapse toggle ---------- */
+      #hud-left-collapse {
+        display: none;
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--cyan);
+        font-size: 9px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: auto;
+        touch-action: manipulation;
+        z-index: 25;
+      }
+      @media (pointer: coarse), (max-width: 720px) {
+        #hud-left-collapse {
+          display: flex;
+        }
+        #hud-left.collapsed .hud-row,
+        #hud-left.collapsed .slider-row,
+        #hud-left.collapsed #btn-fire,
+        #hud-left.collapsed #btn-autorotate,
+        #hud-left.collapsed #btn-autofire,
+        #hud-left.collapsed #narrator-row {
+          display: none;
+        }
+        #hud-left.collapsed {
+          padding-bottom: 8px;
+          width: min(160px, calc(100vw - 20px));
+        }
       }
 
       .overlay {
@@ -941,24 +993,163 @@
       #tour-caption-steps {
         margin-top: 8px;
         display: flex;
-        gap: 4px;
+        gap: 2px;
         justify-content: center;
       }
       #tour-caption-steps span {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: auto;
+      }
+      #tour-caption-steps span::after {
+        content: "";
+        display: block;
         width: 4px;
         height: 4px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.18);
         transition: all 0.3s;
       }
-      #tour-caption-steps span.active {
+      #tour-caption-steps span:hover::after {
+        background: rgba(255, 255, 255, 0.4);
+      }
+      #tour-caption-steps span.active::after {
         background: var(--gold);
         box-shadow: 0 0 6px rgba(255, 170, 0, 0.7);
         width: 12px;
         border-radius: 3px;
       }
-      #tour-caption-steps span.done {
+      #tour-caption-steps span.done::after {
         background: rgba(255, 170, 0, 0.45);
+      }
+
+      /* ---------- Brain-function tour caption (independent whole-brain tour) ---------- */
+      #brain-tour-caption {
+        position: absolute;
+        bottom: clamp(44px, 8vw, 64px);
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        z-index: 22;
+        width: min(480px, calc(100vw - 32px));
+        padding: 16px 20px;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        border-color: rgba(157, 78, 221, 0.4);
+      }
+      #brain-tour-caption.open {
+        display: block;
+      }
+      #brain-tour-caption.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #brain-tour-caption-title {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--magenta);
+        font-weight: 700;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #brain-tour-caption-title .speaking-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--magenta);
+        box-shadow: 0 0 6px var(--magenta);
+        animation: speakPulse 1s infinite;
+      }
+      #brain-tour-caption-text {
+        font-size: 11.5px;
+        line-height: 1.55;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      #brain-tour-caption-progress {
+        margin-top: 12px;
+        height: 2px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+      }
+      #brain-tour-caption-bar {
+        height: 100%;
+        width: 0%;
+        background: var(--magenta);
+        box-shadow: 0 0 6px rgba(255, 0, 170, 0.7);
+        transition: width 0.15s linear;
+      }
+      #brain-tour-caption-steps {
+        margin-top: 8px;
+        display: flex;
+        gap: 2px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      #brain-tour-caption-steps span {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: auto;
+      }
+      #brain-tour-caption-steps span::after {
+        content: "";
+        display: block;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        transition: all 0.3s;
+      }
+      #brain-tour-caption-steps span:hover::after {
+        background: rgba(255, 255, 255, 0.4);
+      }
+      #brain-tour-caption-steps span.active::after {
+        background: var(--magenta);
+        box-shadow: 0 0 6px rgba(255, 0, 170, 0.7);
+        width: 12px;
+        border-radius: 3px;
+      }
+      #brain-tour-caption-steps span.done::after {
+        background: rgba(255, 0, 170, 0.45);
+      }
+      #brain-tour-caption .brain-tour-nav .tour-nav-btn {
+        color: var(--magenta);
+      }
+      /* ---------- Swipe hint (mobile, shown briefly during either tour) ---------- */
+      #tour-swipe-hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 23;
+        font-size: 9px;
+        letter-spacing: 1.2px;
+        color: rgba(255, 255, 255, 0.7);
+        background: rgba(10, 14, 20, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 999px;
+        padding: 6px 14px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      #tour-swipe-hint.show {
+        opacity: 1;
       }
 
       /* ---------- AI Narrator controls ---------- */
@@ -1345,7 +1536,8 @@
       }
 
       /* ---------- Tour manual navigation ---------- */
-      #tour-nav {
+      #tour-nav,
+      .brain-tour-nav {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1522,6 +1714,7 @@
       <button class="tool-btn" id="btn-screenshot" data-i18n-title="tt_screenshot" title="Save a screenshot">📷</button>
       <button class="tool-btn" id="btn-reset-cam" data-i18n-title="tt_reset" title="Reset camera">⟲</button>
       <button class="tool-btn" id="btn-tour" data-i18n-title="tt_tour" title="Guided tour, narrated by AI">▶</button>
+      <button class="tool-btn" id="btn-brain-tour" data-i18n-title="tt_braintour" title="Whole-brain function tour (no neurons)">🗺️</button>
       <button class="tool-btn" id="btn-inside" data-i18n-title="tt_inside" title="See inside the neuron">🔬</button>
       <button class="tool-btn" id="btn-brain" data-i18n-title="tt_brain" title="Real brain examples">🧠</button>
       <button class="tool-btn" id="btn-learning" data-i18n-title="tt_learning" title="How neurons learn together">🧬</button>
@@ -1535,6 +1728,7 @@
     <div id="aria-status" class="sr-only" aria-live="polite"></div>
 
     <div id="hud-left" class="hud-panel">
+      <button id="hud-left-collapse" title="Collapse / expand">▾</button>
       <div class="hud-header">
         <h1 data-i18n="title">Neural Cathedral</h1>
         <div class="subtitle" data-i18n="subtitle">ID: NC-09 // BIOELECTRIC ENGINE</div>
@@ -1639,6 +1833,20 @@
       </div>
     </div>
 
+    <div id="brain-tour-caption" class="hud-panel">
+      <div id="brain-tour-caption-title"><span class="speaking-dot" id="brain-tour-speaking-dot"></span><span id="brain-tour-caption-title-text">Welcome</span></div>
+      <div id="brain-tour-caption-text"></div>
+      <div id="brain-tour-caption-progress"><div id="brain-tour-caption-bar"></div></div>
+      <div id="brain-tour-caption-steps"></div>
+      <div class="brain-tour-nav">
+        <button class="tour-nav-btn" id="brain-tour-prev" title="Previous stop">◀</button>
+        <button class="tour-nav-btn" id="brain-tour-pause" title="Pause / resume">⏸</button>
+        <button class="tour-nav-btn" id="brain-tour-next" title="Next stop">▶</button>
+        <button class="tour-nav-btn" id="brain-tour-exit" title="End tour">✕</button>
+      </div>
+    </div>
+
+    <div id="tour-swipe-hint"></div>
     <div id="inside-hint"></div>
     <div id="inside-labels"></div>
     <div id="anat-labels"></div>
@@ -1751,6 +1959,7 @@
       <h2 data-i18n="help_title">Keyboard Shortcuts</h2>
       <div class="kbd-row"><span data-i18n="kbd_fire">Fire an impulse</span><span class="kbd-key">Space</span></div>
       <div class="kbd-row"><span data-i18n="kbd_tour">Start / stop narrated tour</span><span class="kbd-key">T</span></div>
+      <div class="kbd-row"><span data-i18n="kbd_braintour">Whole-brain function tour</span><span class="kbd-key">G</span></div>
       <div class="kbd-row"><span data-i18n="kbd_narrator">Toggle AI narrator voice</span><span class="kbd-key">N</span></div>
       <div class="kbd-row"><span data-i18n="kbd_mute">Mute / unmute sound</span><span class="kbd-key">M</span></div>
       <div class="kbd-row"><span data-i18n="kbd_reset">Reset camera</span><span class="kbd-key">R</span></div>
@@ -1932,10 +2141,36 @@
           labelCerebellum: "Cerebellum",
           labelBrainstem: "Brainstem",
           labelThalamus: "Thalamus",
+          labelHippocampus: "Hippocampus",
+          labelAmygdala: "Amygdala",
+          labelCallosum: "Corpus Callosum",
           factCerebrum: "The cerebrum handles conscious thought, memory, and voluntary movement.",
           factCerebellum: "The cerebellum fine-tunes balance, posture, and the timing of movement.",
           factBrainstem: "The brainstem controls breathing, heart rate, and basic survival reflexes.",
           factThalamus: "The thalamus relays almost every sensory signal on its way to the cortex.",
+          factHippocampus: "The hippocampus turns short-term experience into long-term memory, and helps you navigate space — it's also one of the few brain regions known to grow new neurons throughout adult life.",
+          factAmygdala: "The amygdala flags emotionally significant experiences, especially fear and threat, and helps decide which moments get tagged as worth remembering vividly.",
+          factCallosum: "The corpus callosum is a thick bundle of roughly 200 million nerve fibers that lets the brain's left and right hemispheres share information almost instantly.",
+          tt_braintour: "Whole-brain function tour — regions only, no neurons",
+          kbd_braintour: "Whole-brain function tour",
+          braintourEnded: "Whole-brain tour ended.",
+          swipeHint: "Swipe to navigate",
+          collapseHud: "Collapse panel",
+          expandHud: "Expand panel",
+          labelHypothalamus: "Hypothalamus",
+          labelPituitary: "Pituitary Gland",
+          labelPineal: "Pineal Gland",
+          labelBasalGanglia: "Basal Ganglia",
+          labelPrefrontal: "Prefrontal Cortex",
+          labelMotorCortex: "Motor Cortex",
+          labelVisualCortex: "Visual Cortex",
+          factHypothalamus: "The hypothalamus keeps the body in balance — regulating temperature, hunger, thirst, and the sleep-wake cycle — and tells the pituitary gland which hormones to release.",
+          factPituitary: "Often called the 'master gland', the pituitary takes orders from the hypothalamus and releases hormones that control growth, metabolism, stress response, and reproduction throughout the body.",
+          factPineal: "Deep in the center of the brain, the tiny pineal gland releases melatonin in response to darkness, setting the body's internal circadian clock.",
+          factBasalGanglia: "The basal ganglia help select and smooth voluntary movements and are deeply involved in habit formation and reward-based learning.",
+          factPrefrontal: "The prefrontal cortex, at the very front of the brain, handles planning, decision-making, impulse control, and much of what makes up personality.",
+          factMotorCortex: "The motor cortex, a strip running across the top of the brain, sends the precise signals that drive voluntary muscle movement throughout the body.",
+          factVisualCortex: "The visual cortex, at the back of the brain, turns raw signals from the eyes into the shapes, colors, and motion you consciously see.",
         },
         es: {
           title: "Catedral Neuronal",
@@ -2048,10 +2283,36 @@
           labelCerebellum: "Cerebelo",
           labelBrainstem: "Tronco encefálico",
           labelThalamus: "Tálamo",
+          labelHippocampus: "Hipocampo",
+          labelAmygdala: "Amígdala",
+          labelCallosum: "Cuerpo Calloso",
           factCerebrum: "El cerebro (cerebrum) gestiona el pensamiento consciente, la memoria y el movimiento voluntario.",
           factCerebellum: "El cerebelo afina el equilibrio, la postura y el ritmo de los movimientos.",
           factBrainstem: "El tronco encefálico controla la respiración, el ritmo cardíaco y los reflejos vitales básicos.",
           factThalamus: "El tálamo retransmite casi toda señal sensorial de camino a la corteza.",
+          factHippocampus: "El hipocampo convierte la experiencia a corto plazo en memoria a largo plazo y te ayuda a orientarte en el espacio — es también una de las pocas regiones del cerebro que sigue generando neuronas nuevas durante la vida adulta.",
+          factAmygdala: "La amígdala marca las experiencias emocionalmente significativas, sobre todo el miedo y la amenaza, y ayuda a decidir qué momentos vale la pena recordar con más intensidad.",
+          factCallosum: "El cuerpo calloso es un grueso haz de unas 200 millones de fibras nerviosas que permite que los hemisferios izquierdo y derecho compartan información casi instantáneamente.",
+          tt_braintour: "Tour del cerebro completo — solo regiones, sin neuronas",
+          kbd_braintour: "Tour del cerebro completo",
+          braintourEnded: "El tour del cerebro completo ha terminado.",
+          swipeHint: "Desliza para navegar",
+          collapseHud: "Contraer panel",
+          expandHud: "Expandir panel",
+          labelHypothalamus: "Hipotálamo",
+          labelPituitary: "Glándula Pituitaria",
+          labelPineal: "Glándula Pineal",
+          labelBasalGanglia: "Ganglios Basales",
+          labelPrefrontal: "Corteza Prefrontal",
+          labelMotorCortex: "Corteza Motora",
+          labelVisualCortex: "Corteza Visual",
+          factHypothalamus: "El hipotálamo mantiene al cuerpo en equilibrio — regulando la temperatura, el hambre, la sed y el ciclo de sueño-vigilia — y le indica a la glándula pituitaria qué hormonas liberar.",
+          factPituitary: "Conocida como la 'glándula maestra', la pituitaria recibe órdenes del hipotálamo y libera hormonas que controlan el crecimiento, el metabolismo, la respuesta al estrés y la reproducción en todo el cuerpo.",
+          factPineal: "En el centro del cerebro, la pequeña glándula pineal libera melatonina en respuesta a la oscuridad, ajustando el reloj circadiano interno del cuerpo.",
+          factBasalGanglia: "Los ganglios basales ayudan a seleccionar y suavizar los movimientos voluntarios, y están profundamente implicados en la formación de hábitos y el aprendizaje basado en recompensas.",
+          factPrefrontal: "La corteza prefrontal, en la parte más frontal del cerebro, gestiona la planificación, la toma de decisiones, el control de impulsos y buena parte de lo que conforma la personalidad.",
+          factMotorCortex: "La corteza motora, una franja que recorre la parte superior del cerebro, envía las señales precisas que impulsan el movimiento muscular voluntario en todo el cuerpo.",
+          factVisualCortex: "La corteza visual, en la parte posterior del cerebro, convierte las señales crudas de los ojos en las formas, colores y movimiento que percibes consciente­mente.",
         },
       };
 
@@ -2939,10 +3200,10 @@
       };
 
       const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x010204, 0.015);
+      scene.fog = new THREE.FogExp2(0x010204, 0.01);
 
-      const desktopCameraPosition = new THREE.Vector3(30, 20, 40);
-      const mobileCameraPosition = new THREE.Vector3(34, 24, 62);
+      const desktopCameraPosition = new THREE.Vector3(44, 30, 58);
+      const mobileCameraPosition = new THREE.Vector3(50, 34, 86);
 
       const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
       camera.position.copy(desktopCameraPosition);
@@ -2973,7 +3234,7 @@
       controls.autoRotateSpeed = 0.6;
       controls.enablePan = false;
       controls.minDistance = 15;
-      controls.maxDistance = 120;
+      controls.maxDistance = 170;
 
       function isCompactViewport() {
         return window.innerWidth <= 720 || window.matchMedia("(pointer: coarse)").matches;
@@ -2994,7 +3255,7 @@
         composer.setSize(width, height);
 
         controls.minDistance = compact ? 24 : 15;
-        controls.maxDistance = compact ? 140 : 120;
+        controls.maxDistance = compact ? 210 : 170;
 
         if (resetCamera) {
           camera.position.copy(targetPosition);
@@ -3349,6 +3610,8 @@
           let curl = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).multiplyScalar(isAxon ? 0.3 : 0.8);
           cDir.add(curl).normalize();
           cur.add(cDir.clone().multiplyScalar(length / segments));
+          const [cx, cy, cz] = clampToBrainEnvelope(cur.x, cur.y, cur.z, 0.9);
+          cur.set(cx, cy, cz);
           points.push(cur.clone());
         }
 
@@ -3379,6 +3642,34 @@
       function addSynapse(pos, isAxon) {
         synapsePositions.push(pos.x, pos.y, pos.z);
         if (isAxon) axonTerminals.push(pos.clone());
+      }
+
+      /* Keeps every branch point (and, further down, every field neuron and
+         secondary neuron) inside the brain's visual envelope — an asymmetric
+         ellipsoid roughly matching the cerebrum/cerebellum/brainstem shapes
+         built later on (wide and tall up front, narrowing toward the
+         cerebellum/brainstem lower-back). Declared here, before any geometry
+         is built, so the primary neuron's own dendrites and axon can never
+         grow past the visible brain surface. */
+      const BRAIN_ENVELOPE_CENTER = { x: 0, y: 4, z: -4 };
+      const BRAIN_ENVELOPE_RX = 52;
+      const BRAIN_ENVELOPE_RY_UP = 42;
+      const BRAIN_ENVELOPE_RY_DOWN = 50;
+      const BRAIN_ENVELOPE_RZ_FRONT = 46;
+      const BRAIN_ENVELOPE_RZ_BACK = 54;
+      function clampToBrainEnvelope(x, y, z, margin = 0.92) {
+        const dx = x - BRAIN_ENVELOPE_CENTER.x;
+        const dy = y - BRAIN_ENVELOPE_CENTER.y;
+        const dz = z - BRAIN_ENVELOPE_CENTER.z;
+        const ry = dy >= 0 ? BRAIN_ENVELOPE_RY_UP : BRAIN_ENVELOPE_RY_DOWN;
+        const rz = dz >= 0 ? BRAIN_ENVELOPE_RZ_FRONT : BRAIN_ENVELOPE_RZ_BACK;
+        const ex = dx / BRAIN_ENVELOPE_RX;
+        const ey = dy / ry;
+        const ez = dz / rz;
+        const mag = Math.sqrt(ex * ex + ey * ey + ez * ez);
+        if (mag <= margin) return [x, y, z];
+        const s = margin / mag;
+        return [BRAIN_ENVELOPE_CENTER.x + ex * s * BRAIN_ENVELOPE_RX, BRAIN_ENVELOPE_CENTER.y + ey * s * ry, BRAIN_ENVELOPE_CENTER.z + ez * s * rz];
       }
 
       for (let i = 0; i < CONFIG.dendriteTrees; i++) {
@@ -3412,7 +3703,9 @@
         const picks = [axonTerminals[0], axonTerminals[Math.min(1, axonTerminals.length - 1)]];
         picks.forEach((term) => {
           const dir = term.clone().normalize();
-          const targetPos = dir.clone().multiplyScalar(term.length() * 1.45 + 14);
+          const targetPosRaw = dir.clone().multiplyScalar(term.length() * 1.15 + 6);
+          const [tx, ty, tz] = clampToBrainEnvelope(targetPosRaw.x, targetPosRaw.y, targetPosRaw.z, 0.9);
+          const targetPos = new THREE.Vector3(tx, ty, tz);
           buildSecondaryNeuron(targetPos);
 
           const mid = term.clone().lerp(targetPos, 0.5).add(new THREE.Vector3((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8));
@@ -3658,33 +3951,10 @@
         return neuron;
       }
 
-      /* Keeps every field neuron inside the brain's visual envelope — an
-         asymmetric ellipsoid roughly matching the cerebrum/cerebellum/brainstem
-         shapes built further down (cerebrum wide and tall up front, narrowing
-         toward the cerebellum/brainstem lower-back). Anything the raw
-         distribution below would place outside gets pulled back onto/just
-         inside the surface, so nothing pokes past the visible brain. */
-      const BRAIN_ENVELOPE_CENTER = { x: 0, y: 4, z: -4 };
-      const BRAIN_ENVELOPE_RX = 52;
-      const BRAIN_ENVELOPE_RY_UP = 42;
-      const BRAIN_ENVELOPE_RY_DOWN = 50;
-      const BRAIN_ENVELOPE_RZ_FRONT = 46;
-      const BRAIN_ENVELOPE_RZ_BACK = 54;
-      function clampToBrainEnvelope(x, y, z) {
-        const dx = x - BRAIN_ENVELOPE_CENTER.x;
-        const dy = y - BRAIN_ENVELOPE_CENTER.y;
-        const dz = z - BRAIN_ENVELOPE_CENTER.z;
-        const ry = dy >= 0 ? BRAIN_ENVELOPE_RY_UP : BRAIN_ENVELOPE_RY_DOWN;
-        const rz = dz >= 0 ? BRAIN_ENVELOPE_RZ_FRONT : BRAIN_ENVELOPE_RZ_BACK;
-        const ex = dx / BRAIN_ENVELOPE_RX;
-        const ey = dy / ry;
-        const ez = dz / rz;
-        const mag = Math.sqrt(ex * ex + ey * ey + ez * ez);
-        const margin = 0.92;
-        if (mag <= margin) return [x, y, z];
-        const s = margin / mag;
-        return [BRAIN_ENVELOPE_CENTER.x + ex * s * BRAIN_ENVELOPE_RX, BRAIN_ENVELOPE_CENTER.y + ey * s * ry, BRAIN_ENVELOPE_CENTER.z + ez * s * rz];
-      }
+      /* BRAIN_ENVELOPE_* and clampToBrainEnvelope() are declared earlier
+         (right before the primary neuron's own dendrite/axon construction)
+         so that both the primary neuron and every field neuron below share
+         the exact same "stay inside the visible brain" boundary. */
 
       const FIELD_COUNT = isCompactViewport() ? 90 : 190;
       for (let i = 0; i < FIELD_COUNT; i++) {
@@ -4013,6 +4283,116 @@
       thalamus.position.set(0, -2, 5);
       brainRegionsGroup.add(thalamus);
 
+      /* Hippocampus: a curved, seahorse-shaped pair tucked medially beneath
+         each temporal lobe — modeled as a partial torus arc so its
+         characteristic curl reads even at this stylized scale. Central to
+         forming new long-term memories. */
+      const hippocampusColor = CONFIG.colors.cyan.clone().lerp(new THREE.Color("#3ddc97"), 0.6);
+      function makeHippocampusGeo() {
+        const geo = new THREE.TorusGeometry(6.2, 1.5, 8, 24, Math.PI * 1.15);
+        addOrganicNoise(geo, 0.05, 1.6);
+        return geo;
+      }
+      const hippocampusLeft = makeRegionMesh(makeHippocampusGeo(), hippocampusColor, 0.07, 0.14);
+      hippocampusLeft.rotation.set(Math.PI / 2.4, 0.3, 0);
+      hippocampusLeft.scale.set(0.9, 0.6, 1.0);
+      hippocampusLeft.position.set(-15, -7, 3);
+      brainRegionsGroup.add(hippocampusLeft);
+
+      const hippocampusRight = makeRegionMesh(makeHippocampusGeo(), hippocampusColor, 0.07, 0.14);
+      hippocampusRight.rotation.set(Math.PI / 2.4, -0.3, 0);
+      hippocampusRight.scale.set(0.9, 0.6, 1.0);
+      hippocampusRight.position.set(15, -7, 3);
+      brainRegionsGroup.add(hippocampusRight);
+
+      /* Amygdala: a small almond-shaped pair sitting just forward of the
+         hippocampus — the brain's threat-detection and emotional-tagging
+         hub, so it gets a warmer, more alert color. */
+      const amygdalaColor = CONFIG.colors.magenta.clone().lerp(CONFIG.colors.orange, 0.5);
+      function makeAmygdalaGeo() {
+        const geo = new THREE.IcosahedronGeometry(3.1, 2);
+        addOrganicNoise(geo, 0.06, 1.8);
+        return geo;
+      }
+      const amygdalaLeft = makeRegionMesh(makeAmygdalaGeo(), amygdalaColor, 0.09, 0.16);
+      amygdalaLeft.scale.set(1.1, 0.8, 0.9);
+      amygdalaLeft.position.set(-13, -5, 11);
+      brainRegionsGroup.add(amygdalaLeft);
+
+      const amygdalaRight = makeRegionMesh(makeAmygdalaGeo(), amygdalaColor, 0.09, 0.16);
+      amygdalaRight.scale.set(1.1, 0.8, 0.9);
+      amygdalaRight.position.set(13, -5, 11);
+      brainRegionsGroup.add(amygdalaRight);
+
+      /* Hypothalamus: small hub just under the thalamus, the body's internal
+         thermostat and hormone dispatcher — warm-toned to read as "control". */
+      const hypothalamusColor = CONFIG.colors.gold.clone().lerp(CONFIG.colors.orange, 0.55);
+      const hypothalamusGeo = new THREE.IcosahedronGeometry(2.6, 2);
+      addOrganicNoise(hypothalamusGeo, 0.08, 2.0);
+      const hypothalamus = makeRegionMesh(hypothalamusGeo, hypothalamusColor, 0.11, 0.18);
+      hypothalamus.position.set(0, -8, 4);
+      brainRegionsGroup.add(hypothalamus);
+
+      /* Pituitary gland: tiny "master gland" hanging just below the
+         hypothalamus on its stalk. */
+      const pituitaryGeo = new THREE.SphereGeometry(1.3, 12, 12);
+      const pituitary = makeRegionMesh(pituitaryGeo, hypothalamusColor, 0.16, 0.22);
+      pituitary.position.set(0, -12.5, 5.5);
+      brainRegionsGroup.add(pituitary);
+
+      /* Pineal gland: tiny, deep-center clock, tucked just behind the
+         thalamus. */
+      const pinealColor = CONFIG.colors.violet.clone().lerp(CONFIG.colors.cyan, 0.3);
+      const pinealGeo = new THREE.SphereGeometry(1.1, 10, 10);
+      const pineal = makeRegionMesh(pinealGeo, pinealColor, 0.16, 0.24);
+      pineal.position.set(0, 1, -2.5);
+      brainRegionsGroup.add(pineal);
+
+      /* Basal ganglia: a deep pair flanking the thalamus, involved in
+         movement selection, habits, and reward. */
+      const basalColor = CONFIG.colors.cyan.clone().lerp(CONFIG.colors.gold, 0.3);
+      function makeBasalGeo() {
+        const geo = new THREE.IcosahedronGeometry(3.4, 2);
+        addOrganicNoise(geo, 0.07, 1.7);
+        return geo;
+      }
+      const basalGanglia1 = makeRegionMesh(makeBasalGeo(), basalColor, 0.08, 0.15);
+      basalGanglia1.scale.set(1.0, 0.8, 0.85);
+      basalGanglia1.position.set(-9, -1, 1);
+      brainRegionsGroup.add(basalGanglia1);
+
+      const basalGanglia2 = makeRegionMesh(makeBasalGeo(), basalColor, 0.08, 0.15);
+      basalGanglia2.scale.set(1.0, 0.8, 0.85);
+      basalGanglia2.position.set(9, -1, 1);
+      brainRegionsGroup.add(basalGanglia2);
+
+      /* Functional cortex zones: prefrontal, motor, and visual — subtle
+         markers on the cerebrum's surface used mostly for clickability, the
+         projected label, and as camera-focus anchors during the whole-brain
+         function tour. */
+      function makeCortexZoneGeo() {
+        const geo = new THREE.IcosahedronGeometry(5.4, 2);
+        addOrganicNoise(geo, 0.06, 1.3);
+        return geo;
+      }
+      const prefrontalColor = cerebrumColor.clone().lerp(new THREE.Color("#ffffff"), 0.35);
+      const prefrontalCortex = makeRegionMesh(makeCortexZoneGeo(), prefrontalColor, 0.05, 0.1);
+      prefrontalCortex.scale.set(1.1, 0.85, 0.6);
+      prefrontalCortex.position.set(0, 12, 38);
+      brainRegionsGroup.add(prefrontalCortex);
+
+      const motorColor = CONFIG.colors.gold.clone().lerp(cerebrumColor, 0.3);
+      const motorCortex = makeRegionMesh(makeCortexZoneGeo(), motorColor, 0.05, 0.1);
+      motorCortex.scale.set(1.3, 0.5, 0.7);
+      motorCortex.position.set(0, 38, 6);
+      brainRegionsGroup.add(motorCortex);
+
+      const visualColor = cerebrumColor.clone().lerp(CONFIG.colors.magenta, 0.3);
+      const visualCortex = makeRegionMesh(makeCortexZoneGeo(), visualColor, 0.05, 0.1);
+      visualCortex.scale.set(1.05, 0.8, 0.55);
+      visualCortex.position.set(0, 12, -50);
+      brainRegionsGroup.add(visualCortex);
+
       /* Clicking a region names it (toast) and nudges the nearest field
          neurons into firing, so the anatomy feels wired into the living field
          rather than sitting inertly behind it. */
@@ -4022,11 +4402,25 @@
         labelCerebellum: "factCerebellum",
         labelBrainstem: "factBrainstem",
         labelThalamus: "factThalamus",
+        labelHippocampus: "factHippocampus",
+        labelAmygdala: "factAmygdala",
+        labelCallosum: "factCallosum",
+        labelHypothalamus: "factHypothalamus",
+        labelPituitary: "factPituitary",
+        labelPineal: "factPineal",
+        labelBasalGanglia: "factBasalGanglia",
+        labelPrefrontal: "factPrefrontal",
+        labelMotorCortex: "factMotorCortex",
+        labelVisualCortex: "factVisualCortex",
       };
+      /* Every clickable mesh remembers its own resting opacity so the
+         whole-brain function tour can dim/spotlight regions and cleanly
+         restore them afterwards. */
       function registerAnatClickable(obj, key) {
         const targets = obj.isGroup ? obj.children : [obj];
         targets.forEach((m) => {
           m.userData.anatKey = key;
+          m.userData.baseOpacity = m.material.opacity;
           anatClickables.push(m);
         });
       }
@@ -4035,6 +4429,19 @@
       registerAnatClickable(cerebellum, "labelCerebellum");
       registerAnatClickable(brainstem, "labelBrainstem");
       registerAnatClickable(thalamus, "labelThalamus");
+      registerAnatClickable(hippocampusLeft, "labelHippocampus");
+      registerAnatClickable(hippocampusRight, "labelHippocampus");
+      registerAnatClickable(amygdalaLeft, "labelAmygdala");
+      registerAnatClickable(amygdalaRight, "labelAmygdala");
+      registerAnatClickable(callosum, "labelCallosum");
+      registerAnatClickable(hypothalamus, "labelHypothalamus");
+      registerAnatClickable(pituitary, "labelPituitary");
+      registerAnatClickable(pineal, "labelPineal");
+      registerAnatClickable(basalGanglia1, "labelBasalGanglia");
+      registerAnatClickable(basalGanglia2, "labelBasalGanglia");
+      registerAnatClickable(prefrontalCortex, "labelPrefrontal");
+      registerAnatClickable(motorCortex, "labelMotorCortex");
+      registerAnatClickable(visualCortex, "labelVisualCortex");
 
       function rippleNearRegion(worldPos, count) {
         const sorted = fieldNeurons
@@ -4065,6 +4472,16 @@
         { key: "labelCerebellum", obj: cerebellum, accent: "#c77dff" },
         { key: "labelBrainstem", obj: brainstem, accent: "#ffd166" },
         { key: "labelThalamus", obj: thalamus, accent: "#ffe08a" },
+        { key: "labelHippocampus", obj: hippocampusLeft, accent: "#3ddc97" },
+        { key: "labelAmygdala", obj: amygdalaLeft, accent: "#ff8a5c" },
+        { key: "labelCallosum", obj: callosum, accent: "#a0c4ff" },
+        { key: "labelHypothalamus", obj: hypothalamus, accent: "#ffb347", secondary: true },
+        { key: "labelPituitary", obj: pituitary, accent: "#ffcf7a", secondary: true },
+        { key: "labelPineal", obj: pineal, accent: "#c39bff", secondary: true },
+        { key: "labelBasalGanglia", obj: basalGanglia1, accent: "#8ad6ff", secondary: true },
+        { key: "labelPrefrontal", obj: prefrontalCortex, accent: "#e8f7ff", secondary: true },
+        { key: "labelMotorCortex", obj: motorCortex, accent: "#ffdd88", secondary: true },
+        { key: "labelVisualCortex", obj: visualCortex, accent: "#ff9ad6", secondary: true },
       ];
       const anatLabelEls = {};
       const anatLabelsContainer = document.getElementById("anat-labels");
@@ -4080,8 +4497,13 @@
       function updateAnatLabels() {
         if (insideMode) return;
         const worldPos = new THREE.Vector3();
+        const hideSecondary = isCompactViewport() && !brainTourActive;
         anatLabelAnchors.forEach((a) => {
           const el = anatLabelEls[a.key];
+          if (a.secondary && hideSecondary && !(brainTourActive && brainTourFocusKeys.includes(a.key))) {
+            el.style.opacity = "0";
+            return;
+          }
           a.obj.getWorldPosition(worldPos);
           const projected = worldPos.clone().project(camera);
           if (projected.z > 1 || projected.z < -1) {
@@ -4309,6 +4731,50 @@
           },
         },
         {
+          position: new THREE.Vector3(38, 24, 46),
+          tag: null,
+          en: {
+            title: "Zooming Out: A Whole Brain",
+            narration:
+              "Pull back, and this single neuron turns out to be just one resident of something much bigger: a stylized brain, with a whole field of neurons of its own scattered across a cerebrum, a cerebellum, and a brainstem — every one of them wired the same basic way you just saw.",
+          },
+          es: {
+            title: "Alejando la Vista: Un Cerebro Completo",
+            narration:
+              "Al alejarte, esta única neurona resulta ser solo una habitante de algo mucho más grande: un cerebro estilizado, con todo un campo de neuronas propio repartido entre un cerebro (cerebrum), un cerebelo y un tronco encefálico — cada una conectada de la misma forma básica que acabas de ver.",
+          },
+        },
+        {
+          position: new THREE.Vector3(-34, -4, 30),
+          tag: null,
+          anatKey: "labelHippocampus",
+          en: {
+            title: "Hippocampus & Amygdala: Memory and Emotion",
+            narration:
+              "Tucked here, medially beneath the temporal lobes, the hippocampus turns today's experience into tomorrow's long-term memory. Right beside it, the amygdala decides how emotionally important a moment feels — which is a big part of why memories tied to fear or joy tend to stick so much harder than ordinary ones.",
+          },
+          es: {
+            title: "Hipocampo y Amígdala: Memoria y Emoción",
+            narration:
+              "Escondido aquí, de forma medial bajo los lóbulos temporales, el hipocampo convierte la experiencia de hoy en la memoria a largo plazo de mañana. Justo al lado, la amígdala decide cuán importante emocionalmente se siente un momento — por eso los recuerdos ligados al miedo o a la alegría suelen quedar grabados con mucha más fuerza que los comunes.",
+          },
+        },
+        {
+          position: new THREE.Vector3(14, -16, -60),
+          tag: null,
+          anatKey: "labelCerebellum",
+          en: {
+            title: "Cerebellum & Brainstem: Movement and Survival",
+            narration:
+              "Down at the back and base of the brain, the finely-wrinkled cerebellum fine-tunes balance, posture, and the exact timing of movement — it's why a trained pianist's fingers land precisely without conscious thought. Below it, the brainstem quietly runs the functions you never have to think about: breathing, heartbeat, and basic survival reflexes.",
+          },
+          es: {
+            title: "Cerebelo y Tronco Encefálico: Movimiento y Supervivencia",
+            narration:
+              "En la parte de atrás y la base del cerebro, el cerebelo, finamente plegado, afina el equilibrio, la postura y el ritmo exacto del movimiento — por eso los dedos de un pianista entrenado caen con precisión sin pensarlo. Debajo, el tronco encefálico gestiona en silencio las funciones en las que nunca piensas: respirar, el latido del corazón y los reflejos básicos de supervivencia.",
+          },
+        },
+        {
           position: desktopCameraPosition.clone(),
           tag: null,
           en: {
@@ -4324,8 +4790,13 @@
         },
       ];
 
-      TOUR_STOPS.forEach(() => {
+      TOUR_STOPS.forEach((stop, i) => {
         const dot = document.createElement("span");
+        dot.title = stop.en.title;
+        dot.addEventListener("click", () => {
+          if (!tourActive) startTour();
+          goToLeg(i);
+        });
         tourCaptionSteps.appendChild(dot);
       });
 
@@ -4395,6 +4866,19 @@
             if (tourActive && !STATE.isAnimating) triggerImpulse(null);
           }, LEG_TRAVEL_TIME * 550);
         }
+
+        if (stop.anatKey) {
+          setTimeout(() => {
+            if (!tourActive) return;
+            const anchor = anatLabelAnchors.find((a) => a.key === stop.anatKey);
+            if (!anchor) return;
+            const worldPos = new THREE.Vector3();
+            anchor.obj.getWorldPosition(worldPos);
+            ensureAudio();
+            playZap();
+            rippleNearRegion(worldPos, 3);
+          }, LEG_TRAVEL_TIME * 550);
+        }
       }
 
       function goToLeg(index) {
@@ -4406,6 +4890,7 @@
       }
 
       function startTour() {
+        if (typeof brainTourActive !== "undefined" && brainTourActive) endBrainTour();
         tourActive = true;
         tourPaused = false;
         tourPauseBtn.textContent = "\u23F8";
@@ -4485,6 +4970,354 @@
           beginLeg(tourLeg);
         }
       }
+
+      /* ================= Whole-brain function tour: an independent tour that
+         hides the single hero neuron and the scattered neuron field entirely,
+         leaving only the anatomical brain-region shells, and walks through
+         what each region actually does. Deliberately a separate, lightweight
+         system from the neuron tour above rather than a shared refactor, so
+         the original guided tour can never be destabilized by this one. ================= */
+      const btnBrainTour = document.getElementById("btn-brain-tour");
+      const brainTourCaptionEl = document.getElementById("brain-tour-caption");
+      const brainTourCaptionTitleText = document.getElementById("brain-tour-caption-title-text");
+      const brainTourSpeakingDot = document.getElementById("brain-tour-speaking-dot");
+      const brainTourCaptionText = document.getElementById("brain-tour-caption-text");
+      const brainTourCaptionBar = document.getElementById("brain-tour-caption-bar");
+      const brainTourCaptionSteps = document.getElementById("brain-tour-caption-steps");
+      const brainTourPrevBtn = document.getElementById("brain-tour-prev");
+      const brainTourPauseBtn = document.getElementById("brain-tour-pause");
+      const brainTourNextBtn = document.getElementById("brain-tour-next");
+      const brainTourExitBtn = document.getElementById("brain-tour-exit");
+
+      const BRAIN_TOUR_STOPS = [
+        {
+          position: new THREE.Vector3(70, 46, 100),
+          focus: [],
+          en: { title: "The Brain As A Whole", narration: "Instead of following one neuron, this tour steps back to see the whole organ: roughly 86 billion neurons organized into specialized regions that work together to produce everything you think, feel, and do." },
+          es: { title: "El Cerebro en su Conjunto", narration: "En lugar de seguir a una sola neurona, este recorrido se aleja para ver el órgano completo: unos 86 mil millones de neuronas organizadas en regiones especializadas que trabajan juntas para producir todo lo que piensas, sientes y haces." },
+        },
+        {
+          position: new THREE.Vector3(0, 46, 108),
+          focus: ["labelCerebrum"],
+          en: { title: "Cerebrum: The Thinking Cortex", narration: "The large, folded cerebrum is split into two hemispheres and four lobes. Its outer layer, the cortex, is where conscious thought, language, perception, and voluntary movement are organized." },
+          es: { title: "Cerebro: La Corteza Pensante", narration: "El gran cerebro, plegado sobre sí mismo, se divide en dos hemisferios y cuatro lóbulos. Su capa externa, la corteza, es donde se organizan el pensamiento consciente, el lenguaje, la percepción y el movimiento voluntario." },
+        },
+        {
+          position: new THREE.Vector3(0, 22, 92),
+          focus: ["labelPrefrontal"],
+          en: { title: "Prefrontal Cortex: Planning Ahead", narration: "Right behind the forehead, the prefrontal cortex weighs consequences, makes plans, and reins in impulses — one of the last regions of the brain to fully mature." },
+          es: { title: "Corteza Prefrontal: Planear el Futuro", narration: "Justo detrás de la frente, la corteza prefrontal evalúa consecuencias, hace planes y frena los impulsos — es una de las últimas regiones del cerebro en madurar por completo." },
+        },
+        {
+          position: new THREE.Vector3(50, 66, 30),
+          focus: ["labelMotorCortex"],
+          en: { title: "Motor Cortex: Commanding Movement", narration: "A narrow strip across the top of the brain, the motor cortex sends precise electrical commands down the spinal cord to the muscles, coordinating every voluntary movement you make." },
+          es: { title: "Corteza Motora: Ordenando el Movimiento", narration: "Una franja angosta que recorre la parte superior del cerebro, la corteza motora, envía órdenes eléctricas precisas por la médula espinal hacia los músculos, coordinando cada movimiento voluntario que haces." },
+        },
+        {
+          position: new THREE.Vector3(0, 24, -100),
+          focus: ["labelVisualCortex"],
+          en: { title: "Visual Cortex: Building Sight", narration: "At the very back of the brain, the visual cortex receives signals relayed from the eyes and assembles them into edges, color, motion, and ultimately the scene you perceive." },
+          es: { title: "Corteza Visual: Construyendo la Vista", narration: "En la parte más posterior del cerebro, la corteza visual recibe señales retransmitidas desde los ojos y las ensambla en bordes, color, movimiento y, finalmente, la escena que percibes." },
+        },
+        {
+          position: new THREE.Vector3(26, 14, 40),
+          focus: ["labelThalamus"],
+          en: { title: "Thalamus: The Relay Station", narration: "Almost every sensory signal — sight, sound, touch, taste — passes through the thalamus first, which filters and routes it up to the right patch of cortex." },
+          es: { title: "Tálamo: La Estación de Relevo", narration: "Casi toda señal sensorial — vista, oído, tacto, gusto — pasa primero por el tálamo, que la filtra y la envía hacia la zona correcta de la corteza." },
+        },
+        {
+          position: new THREE.Vector3(24, -10, 34),
+          focus: ["labelHypothalamus", "labelPituitary"],
+          en: { title: "Hypothalamus & Pituitary: The Control Center", narration: "Just below the thalamus, the hypothalamus monitors the body's internal state and commands the pituitary gland, the body's master hormone gland, to keep everything in balance." },
+          es: { title: "Hipotálamo y Pituitaria: El Centro de Control", narration: "Justo debajo del tálamo, el hipotálamo monitorea el estado interno del cuerpo y le ordena a la glándula pituitaria, la glándula maestra del cuerpo, mantener todo en equilibrio." },
+        },
+        {
+          position: new THREE.Vector3(30, 4, 26),
+          focus: ["labelBasalGanglia"],
+          en: { title: "Basal Ganglia: Habits and Reward", narration: "Deep clusters flanking the thalamus, the basal ganglia smooth out movement and sit at the center of how habits form and how the brain learns from reward." },
+          es: { title: "Ganglios Basales: Hábitos y Recompensa", narration: "Racimos profundos a los costados del tálamo, los ganglios basales suavizan el movimiento y son clave en cómo se forman los hábitos y cómo el cerebro aprende de la recompensa." },
+        },
+        {
+          position: new THREE.Vector3(-40, -2, 46),
+          focus: ["labelHippocampus", "labelAmygdala"],
+          en: { title: "Hippocampus & Amygdala: Memory and Emotion", narration: "Tucked beneath the temporal lobes, the hippocampus files today's experiences into long-term memory, while the neighboring amygdala tags which of those experiences carry emotional weight." },
+          es: { title: "Hipocampo y Amígdala: Memoria y Emoción", narration: "Escondidos bajo los lóbulos temporales, el hipocampo archiva las experiencias de hoy en la memoria a largo plazo, mientras la vecina amígdala marca cuáles de esas experiencias tienen peso emocional." },
+        },
+        {
+          position: new THREE.Vector3(18, 8, 16),
+          focus: ["labelPineal"],
+          en: { title: "Pineal Gland: The Body Clock", narration: "A tiny gland near the brain's center releases melatonin as light fades, anchoring the body's circadian rhythm to the cycle of day and night." },
+          es: { title: "Glándula Pineal: El Reloj del Cuerpo", narration: "Una diminuta glándula cerca del centro del cerebro libera melatonina cuando la luz disminuye, ajustando el ritmo circadiano del cuerpo al ciclo del día y la noche." },
+        },
+        {
+          position: new THREE.Vector3(20, -36, -96),
+          focus: ["labelCerebellum"],
+          en: { title: "Cerebellum: Balance and Timing", narration: "Tucked under the back of the brain, the densely-folded cerebellum fine-tunes balance, posture, and the exact timing of movement, refining the commands the motor cortex sends out." },
+          es: { title: "Cerebelo: Equilibrio y Sincronía", narration: "Ubicado bajo la parte posterior del cerebro, el cerebelo, densamente plegado, afina el equilibrio, la postura y el ritmo exacto del movimiento, refinando las órdenes que envía la corteza motora." },
+        },
+        {
+          position: new THREE.Vector3(0, -60, -46),
+          focus: ["labelBrainstem"],
+          en: { title: "Brainstem: Keeping You Alive", narration: "The brainstem bridges the brain to the spinal cord and quietly runs the functions you never consciously think about: breathing, heartbeat, and basic survival reflexes." },
+          es: { title: "Tronco Encefálico: Manteniéndote Vivo", narration: "El tronco encefálico conecta el cerebro con la médula espinal y gestiona en silencio las funciones en las que nunca piensas conscientemente: la respiración, el latido del corazón y los reflejos básicos de supervivencia." },
+        },
+        {
+          position: new THREE.Vector3(80, 50, 90),
+          focus: [],
+          en: { title: "A Symphony of Regions", narration: "None of these regions works alone — thought, movement, memory, and emotion all emerge from constant, high-speed conversation between every structure you just saw." },
+          es: { title: "Una Sinfonía de Regiones", narration: "Ninguna de estas regiones trabaja sola — el pensamiento, el movimiento, la memoria y la emoción emergen de una conversación constante y a gran velocidad entre cada estructura que acabas de ver." },
+        },
+      ];
+
+      BRAIN_TOUR_STOPS.forEach((stop, i) => {
+        const dot = document.createElement("span");
+        dot.title = stop.en.title;
+        dot.addEventListener("click", () => {
+          if (!brainTourActive) startBrainTour();
+          goToBrainLeg(i);
+        });
+        brainTourCaptionSteps.appendChild(dot);
+      });
+
+      let brainTourActive = false;
+      let brainTourPaused = false;
+      let brainTourLeg = 0;
+      let brainTourT = 0;
+      let brainTourStartPos = null;
+      let brainTourPrevAutoRotate = true;
+      let brainTourNarrationDone = true;
+      let brainTourLegDuration = 3.2;
+      let brainTourFocusKeys = [];
+      const BRAIN_LEG_TRAVEL_TIME = 3.0;
+
+      function beginBrainLeg(index) {
+        const stop = BRAIN_TOUR_STOPS[index];
+        const copy = stop[currentLang] || stop.en;
+        brainTourCaptionTitleText.textContent = copy.title;
+        brainTourCaptionText.textContent = copy.narration;
+        [...brainTourCaptionSteps.children].forEach((d, i) => {
+          d.classList.toggle("active", i === index);
+          d.classList.toggle("done", i < index);
+        });
+        brainTourFocusKeys = stop.focus || [];
+        brainTourCaptionEl.classList.add("open");
+        requestAnimationFrame(() => brainTourCaptionEl.classList.add("show"));
+        ariaStatus.textContent = `${copy.title}. ${copy.narration}`;
+
+        brainTourSpeakingDot.style.opacity = "1";
+        brainTourNarrationDone = false;
+        const spoke = speak(copy.narration, () => {
+          brainTourNarrationDone = true;
+          brainTourSpeakingDot.style.opacity = "0.25";
+        });
+        if (!spoke) {
+          setTimeout(() => {
+            brainTourNarrationDone = true;
+            brainTourSpeakingDot.style.opacity = "0.25";
+          }, estimateSpeechMs(copy.narration));
+        }
+        brainTourLegDuration = Math.max(BRAIN_LEG_TRAVEL_TIME, estimateSpeechMs(copy.narration) / 1000 + 0.6);
+
+        if (stop.focus && stop.focus.length) {
+          setTimeout(() => {
+            if (!brainTourActive) return;
+            ensureAudio();
+            playZap();
+            stop.focus.forEach((key) => {
+              const anchor = anatLabelAnchors.find((a) => a.key === key);
+              if (!anchor) return;
+              const worldPos = new THREE.Vector3();
+              anchor.obj.getWorldPosition(worldPos);
+              rippleNearRegion(worldPos, 2);
+            });
+          }, BRAIN_LEG_TRAVEL_TIME * 550);
+        }
+      }
+
+      function goToBrainLeg(index) {
+        stopSpeaking();
+        brainTourLeg = Math.max(0, Math.min(BRAIN_TOUR_STOPS.length - 1, index));
+        brainTourT = 0;
+        brainTourStartPos = camera.position.clone();
+        beginBrainLeg(brainTourLeg);
+      }
+
+      function startBrainTour() {
+        if (tourActive) endTour();
+        if (insideMode) setInsideMode(false);
+        brainTourActive = true;
+        brainTourPaused = false;
+        brainTourPauseBtn.textContent = "\u23F8";
+        brainTourLeg = 0;
+        brainTourT = 0;
+        brainTourStartPos = camera.position.clone();
+        brainTourPrevAutoRotate = controls.autoRotate;
+        controls.autoRotate = false;
+        controls.enabled = false;
+        btnBrainTour.classList.add("on");
+        btnBrainTour.textContent = "\u25A0";
+        networkGroup.visible = false;
+        brainBaseGroup.visible = false;
+        stopFactCycle();
+        beginBrainLeg(0);
+        maybeShowSwipeHint();
+      }
+      function endBrainTour() {
+        brainTourActive = false;
+        brainTourPaused = false;
+        controls.enabled = true;
+        controls.autoRotate = brainTourPrevAutoRotate;
+        btnBrainTour.classList.remove("on");
+        btnBrainTour.textContent = "\u25B6";
+        brainTourCaptionEl.classList.remove("show");
+        setTimeout(() => brainTourCaptionEl.classList.remove("open"), 400);
+        stopSpeaking();
+        brainTourFocusKeys = [];
+        brainTourCaptionBar.style.width = "0%";
+        [...brainTourCaptionSteps.children].forEach((d) => d.classList.remove("active", "done"));
+        networkGroup.visible = true;
+        brainBaseGroup.visible = true;
+        ariaStatus.textContent = t("braintourEnded");
+        startFactCycle();
+      }
+      btnBrainTour.addEventListener("click", () => {
+        if (brainTourActive) endBrainTour();
+        else startBrainTour();
+      });
+      brainTourPrevBtn.addEventListener("click", () => {
+        if (!brainTourActive) return;
+        goToBrainLeg(brainTourLeg - 1 < 0 ? 0 : brainTourLeg - 1);
+      });
+      brainTourNextBtn.addEventListener("click", () => {
+        if (!brainTourActive) return;
+        if (brainTourLeg + 1 >= BRAIN_TOUR_STOPS.length) endBrainTour();
+        else goToBrainLeg(brainTourLeg + 1);
+      });
+      brainTourPauseBtn.addEventListener("click", () => {
+        if (!brainTourActive) return;
+        brainTourPaused = !brainTourPaused;
+        brainTourPauseBtn.textContent = brainTourPaused ? "\u25B6" : "\u23F8";
+        if (brainTourPaused) window.speechSynthesis && window.speechSynthesis.pause();
+        else window.speechSynthesis && window.speechSynthesis.resume();
+      });
+      brainTourExitBtn.addEventListener("click", () => {
+        if (brainTourActive) endBrainTour();
+      });
+      function updateBrainTour(dt) {
+        if (!brainTourActive || brainTourPaused) return;
+        const from = brainTourLeg === 0 ? brainTourStartPos : BRAIN_TOUR_STOPS[brainTourLeg - 1].position;
+        const to = BRAIN_TOUR_STOPS[brainTourLeg].position;
+        const travelT = Math.min(1, brainTourT / BRAIN_LEG_TRAVEL_TIME);
+        const eased = travelT < 0.5 ? 2 * travelT * travelT : 1 - Math.pow(-2 * travelT + 2, 2) / 2;
+        camera.position.lerpVectors(from, to, eased);
+        camera.lookAt(0, 0, 0);
+
+        brainTourT += dt;
+        brainTourCaptionBar.style.width = `${Math.min(100, (brainTourT / brainTourLegDuration) * 100)}%`;
+
+        if (brainTourT >= brainTourLegDuration && brainTourNarrationDone) {
+          brainTourT = 0;
+          brainTourLeg++;
+          if (brainTourLeg >= BRAIN_TOUR_STOPS.length) {
+            endBrainTour();
+            return;
+          }
+          beginBrainLeg(brainTourLeg);
+        }
+      }
+
+      /* Spotlight: while the whole-brain tour is active, the focused
+         region(s) glow brighter and everything else dims, so the narration
+         always has an obvious visual anchor. Runs every frame but only does
+         real work (a lerp per material) while a brain-tour stop is focusing
+         something, and gently restores normal opacity otherwise. */
+      function updateAnatSpotlight() {
+        anatClickables.forEach((m) => {
+          const base = m.userData.baseOpacity ?? m.material.opacity;
+          let target = base;
+          if (brainTourActive) {
+            const focused = brainTourFocusKeys.includes(m.userData.anatKey);
+            target = focused ? Math.min(1, base * 2.6 + 0.08) : base * 0.3;
+          }
+          m.material.opacity += (target - m.material.opacity) * 0.09;
+        });
+      }
+
+      /* ================= Swipe gestures: on touch devices, a left/right
+         swipe over the caption steps through either active tour, mirroring
+         the prev/next buttons — handy since the buttons are small on phones. ================= */
+      const swipeHintEl = document.getElementById("tour-swipe-hint");
+      let swipeShown = false;
+      function maybeShowSwipeHint() {
+        if (swipeShown || !isCompactViewport()) return;
+        swipeShown = true;
+        swipeHintEl.textContent = t("swipeHint");
+        swipeHintEl.classList.add("show");
+        setTimeout(() => swipeHintEl.classList.remove("show"), 2200);
+      }
+      let touchStartX = null;
+      let touchStartY = null;
+      window.addEventListener(
+        "touchstart",
+        (e) => {
+          if (!tourActive && !brainTourActive) return;
+          if (e.touches.length !== 1) return;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        },
+        { passive: true }
+      );
+      window.addEventListener(
+        "touchend",
+        (e) => {
+          if (touchStartX === null) return;
+          if (!tourActive && !brainTourActive) {
+            touchStartX = null;
+            return;
+          }
+          const endX = e.changedTouches[0].clientX;
+          const endY = e.changedTouches[0].clientY;
+          const dx = endX - touchStartX;
+          const dy = endY - touchStartY;
+          touchStartX = null;
+          if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+          if (haptic) haptic(8);
+          if (tourActive) {
+            if (dx < 0) tourNextBtn.click();
+            else tourPrevBtn.click();
+          } else if (brainTourActive) {
+            if (dx < 0) brainTourNextBtn.click();
+            else brainTourPrevBtn.click();
+          }
+        },
+        { passive: true }
+      );
+
+      /* ================= Haptic feedback: short vibration pulses on key
+         interactions for touch devices that support the Vibration API. No-op
+         (and harmless) everywhere else, including iOS Safari. ================= */
+      function haptic(ms = 10) {
+        try {
+          if (navigator.vibrate) navigator.vibrate(ms);
+        } catch (err) {
+          /* ignore */
+        }
+      }
+      document.querySelectorAll(".tool-btn, .btn-trigger, .btn-secondary, .tour-nav-btn").forEach((btn) => {
+        btn.addEventListener("click", () => haptic(8));
+      });
+
+      /* ================= Mobile HUD collapse toggle ================= */
+      const hudLeftEl = document.getElementById("hud-left");
+      const hudLeftCollapseBtn = document.getElementById("hud-left-collapse");
+      hudLeftCollapseBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const collapsed = hudLeftEl.classList.toggle("collapsed");
+        hudLeftCollapseBtn.textContent = collapsed ? "▸" : "▾";
+        hudLeftCollapseBtn.title = t(collapsed ? "expandHud" : "collapseHud");
+        haptic(6);
+      });
 
       /* ================= Toast feedback ================= */
       const toastEl = document.getElementById("toast");
@@ -4572,6 +5405,10 @@
           case "T":
             btnTour.click();
             break;
+          case "g":
+          case "G":
+            btnBrainTour.click();
+            break;
           case "n":
           case "N":
             setNarration(!narrationEnabled);
@@ -4623,6 +5460,8 @@
             toggleBrainPanel(false);
             toggleLearningPanel(false);
             if (insideMode) setInsideMode(false);
+            if (tourActive) endTour();
+            if (brainTourActive) endBrainTour();
             break;
         }
       });
@@ -4745,6 +5584,8 @@
         uniforms.uHighlightAxon.value += (highlightTarget.axon - uniforms.uHighlightAxon.value) * 0.08;
 
         updateTour(dt);
+        updateBrainTour(dt);
+        updateAnatSpotlight();
         controls.update();
 
         dust.rotation.y = time * 0.02;
@@ -4772,6 +5613,16 @@
         const thalamusPulse = 1 + 0.16 * Math.sin(time * 2.2) + (STATE.isAnimating ? 0.3 : 0);
         thalamus.scale.setScalar(thalamusPulse);
         thalamusMat.opacity = 0.24 + 0.08 * Math.sin(time * 2.2) + (STATE.isAnimating ? 0.25 : 0);
+
+        /* Whole-brain "breathing": a slow, barely-there rotation plus a gentle
+           scale pulse across the anatomical shell, independent of the
+           thalamus's own firing-linked pulse — keeps the brain feeling alive
+           even when nobody is interacting with it. */
+        brainRegionsGroup.rotation.y = Math.sin(time * 0.02) * 0.035;
+        const brainBreathe = 1 + 0.01 * Math.sin(time * 0.35);
+        cerebrumLeft.scale.set(0.62 * brainBreathe, 0.72 * brainBreathe, 0.95 * brainBreathe);
+        cerebrumRight.scale.set(0.62 * brainBreathe, 0.72 * brainBreathe, 0.95 * brainBreathe);
+        cerebellum.scale.set(1.0 * brainBreathe, 0.62 * brainBreathe, 0.78 * brainBreathe);
 
         if (fieldConnMat) {
           fieldConnMat.opacity = 0.14 + 0.05 * Math.sin(time * 0.6) + 0.02 * Math.sin(time * 1.7);
