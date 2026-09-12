@@ -444,9 +444,19 @@
         top: clamp(52px, 8vw, 68px);
         right: clamp(12px, 3vw, 28px);
         z-index: 25;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: min-content;
         gap: 8px;
+        width: max-content;
+        max-width: calc(100vw - 16px);
+        padding: 8px;
+        background: rgba(8, 12, 20, 0.32);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        backdrop-filter: blur(16px) saturate(160%);
+        -webkit-backdrop-filter: blur(16px) saturate(160%);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
       }
       .tool-btn {
         width: 34px;
@@ -700,24 +710,23 @@
         }
 
         #toolbar {
-          top: max(38px, calc(env(safe-area-inset-top) + 32px));
+          top: max(36px, calc(env(safe-area-inset-top) + 30px));
           right: 8px;
-          flex-direction: row;
-          flex-wrap: wrap;
-          justify-content: flex-end;
-          width: 152px;
+          gap: 6px;
+          padding: 6px;
         }
         .tool-btn {
-          width: 28px;
-          height: 28px;
-          font-size: 12px;
+          width: 30px;
+          height: 30px;
+          font-size: 13px;
+          flex-shrink: 0;
         }
         .tool-btn-label {
           font-size: 5px;
         }
 
         #hud-left {
-          top: max(78px, calc(env(safe-area-inset-top) + 72px));
+          top: max(74px, calc(env(safe-area-inset-top) + 68px));
           left: 10px;
           right: auto;
           width: min(220px, calc(100vw - 20px));
@@ -1603,6 +1612,30 @@
         text-transform: uppercase;
         text-align: center;
       }
+      #explorer-hint {
+        position: absolute;
+        bottom: clamp(44px, 8vw, 64px);
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        z-index: 21;
+        width: min(360px, calc(100vw - 32px));
+        font-size: 10px;
+        letter-spacing: 0.6px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.85);
+        padding: 10px 16px;
+        text-align: center;
+        pointer-events: none;
+        opacity: 0;
+        display: none;
+        border-color: rgba(61, 220, 151, 0.35);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      #explorer-hint.show {
+        display: block;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
       #inside-hint.show {
         opacity: 1;
       }
@@ -1713,8 +1746,9 @@
       <button class="tool-btn on" id="btn-narration" data-i18n-title="tt_narration" title="Toggle AI narrator voice">🗣️</button>
       <button class="tool-btn" id="btn-screenshot" data-i18n-title="tt_screenshot" title="Save a screenshot">📷</button>
       <button class="tool-btn" id="btn-reset-cam" data-i18n-title="tt_reset" title="Reset camera">⟲</button>
-      <button class="tool-btn" id="btn-tour" data-i18n-title="tt_tour" title="Guided tour, narrated by AI">▶</button>
-      <button class="tool-btn" id="btn-brain-tour" data-i18n-title="tt_braintour" title="Whole-brain function tour (no neurons)">🗺️</button>
+      <button class="tool-btn" id="btn-tour" data-i18n-title="tt_tour" title="Guided tour, narrated by AI"><span id="btn-tour-icon">▶</span><span class="tool-btn-label">1</span></button>
+      <button class="tool-btn" id="btn-brain-tour" data-i18n-title="tt_braintour" title="Whole-brain function tour (no neurons)"><span id="btn-brain-tour-icon">🗺️</span><span class="tool-btn-label">2</span></button>
+      <button class="tool-btn" id="btn-explorer" data-i18n-title="tt_explorer" title="Explore brain parts freely — click any part to stimulate it">🧩</button>
       <button class="tool-btn" id="btn-inside" data-i18n-title="tt_inside" title="See inside the neuron">🔬</button>
       <button class="tool-btn" id="btn-brain" data-i18n-title="tt_brain" title="Real brain examples">🧠</button>
       <button class="tool-btn" id="btn-learning" data-i18n-title="tt_learning" title="How neurons learn together">🧬</button>
@@ -1848,6 +1882,7 @@
 
     <div id="tour-swipe-hint"></div>
     <div id="inside-hint"></div>
+    <div id="explorer-hint" class="hud-panel"></div>
     <div id="inside-labels"></div>
     <div id="anat-labels"></div>
 
@@ -1960,6 +1995,7 @@
       <div class="kbd-row"><span data-i18n="kbd_fire">Fire an impulse</span><span class="kbd-key">Space</span></div>
       <div class="kbd-row"><span data-i18n="kbd_tour">Start / stop narrated tour</span><span class="kbd-key">T</span></div>
       <div class="kbd-row"><span data-i18n="kbd_braintour">Whole-brain function tour</span><span class="kbd-key">G</span></div>
+      <div class="kbd-row"><span data-i18n="kbd_explorer">Explore brain parts</span><span class="kbd-key">E</span></div>
       <div class="kbd-row"><span data-i18n="kbd_narrator">Toggle AI narrator voice</span><span class="kbd-key">N</span></div>
       <div class="kbd-row"><span data-i18n="kbd_mute">Mute / unmute sound</span><span class="kbd-key">M</span></div>
       <div class="kbd-row"><span data-i18n="kbd_reset">Reset camera</span><span class="kbd-key">R</span></div>
@@ -2154,6 +2190,11 @@
           tt_braintour: "Whole-brain function tour — regions only, no neurons",
           kbd_braintour: "Whole-brain function tour",
           braintourEnded: "Whole-brain tour ended.",
+          tt_explorer: "Explore brain parts freely — click any part to stimulate it",
+          kbd_explorer: "Explore brain parts",
+          explorerHint: "Explorer mode: tap or click any brain region to stimulate it. Free camera — press E or tap 🧩 again to exit.",
+          explorerOn: "Brain explorer on — tap any region",
+          explorerOff: "Brain explorer off",
           swipeHint: "Swipe to navigate",
           collapseHud: "Collapse panel",
           expandHud: "Expand panel",
@@ -2296,6 +2337,11 @@
           tt_braintour: "Tour del cerebro completo — solo regiones, sin neuronas",
           kbd_braintour: "Tour del cerebro completo",
           braintourEnded: "El tour del cerebro completo ha terminado.",
+          tt_explorer: "Explora las partes del cerebro libremente — toca cualquier parte para estimularla",
+          kbd_explorer: "Explorar partes del cerebro",
+          explorerHint: "Modo explorador: toca o haz clic en cualquier región del cerebro para estimularla. Cámara libre — pulsa E o toca 🧩 de nuevo para salir.",
+          explorerOn: "Explorador activado — toca cualquier región",
+          explorerOff: "Explorador desactivado",
           swipeHint: "Desliza para navegar",
           collapseHud: "Contraer panel",
           expandHud: "Expandir panel",
@@ -4454,7 +4500,7 @@
         }
       }
 
-      function triggerAnatRegion(key) {
+      function triggerAnatRegion(key, mesh) {
         showToast(t(anatFactKeys[key] || key), 3200);
         ensureAudio();
         playZap();
@@ -4463,6 +4509,34 @@
           const worldPos = new THREE.Vector3();
           anchor.obj.getWorldPosition(worldPos);
           rippleNearRegion(worldPos, 3);
+        }
+        if (mesh) pulseRegionMesh(mesh);
+      }
+
+      /* "Stimulus" feedback: briefly bumps the scale of whichever region mesh
+         (or its shared fill+wire group) was just clicked, so a click reads as
+         an actual electrical/chemical nudge rather than just a toast. Cheap
+         to run every frame since the array is normally empty. */
+      const stimulusPulses = [];
+      function pulseRegionMesh(mesh) {
+        const target = mesh.parent && mesh.parent !== brainRegionsGroup ? mesh.parent : mesh;
+        if (!target.userData._baseScale) target.userData._baseScale = target.scale.clone();
+        const baseScale = target.userData._baseScale;
+        const existing = stimulusPulses.findIndex((p) => p.target === target);
+        if (existing !== -1) stimulusPulses.splice(existing, 1);
+        stimulusPulses.push({ target, baseScale, start: clock.getElapsedTime(), duration: 0.75 });
+      }
+      function updateStimulusPulses(time) {
+        for (let i = stimulusPulses.length - 1; i >= 0; i--) {
+          const p = stimulusPulses[i];
+          const tt = (time - p.start) / p.duration;
+          if (tt >= 1) {
+            p.target.scale.copy(p.baseScale);
+            stimulusPulses.splice(i, 1);
+            continue;
+          }
+          const bump = Math.sin(tt * Math.PI) * 0.4 * (1 - tt * 0.3);
+          p.target.scale.set(p.baseScale.x * (1 + bump), p.baseScale.y * (1 + bump), p.baseScale.z * (1 + bump));
         }
       }
 
@@ -4901,7 +4975,7 @@
         controls.autoRotate = false;
         controls.enabled = false;
         btnTour.classList.add("on");
-        btnTour.textContent = "\u25A0";
+        document.getElementById("btn-tour-icon").textContent = "\u25A0";
         stopFactCycle();
         beginLeg(0);
       }
@@ -4911,7 +4985,7 @@
         controls.enabled = true;
         controls.autoRotate = tourPrevAutoRotate;
         btnTour.classList.remove("on");
-        btnTour.textContent = "\u25B6";
+        document.getElementById("btn-tour-icon").textContent = "\u25B6";
         tourCaptionEl.classList.remove("show");
         setTimeout(() => tourCaptionEl.classList.remove("open"), 400);
         clearTourHighlight();
@@ -5156,7 +5230,7 @@
         controls.autoRotate = false;
         controls.enabled = false;
         btnBrainTour.classList.add("on");
-        btnBrainTour.textContent = "\u25A0";
+        document.getElementById("btn-brain-tour-icon").textContent = "\u25A0";
         networkGroup.visible = false;
         brainBaseGroup.visible = false;
         stopFactCycle();
@@ -5169,7 +5243,7 @@
         controls.enabled = true;
         controls.autoRotate = brainTourPrevAutoRotate;
         btnBrainTour.classList.remove("on");
-        btnBrainTour.textContent = "\u25B6";
+        document.getElementById("btn-brain-tour-icon").textContent = "\u25B6";
         brainTourCaptionEl.classList.remove("show");
         setTimeout(() => brainTourCaptionEl.classList.remove("open"), 400);
         stopSpeaking();
