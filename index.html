@@ -627,6 +627,454 @@
         display: block;
       }
 
+      /* ---------- Brain comparator panel (healthy vs. condition) ---------- */
+      #brain-compare-panel {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 40;
+        width: min(680px, calc(100vw - 24px));
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 20px 22px 18px;
+        display: none;
+      }
+      #brain-compare-panel.open {
+        display: block;
+      }
+      #brain-compare-panel h2 {
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin: 0 0 10px 0;
+      }
+      #brain-compare-close {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        background: none;
+        border: none;
+        pointer-events: auto;
+      }
+      #brain-compare-close:hover {
+        color: var(--cyan);
+      }
+      #bcmp-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .bcmp-pill {
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.7);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        pointer-events: auto;
+        touch-action: manipulation;
+      }
+      .bcmp-pill:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+      .bcmp-pill.active {
+        background: rgba(255, 170, 0, 0.18);
+        border-color: rgba(255, 170, 0, 0.55);
+        color: var(--gold);
+      }
+      #bcmp-subtitle {
+        font-size: 9.5px;
+        color: rgba(255, 255, 255, 0.45);
+        letter-spacing: 0.6px;
+        margin: -8px 0 12px 0;
+      }
+      .bcmp-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .bcmp-col {
+        flex: 1 1 260px;
+        min-width: 220px;
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 12px;
+        padding: 8px 8px 4px;
+      }
+      .bcmp-col-title {
+        font-size: 9px;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 2px;
+      }
+      .bcmp-col-title.normal {
+        color: var(--cyan);
+      }
+      .bcmp-col-title.condition {
+        color: #ff8a5c;
+      }
+      #bcmp-legend {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin: 10px 0 4px;
+        font-size: 8.5px;
+        color: rgba(255, 255, 255, 0.55);
+        flex-wrap: wrap;
+      }
+      #bcmp-legend span.dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+      #bcmp-summary {
+        font-size: 10px;
+        line-height: 1.55;
+        color: rgba(255, 255, 255, 0.75);
+        margin: 12px 0 10px;
+      }
+      #bcmp-notes {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 6px;
+      }
+      .bcmp-note-row {
+        display: flex;
+        gap: 8px;
+        font-size: 9.5px;
+        line-height: 1.4;
+        align-items: baseline;
+      }
+      .bcmp-note-swatch {
+        flex: 0 0 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 3px;
+      }
+      .bcmp-note-label {
+        flex: 0 0 auto;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .bcmp-note-text {
+        color: rgba(255, 255, 255, 0.6);
+      }
+      #bcmp-disclaimer {
+        font-size: 8.5px;
+        color: rgba(255, 255, 255, 0.35);
+        line-height: 1.5;
+        margin-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding-top: 8px;
+      }
+      #brain-to-compare-btn,
+      #compare-to-brain-btn {
+        width: 100%;
+        margin-top: 12px;
+        box-sizing: border-box;
+        text-align: center;
+      }
+
+      /* ---------- Lesion mode hint / control bar ---------- */
+      #lesion-hint {
+        position: absolute;
+        bottom: clamp(44px, 8vw, 64px);
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        z-index: 21;
+        width: min(380px, calc(100vw - 32px));
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.85);
+        padding: 10px 16px 12px;
+        text-align: center;
+        pointer-events: auto;
+        opacity: 0;
+        display: none;
+        border-color: rgba(255, 90, 90, 0.4);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      #lesion-hint.show {
+        display: block;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #lesion-hint-title {
+        color: #ff6b6b;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        font-size: 9px;
+        margin-bottom: 4px;
+      }
+      #lesion-reset-btn {
+        margin-top: 8px;
+        background: rgba(255, 90, 90, 0.12);
+        border: 1px solid rgba(255, 90, 90, 0.4);
+        color: #ff8a8a;
+        border-radius: 999px;
+        padding: 5px 14px;
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        pointer-events: auto;
+        touch-action: manipulation;
+      }
+      #lesion-reset-btn:hover {
+        background: rgba(255, 90, 90, 0.22);
+      }
+
+      /* ---------- Neurotransmitter pathway overlay hint / control bar ---------- */
+      #chem-hint {
+        position: absolute;
+        bottom: clamp(44px, 8vw, 64px);
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        z-index: 21;
+        width: min(380px, calc(100vw - 32px));
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.85);
+        padding: 10px 16px 12px;
+        text-align: center;
+        pointer-events: auto;
+        opacity: 0;
+        display: none;
+        border-color: rgba(160, 130, 255, 0.4);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      #chem-hint.show {
+        display: block;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #chem-hint-title {
+        color: #c3a6ff;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        font-size: 9px;
+        margin-bottom: 4px;
+      }
+      .chem-toggle-row {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      .chem-toggle {
+        border-radius: 999px;
+        padding: 5px 14px;
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        pointer-events: auto;
+        touch-action: manipulation;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.55);
+        opacity: 0.6;
+        transition: all 0.25s ease;
+      }
+      .chem-toggle-dopamine.on {
+        background: rgba(255, 178, 56, 0.18);
+        border-color: rgba(255, 178, 56, 0.65);
+        color: #ffcc80;
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(255, 178, 56, 0.4);
+      }
+      .chem-toggle-serotonin.on {
+        background: rgba(63, 232, 201, 0.18);
+        border-color: rgba(63, 232, 201, 0.65);
+        color: #8ff5e0;
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(63, 232, 201, 0.4);
+      }
+
+      /* ---------- Brain-states hint / control bar ---------- */
+      #state-hint {
+        position: absolute;
+        bottom: clamp(44px, 8vw, 64px);
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        z-index: 21;
+        width: min(380px, calc(100vw - 32px));
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.85);
+        padding: 10px 16px 12px;
+        text-align: center;
+        pointer-events: auto;
+        opacity: 0;
+        display: none;
+        border-color: rgba(122, 217, 255, 0.4);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      #state-hint.show {
+        display: block;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #state-hint-title {
+        color: #7ad9ff;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        font-size: 9px;
+        margin-bottom: 4px;
+      }
+      .state-btn-row {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      .state-btn {
+        border-radius: 999px;
+        padding: 5px 14px;
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        pointer-events: auto;
+        touch-action: manipulation;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: rgba(255, 255, 255, 0.65);
+        transition: all 0.25s ease;
+      }
+      /* ---------- Brain activity dashboard ---------- */
+      #activity-panel {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 40;
+        width: min(460px, calc(100vw - 24px));
+        max-height: 88vh;
+        overflow-y: auto;
+        padding: 20px 22px 18px;
+        display: none;
+      }
+      #activity-panel.open {
+        display: block;
+      }
+      #activity-panel h2 {
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin: 0 0 6px 0;
+      }
+      #activity-close {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        background: none;
+        border: none;
+        pointer-events: auto;
+      }
+      #activity-close:hover {
+        color: var(--cyan);
+      }
+      #activity-subtitle {
+        font-size: 9.5px;
+        color: rgba(255, 255, 255, 0.45);
+        line-height: 1.5;
+        margin-bottom: 12px;
+      }
+      .activity-section-title {
+        font-size: 9px;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
+        margin: 14px 0 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding-top: 10px;
+      }
+      .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .activity-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .activity-label {
+        flex: 0 0 108px;
+        font-size: 9.5px;
+        color: rgba(255, 255, 255, 0.75);
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .activity-track {
+        flex: 1 1 auto;
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        position: relative;
+      }
+      .activity-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        transition: width 0.25s ease;
+        box-shadow: 0 0 6px currentColor;
+      }
+      .activity-pct {
+        flex: 0 0 30px;
+        text-align: right;
+        font-size: 9px;
+        color: rgba(255, 255, 255, 0.5);
+        font-variant-numeric: tabular-nums;
+      }
+      #activity-disclaimer {
+        font-size: 8.5px;
+        color: rgba(255, 255, 255, 0.35);
+        line-height: 1.5;
+        margin-top: 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding-top: 8px;
+      }
+
+      .state-btn.active {
+        background: rgba(122, 217, 255, 0.2);
+        border-color: rgba(122, 217, 255, 0.7);
+        color: #d8f2ff;
+        box-shadow: 0 0 10px rgba(122, 217, 255, 0.4);
+      }
+
       #cursor {
         position: fixed;
         top: 0;
@@ -1751,6 +2199,11 @@
       <button class="tool-btn" id="btn-explorer" data-i18n-title="tt_explorer" title="Explore brain parts freely — click any part to stimulate it">🧩</button>
       <button class="tool-btn" id="btn-inside" data-i18n-title="tt_inside" title="See inside the neuron">🔬</button>
       <button class="tool-btn" id="btn-brain" data-i18n-title="tt_brain" title="Real brain examples">🧠</button>
+      <button class="tool-btn" id="btn-brain-compare" data-i18n-title="tt_braincompare" title="Compare brains: healthy vs. a condition">🆚</button>
+      <button class="tool-btn" id="btn-lesion" data-i18n-title="tt_lesion" title="Lesion mode: simulate regional brain damage">🩹</button>
+      <button class="tool-btn" id="btn-chem" data-i18n-title="tt_chem" title="Neurotransmitter pathways overlay">🧪</button>
+      <button class="tool-btn" id="btn-brainstate" data-i18n-title="tt_brainstate" title="Brain states: sleep, stress, focus">🌗</button>
+      <button class="tool-btn" id="btn-activity" data-i18n-title="tt_activity" title="Brain activity dashboard">📊</button>
       <button class="tool-btn" id="btn-learning" data-i18n-title="tt_learning" title="How neurons learn together">🧬</button>
       <button class="tool-btn" id="btn-compare" data-i18n-title="tt_compare" title="Compare to an artificial neuron">⇄</button>
       <button class="tool-btn" id="btn-theme" data-i18n-title="tt_theme" title="Toggle dusk mode">☾</button>
@@ -1950,6 +2403,61 @@
         </span>
         <button class="brain-nav-btn" id="brain-next" data-i18n="brain_next">Next ›</button>
       </div>
+      <button class="brain-nav-btn" id="brain-to-compare-btn" data-i18n="btn_open_braincompare">🆚 Compare: healthy brain vs. a condition</button>
+    </div>
+
+    <div id="brain-compare-panel" class="hud-panel">
+      <button id="brain-compare-close" title="Close">✕</button>
+      <h2 data-i18n="bcmp_title">Brain Comparator: Healthy vs. a Condition</h2>
+      <div id="bcmp-pills"></div>
+      <div id="bcmp-subtitle"></div>
+      <div class="bcmp-row">
+        <div class="bcmp-col">
+          <div class="bcmp-col-title normal" data-i18n="bcmp_normal">Typical Brain</div>
+          <svg id="bcmp-svg-normal" viewBox="0 0 240 200" width="100%" height="auto"></svg>
+        </div>
+        <div class="bcmp-col">
+          <div class="bcmp-col-title condition" id="bcmp-condition-title">Condition</div>
+          <svg id="bcmp-svg-condition" viewBox="0 0 240 200" width="100%" height="auto"></svg>
+        </div>
+      </div>
+      <div id="bcmp-legend">
+        <span><span class="dot" style="background:#ff8a5c;"></span><span data-i18n="bcmp_legend_hyper">Higher than typical activity</span></span>
+        <span><span class="dot" style="background:rgba(255,255,255,0.5);"></span><span data-i18n="bcmp_legend_normal">Typical activity</span></span>
+        <span><span class="dot" style="background:#5b8dff;"></span><span data-i18n="bcmp_legend_hypo">Lower than typical activity</span></span>
+      </div>
+      <p id="bcmp-summary"></p>
+      <div id="bcmp-notes"></div>
+      <button class="brain-nav-btn" id="compare-to-brain-btn" data-i18n="btn_open_brainexamples">🧠 See real brain examples</button>
+      <p id="bcmp-disclaimer" data-i18n="bcmp_disclaimer">
+        Simplified for teaching purposes. Real brains — and how a condition shows up in any one person — vary far more than any single diagram can capture. This is not a diagnostic tool.
+      </p>
+    </div>
+
+    <div id="lesion-hint" class="hud-panel">
+      <div id="lesion-hint-title" data-i18n="lesion_hint_title">Lesion Mode</div>
+      <div id="lesion-hint-text" data-i18n="lesion_hint_default">Tap any brain region to simulate damaging it and see what that region normally contributes.</div>
+      <button id="lesion-reset-btn" data-i18n="lesion_reset_btn">Reset brain</button>
+    </div>
+
+    <div id="chem-hint" class="hud-panel">
+      <div id="chem-hint-title" data-i18n="chem_hint_title">Neurotransmitter Pathways</div>
+      <div id="chem-hint-text" data-i18n="chem_hint_default">Toggle a system below to trace its pathway through the brain.</div>
+      <div class="chem-toggle-row">
+        <button class="chem-toggle chem-toggle-dopamine" id="chem-toggle-dopamine" data-i18n="chem_toggle_dopamine">● Dopamine</button>
+        <button class="chem-toggle chem-toggle-serotonin" id="chem-toggle-serotonin" data-i18n="chem_toggle_serotonin">● Serotonin</button>
+      </div>
+    </div>
+
+    <div id="state-hint" class="hud-panel">
+      <div id="state-hint-title" data-i18n="state_hint_title">Brain States</div>
+      <div id="state-hint-text" data-i18n="state_hint_default">Pick a state to see which regions light up and why.</div>
+      <div class="state-btn-row">
+        <button class="state-btn" id="state-btn-sleep" data-i18n="state_btn_sleep">😴 Sleep</button>
+        <button class="state-btn" id="state-btn-stress" data-i18n="state_btn_stress">😰 Stress</button>
+        <button class="state-btn" id="state-btn-focus" data-i18n="state_btn_focus">🎯 Focus</button>
+        <button class="state-btn" id="state-btn-off" data-i18n="state_btn_off">Off</button>
+      </div>
     </div>
 
     <div id="learning-panel" class="hud-panel">
@@ -1989,6 +2497,19 @@
       </div>
     </div>
 
+    <div id="activity-panel" class="hud-panel">
+      <button id="activity-close" title="Close">✕</button>
+      <h2 data-i18n="activity_title">Brain Activity Dashboard</h2>
+      <div id="activity-subtitle" data-i18n="activity_subtitle">Live, simplified activity per region — driven by firing, an active state, or an active pathway.</div>
+      <div class="activity-section-title" data-i18n="activity_regions_title">Regions</div>
+      <div id="activity-regions" class="activity-list"></div>
+      <div class="activity-section-title" data-i18n="activity_chem_title">Neurotransmitter Systems</div>
+      <div id="activity-chem" class="activity-list"></div>
+      <p id="activity-disclaimer" data-i18n="activity_disclaimer">
+        Simplified for teaching purposes — a stylized summary of what's active elsewhere in this piece, not a measurement of real neural activity.
+      </p>
+    </div>
+
     <div id="help-panel" class="hud-panel">
       <button id="help-close" title="Close" style="position:absolute; top:10px; right:12px; font-size:14px; color:rgba(255,255,255,0.5); cursor:pointer; background:none; border:none; pointer-events:auto;">✕</button>
       <h2 data-i18n="help_title">Keyboard Shortcuts</h2>
@@ -2003,6 +2524,11 @@
       <div class="kbd-row"><span data-i18n="kbd_compare">Compare bio vs. artificial</span><span class="kbd-key">C</span></div>
       <div class="kbd-row"><span data-i18n="kbd_inside">See inside the neuron</span><span class="kbd-key">I</span></div>
       <div class="kbd-row"><span data-i18n="kbd_brain">Brain examples</span><span class="kbd-key">B</span></div>
+      <div class="kbd-row"><span data-i18n="kbd_braincompare">Compare healthy vs. condition</span><span class="kbd-key">V</span></div>
+      <div class="kbd-row"><span data-i18n="kbd_lesion">Lesion mode</span><span class="kbd-key">X</span></div>
+      <div class="kbd-row"><span data-i18n="kbd_chem">Neurotransmitter pathways</span><span class="kbd-key">P</span></div>
+      <div class="kbd-row"><span data-i18n="kbd_brainstate">Brain states</span><span class="kbd-key">S</span></div>
+      <div class="kbd-row"><span data-i18n="kbd_activity">Activity dashboard</span><span class="kbd-key">A</span></div>
       <div class="kbd-row"><span data-i18n="kbd_learning">How learning works</span><span class="kbd-key">K</span></div>
       <div class="kbd-row"><span data-i18n="kbd_lang">Switch language</span><span class="kbd-key">L</span></div>
       <div class="kbd-row"><span data-i18n="kbd_hide">Hide / show interface</span><span class="kbd-key">H</span></div>
@@ -2227,6 +2753,57 @@
           effectPrefrontal: "A pulse here can momentarily sharpen or scramble planning and decision-making, since this region governs judgment and impulse control.",
           effectMotorCortex: "The classic result from early brain-mapping surgery: a pulse here twitches one very specific muscle on the opposite side of the body.",
           effectVisualCortex: "Stimulating it can conjure phantom flashes of light or color — called phosphenes — with no actual light entering the eyes.",
+          tt_braincompare: "Compare brains: healthy vs. a condition",
+          kbd_braincompare: "Compare healthy vs. condition",
+          tt_lesion: "Lesion mode: simulate regional brain damage",
+          kbd_lesion: "Lesion mode",
+          btn_open_braincompare: "🆚 Compare: healthy brain vs. a condition",
+          btn_open_brainexamples: "🧠 See real brain examples",
+          bcmp_title: "Brain Comparator: Healthy vs. a Condition",
+          bcmp_normal: "Typical Brain",
+          bcmp_legend_hyper: "Higher than typical activity",
+          bcmp_legend_normal: "Typical activity",
+          bcmp_legend_hypo: "Lower than typical activity",
+          bcmp_disclaimer:
+            "Simplified for teaching purposes. Real brains — and how a condition shows up in any one person — vary far more than any single diagram can capture. This is not a diagnostic tool.",
+          lesion_hint_title: "Lesion Mode",
+          lesion_hint_default: "Tap any brain region to simulate damaging it and see what that region normally contributes.",
+          lesion_reset_btn: "Reset brain",
+          toastLesionOn: "Lesion mode on — tap a brain region to \"damage\" it",
+          toastLesionOff: "Lesion mode off",
+          toastLesionRestored: "Region restored to normal",
+          toastBrainReset: "Brain fully restored",
+          tt_chem: "Neurotransmitter pathways overlay",
+          kbd_chem: "Neurotransmitter pathways",
+          chem_hint_title: "Neurotransmitter Pathways",
+          chem_hint_default: "Toggle a system below to trace its pathway through the brain.",
+          chem_toggle_dopamine: "● Dopamine",
+          chem_toggle_serotonin: "● Serotonin",
+          chem_desc_dopamine: "Dopamine pathways run from deep midbrain nuclei up through the basal ganglia and out to the prefrontal cortex — central to motivation, reward, and voluntary movement.",
+          chem_desc_serotonin: "Serotonin pathways start in the brainstem's raphe nuclei and fan out widely — to the thalamus, hippocampus, amygdala, and prefrontal cortex — helping regulate mood, sleep, and appetite.",
+          toastChemDopamineOn: "Dopamine pathway highlighted",
+          toastChemDopamineOff: "Dopamine pathway hidden",
+          toastChemSerotoninOn: "Serotonin pathway highlighted",
+          toastChemSerotoninOff: "Serotonin pathway hidden",
+          tt_brainstate: "Brain states: sleep, stress, focus",
+          kbd_brainstate: "Brain states",
+          state_hint_title: "Brain States",
+          state_hint_default: "Pick a state to see which regions light up and why.",
+          state_btn_sleep: "😴 Sleep",
+          state_btn_stress: "😰 Stress",
+          state_btn_focus: "🎯 Focus",
+          state_btn_off: "Off",
+          state_desc_sleep: "During sleep, the thalamus dials down incoming senses, the hypothalamus and pineal gland drive the sleep-wake rhythm, and the brainstem keeps arousal low.",
+          state_desc_stress: "Under stress, the amygdala flags threat, and the hypothalamus and pituitary launch the body's stress-hormone response — while prefrontal control tends to take a back seat.",
+          state_desc_focus: "During focused concentration, the prefrontal cortex directs attention, the basal ganglia help select and sustain the right actions, and the thalamus sharpens which signals get through.",
+          toastStateOff: "Brain state cleared",
+          tt_activity: "Brain activity dashboard",
+          kbd_activity: "Activity dashboard",
+          activity_title: "Brain Activity Dashboard",
+          activity_subtitle: "Live, simplified activity per region — driven by firing, an active state, or an active pathway.",
+          activity_regions_title: "Regions",
+          activity_chem_title: "Neurotransmitter Systems",
+          activity_disclaimer: "Simplified for teaching purposes — a stylized summary of what's active elsewhere in this piece, not a measurement of real neural activity.",
         },
         es: {
           title: "Catedral Neuronal",
@@ -2389,6 +2966,57 @@
           effectPrefrontal: "Un pulso aquí puede agudizar o desordenar momentáneamente la planificación y la toma de decisiones, ya que esta región gobierna el juicio y el control de impulsos.",
           effectMotorCortex: "El resultado clásico de las primeras cirugías de mapeo cerebral: un pulso aquí hace contraer un músculo muy específico del lado opuesto del cuerpo.",
           effectVisualCortex: "Estimularla puede provocar destellos fantasma de luz o color — llamados fosfenos — sin que entre luz real por los ojos.",
+          tt_braincompare: "Comparar cerebros: normal vs. una condición",
+          kbd_braincompare: "Comparar normal vs. condición",
+          tt_lesion: "Modo lesión: simular daño en una región",
+          kbd_lesion: "Modo lesión",
+          btn_open_braincompare: "🆚 Comparar: cerebro normal vs. una condición",
+          btn_open_brainexamples: "🧠 Ver ejemplos reales del cerebro",
+          bcmp_title: "Comparador de Cerebros: Normal vs. una Condición",
+          bcmp_normal: "Cerebro Típico",
+          bcmp_legend_hyper: "Actividad mayor a lo típico",
+          bcmp_legend_normal: "Actividad típica",
+          bcmp_legend_hypo: "Actividad menor a lo típico",
+          bcmp_disclaimer:
+            "Simplificado con fines educativos. Los cerebros reales — y cómo se manifiesta una condición en cada persona — varían mucho más de lo que cualquier diagrama puede mostrar. Esto no es una herramienta de diagnóstico.",
+          lesion_hint_title: "Modo Lesión",
+          lesion_hint_default: "Toca cualquier región del cerebro para simular un daño y descubrir qué función normalmente cumple.",
+          lesion_reset_btn: "Restaurar cerebro",
+          toastLesionOn: "Modo lesión activado — toca una región para \"dañarla\"",
+          toastLesionOff: "Modo lesión desactivado",
+          toastLesionRestored: "Región restaurada a la normalidad",
+          toastBrainReset: "Cerebro completamente restaurado",
+          tt_chem: "Overlay de rutas de neurotransmisores",
+          kbd_chem: "Rutas de neurotransmisores",
+          chem_hint_title: "Rutas de Neurotransmisores",
+          chem_hint_default: "Activa un sistema para trazar su ruta a través del cerebro.",
+          chem_toggle_dopamine: "● Dopamina",
+          chem_toggle_serotonin: "● Serotonina",
+          chem_desc_dopamine: "Las rutas dopaminérgicas van desde núcleos profundos del mesencéfalo, pasando por los ganglios basales, hasta la corteza prefrontal — clave en la motivación, la recompensa y el movimiento voluntario.",
+          chem_desc_serotonin: "Las rutas serotoninérgicas nacen en los núcleos del rafe del tronco encefálico y se extienden ampliamente — hacia el tálamo, el hipocampo, la amígdala y la corteza prefrontal — ayudando a regular el ánimo, el sueño y el apetito.",
+          toastChemDopamineOn: "Ruta dopaminérgica resaltada",
+          toastChemDopamineOff: "Ruta dopaminérgica oculta",
+          toastChemSerotoninOn: "Ruta serotoninérgica resaltada",
+          toastChemSerotoninOff: "Ruta serotoninérgica oculta",
+          tt_brainstate: "Estados del cerebro: sueño, estrés, concentración",
+          kbd_brainstate: "Estados del cerebro",
+          state_hint_title: "Estados del Cerebro",
+          state_hint_default: "Elige un estado para ver qué regiones se activan y por qué.",
+          state_btn_sleep: "😴 Sueño",
+          state_btn_stress: "😰 Estrés",
+          state_btn_focus: "🎯 Concentración",
+          state_btn_off: "Apagar",
+          state_desc_sleep: "Durante el sueño, el tálamo reduce la entrada de señales sensoriales, el hipotálamo y la glándula pineal marcan el ritmo de sueño-vigilia, y el tronco encefálico mantiene baja la activación general.",
+          state_desc_stress: "Bajo estrés, la amígdala detecta la amenaza, y el hipotálamo y la pituitaria activan la respuesta hormonal del cuerpo — mientras el control prefrontal suele quedar en segundo plano.",
+          state_desc_focus: "Durante la concentración, la corteza prefrontal dirige la atención, los ganglios basales ayudan a seleccionar y sostener las acciones adecuadas, y el tálamo afina qué señales pasan.",
+          toastStateOff: "Estado cerebral desactivado",
+          tt_activity: "Panel de actividad cerebral",
+          kbd_activity: "Panel de actividad",
+          activity_title: "Panel de Actividad Cerebral",
+          activity_subtitle: "Actividad simplificada en vivo por región — impulsada por el disparo neuronal, un estado activo o una ruta activa.",
+          activity_regions_title: "Regiones",
+          activity_chem_title: "Sistemas de Neurotransmisores",
+          activity_disclaimer: "Simplificado con fines educativos — un resumen estilizado de lo que está activo en el resto de esta pieza, no una medición de actividad neuronal real.",
         },
       };
 
@@ -2427,8 +3055,12 @@
         if (typeof refreshLifetimeStats === "function") refreshLifetimeStats();
         if (typeof updateCompass === "function") updateCompass();
         if (typeof renderBrainCard === "function" && brainPanelEl.classList.contains("open")) renderBrainCard();
+        if (typeof renderBrainCompare === "function" && brainComparePanelEl.classList.contains("open")) renderBrainCompare();
         if (typeof renderLearningStep === "function" && learningPanelEl.classList.contains("open")) renderLearningStep(learningIndex);
         if (typeof tourActive !== "undefined" && tourActive && typeof beginLeg === "function") beginLeg(tourLeg);
+        if (typeof refreshChemHint === "function") refreshChemHint();
+        if (typeof refreshStateHint === "function") refreshStateHint();
+        if (typeof refreshActivityLabels === "function") refreshActivityLabels();
         setTimeout(populateVoiceOptions, 50);
         showToast(t("toastLang"));
       }
@@ -2660,7 +3292,9 @@
           comparePanel.classList.contains("open") ||
           document.getElementById("help-panel").classList.contains("open") ||
           document.getElementById("brain-panel").classList.contains("open") ||
-          document.getElementById("learning-panel").classList.contains("open");
+          document.getElementById("brain-compare-panel").classList.contains("open") ||
+          document.getElementById("learning-panel").classList.contains("open") ||
+          document.getElementById("activity-panel").classList.contains("open");
         compareBackdrop.classList.toggle("open", anyOpen);
       }
       function toggleCompare(open) {
@@ -2669,7 +3303,9 @@
         if (open) {
           toggleHelp(false, true);
           toggleBrainPanel(false, true);
+          toggleBrainCompare(false, true);
           toggleLearningPanel(false, true);
+          if (typeof toggleActivityPanel === "function") toggleActivityPanel(false, true);
         }
         refreshModalBackdrop();
       }
@@ -2679,7 +3315,9 @@
         toggleCompare(false);
         toggleHelp(false);
         toggleBrainPanel(false);
+        toggleBrainCompare(false);
         toggleLearningPanel(false);
+        if (typeof toggleActivityPanel === "function") toggleActivityPanel(false);
       });
 
       /* ================= Inside-the-neuron toggle button ================= */
@@ -2770,9 +3408,11 @@
         if (open) {
           renderBrainCard();
           if (!skipCloseOthers) {
-            toggleCompare(false);
+            toggleCompare(false, true);
             toggleHelp(false, true);
+            toggleBrainCompare(false, true);
             toggleLearningPanel(false, true);
+            if (typeof toggleActivityPanel === "function") toggleActivityPanel(false, true);
           }
         } else {
           stopSpeaking();
@@ -2798,6 +3438,275 @@
         const card = BRAIN_EXAMPLES[currentLang][brainIndex];
         brainSpeakBtn.classList.add("on");
         speak(`${card.title}. ${card.text}`, () => brainSpeakBtn.classList.remove("on"));
+      });
+
+      /* ================= Brain Comparator: healthy vs. a condition =================
+         A compact, bilingual, educational side-by-side of a "typical" schematic brain
+         and the same schematic with a few well-established regions shown as more or
+         less active, for a handful of conditions. Deliberately simplified — this is a
+         teaching aid, not a diagnostic or clinical claim about any individual. Region
+         set and accent colors mirror the anatomical regions already used in the 3D
+         scene (labelPrefrontal, labelBasalGanglia, labelHippocampus, labelAmygdala,
+         labelCerebellum) so the vocabulary stays consistent across the whole piece. */
+      const BCMP_REGIONS = [
+        { key: "prefrontal", labelKey: "labelPrefrontal", accent: "#e8f7ff", cx: 62, cy: 60, r: 20 },
+        { key: "basal", labelKey: "labelBasalGanglia", accent: "#8ad6ff", cx: 110, cy: 95, r: 14 },
+        { key: "hippocampus", labelKey: "labelHippocampus", accent: "#3ddc97", cx: 140, cy: 118, r: 12 },
+        { key: "amygdala", labelKey: "labelAmygdala", accent: "#ff8a5c", cx: 118, cy: 128, r: 9 },
+        { key: "cerebellum", labelKey: "labelCerebellum", accent: "#c77dff", cx: 195, cy: 148, r: 20 },
+      ];
+      const BCMP_REGION_BY_KEY = Object.fromEntries(BCMP_REGIONS.map((r) => [r.key, r]));
+
+      const BRAIN_CONDITIONS = {
+        en: {
+          adhd: {
+            name: "ADHD",
+            subtitle: "Attention-Deficit/Hyperactivity Disorder",
+            summary:
+              "On average, imaging studies find under-activity and slower maturation in circuits that plan, focus, and inhibit impulses, alongside atypical dopamine signaling in reward-related regions.",
+            regions: {
+              prefrontal: { level: -0.6, note: "Reduced activation — makes it harder to sustain focus and inhibit impulses." },
+              basal: { level: -0.4, note: "Atypical dopamine signaling disrupts reward-based self-control and motivation." },
+              cerebellum: { level: -0.3, note: "Slightly reduced volume in some studies; linked to timing and attention." },
+              hippocampus: { level: 0, note: "Usually close to typical activity." },
+              amygdala: { level: 0.1, note: "Roughly typical, occasionally mildly reactive." },
+            },
+          },
+          alzheimers: {
+            name: "Alzheimer's",
+            subtitle: "Progressive neurodegenerative disease",
+            summary:
+              "Amyloid and tau buildup progressively damages neurons, usually starting in memory circuits and spreading outward — imaging shows shrinkage and reduced activity, not just altered activity.",
+            regions: {
+              hippocampus: { level: -0.9, note: "Early, severe shrinkage and under-activity — the hallmark of Alzheimer's memory loss." },
+              prefrontal: { level: -0.35, note: "Activity drops as the disease progresses, affecting judgment and planning." },
+              amygdala: { level: -0.2, note: "Mild volume loss, usually appearing in later stages." },
+              basal: { level: -0.2, note: "Reduced activity contributes to slowed thinking." },
+              cerebellum: { level: -0.05, note: "Relatively spared until quite late in the disease." },
+            },
+          },
+          parkinsons: {
+            name: "Parkinson's",
+            subtitle: "Movement disorder",
+            summary:
+              "Loss of dopamine-producing neurons feeding the basal ganglia disrupts the circuit that smooths and initiates movement, producing tremor, stiffness, and slowed motion.",
+            regions: {
+              basal: { level: -0.85, note: "Dopamine neuron loss here is the core problem — it drives tremor, stiffness, and slow movement." },
+              cerebellum: { level: 0.2, note: "Sometimes shows compensatory over-activity, trying to smooth out lost basal-ganglia timing." },
+              prefrontal: { level: -0.2, note: "Mild reductions later on can affect planning and processing speed." },
+              hippocampus: { level: -0.05, note: "Usually close to typical, especially early on." },
+              amygdala: { level: 0, note: "Typically close to typical activity." },
+            },
+          },
+          depression: {
+            name: "Depression",
+            subtitle: "Major depressive disorder",
+            summary:
+              "A common pattern is a quieter prefrontal cortex paired with an over-reactive amygdala — weaker top-down control over a heightened threat/negative-emotion signal — plus mild stress-related hippocampal changes.",
+            regions: {
+              prefrontal: { level: -0.45, note: "Reduced activity, especially in circuits that regulate mood and dampen negative emotion." },
+              amygdala: { level: 0.55, note: "Over-reactive to negative or threatening cues, even mild ones." },
+              hippocampus: { level: -0.25, note: "Chronic stress hormones are linked to mild volume reduction here." },
+              basal: { level: -0.2, note: "Reduced reward-circuit response, part of why pleasure feels blunted." },
+              cerebellum: { level: 0, note: "Usually close to typical activity." },
+            },
+          },
+        },
+        es: {
+          adhd: {
+            name: "TDAH",
+            subtitle: "Trastorno por Déficit de Atención e Hiperactividad",
+            summary:
+              "En promedio, los estudios de imagen muestran menor actividad y una maduración más lenta en los circuitos que planifican, enfocan e inhiben impulsos, junto con una señalización atípica de dopamina en regiones de recompensa.",
+            regions: {
+              prefrontal: { level: -0.6, note: "Activación reducida — dificulta sostener el foco e inhibir impulsos." },
+              basal: { level: -0.4, note: "La señalización atípica de dopamina altera el autocontrol y la motivación basados en recompensa." },
+              cerebellum: { level: -0.3, note: "Volumen ligeramente reducido en algunos estudios; asociado a la sincronización y la atención." },
+              hippocampus: { level: 0, note: "Suele estar cerca de la actividad típica." },
+              amygdala: { level: 0.1, note: "Aproximadamente típica, a veces algo más reactiva." },
+            },
+          },
+          alzheimers: {
+            name: "Alzheimer",
+            subtitle: "Enfermedad neurodegenerativa progresiva",
+            summary:
+              "La acumulación de amiloide y tau daña progresivamente las neuronas, usualmente comenzando en los circuitos de la memoria y expandiéndose — las imágenes muestran atrofia y menor actividad, no solo actividad alterada.",
+            regions: {
+              hippocampus: { level: -0.9, note: "Atrofia temprana y severa, con baja actividad — el sello distintivo de la pérdida de memoria en el Alzheimer." },
+              prefrontal: { level: -0.35, note: "La actividad baja a medida que avanza la enfermedad, afectando el juicio y la planificación." },
+              amygdala: { level: -0.2, note: "Pérdida leve de volumen, usualmente en etapas más avanzadas." },
+              basal: { level: -0.2, note: "La actividad reducida contribuye a un pensamiento más lento." },
+              cerebellum: { level: -0.05, note: "Relativamente preservado hasta etapas bastante avanzadas." },
+            },
+          },
+          parkinsons: {
+            name: "Párkinson",
+            subtitle: "Trastorno del movimiento",
+            summary:
+              "La pérdida de neuronas productoras de dopamina que alimentan a los ganglios basales altera el circuito que suaviza e inicia el movimiento, produciendo temblor, rigidez y lentitud motora.",
+            regions: {
+              basal: { level: -0.85, note: "La pérdida de neuronas dopaminérgicas aquí es el problema central — genera temblor, rigidez y lentitud de movimiento." },
+              cerebellum: { level: 0.2, note: "A veces muestra sobreactividad compensatoria, tratando de suplir la pérdida de sincronización de los ganglios basales." },
+              prefrontal: { level: -0.2, note: "Reducciones leves más adelante pueden afectar la planificación y la velocidad de procesamiento." },
+              hippocampus: { level: -0.05, note: "Suele estar cerca de lo típico, sobre todo al inicio." },
+              amygdala: { level: 0, note: "Generalmente cerca de la actividad típica." },
+            },
+          },
+          depression: {
+            name: "Depresión",
+            subtitle: "Trastorno depresivo mayor",
+            summary:
+              "Un patrón frecuente es una corteza prefrontal menos activa junto con una amígdala sobrerreactiva — un control descendente más débil sobre una señal de amenaza/emoción negativa amplificada — más cambios leves en el hipocampo asociados al estrés.",
+            regions: {
+              prefrontal: { level: -0.45, note: "Actividad reducida, sobre todo en circuitos que regulan el ánimo y amortiguan la emoción negativa." },
+              amygdala: { level: 0.55, note: "Sobrerreactiva ante señales negativas o amenazantes, incluso leves." },
+              hippocampus: { level: -0.25, note: "Las hormonas de estrés crónico se asocian con una leve reducción de volumen aquí." },
+              basal: { level: -0.2, note: "Menor respuesta del circuito de recompensa, parte de por qué el placer se siente apagado." },
+              cerebellum: { level: 0, note: "Suele estar cerca de la actividad típica." },
+            },
+          },
+        },
+      };
+
+      let bcmpCondition = "adhd";
+      const brainComparePanelEl = document.getElementById("brain-compare-panel");
+      const bcmpPillsEl = document.getElementById("bcmp-pills");
+      const bcmpSubtitleEl = document.getElementById("bcmp-subtitle");
+      const bcmpConditionTitleEl = document.getElementById("bcmp-condition-title");
+      const bcmpSummaryEl = document.getElementById("bcmp-summary");
+      const bcmpNotesEl = document.getElementById("bcmp-notes");
+      const bcmpSvgNormal = document.getElementById("bcmp-svg-normal");
+      const bcmpSvgCondition = document.getElementById("bcmp-svg-condition");
+      const btnBrainCompare = document.getElementById("btn-brain-compare");
+
+      /* A shared, simplified side-profile brain silhouette (frontal lobe on the
+         left, cerebellum bump on the lower right, small brainstem stub) drawn
+         once per SVG, with a handful of colored "activity" circles laid over
+         it at fixed anatomical-ish positions. */
+      function bcmpOutlinePath() {
+        return "M40,55 C25,35 45,15 80,12 C115,9 150,18 175,35 C205,50 222,75 218,100 C232,108 236,128 222,140 C224,158 208,170 188,166 C178,182 155,186 138,175 C118,186 92,182 78,168 C55,170 38,158 36,138 C20,132 16,110 28,95 C18,82 24,64 40,55 Z";
+      }
+      function bcmpStemPath() {
+        return "M150,168 C152,182 148,194 140,200 L160,200 C158,190 160,178 158,168 Z";
+      }
+      function buildBcmpSvg(container, idPrefix) {
+        container.innerHTML = "";
+        const ns = "http://www.w3.org/2000/svg";
+        const outline = document.createElementNS(ns, "path");
+        outline.setAttribute("d", bcmpOutlinePath());
+        outline.setAttribute("fill", "rgba(255,255,255,0.03)");
+        outline.setAttribute("stroke", "rgba(255,255,255,0.28)");
+        outline.setAttribute("stroke-width", "1.4");
+        container.appendChild(outline);
+        const stem = document.createElementNS(ns, "path");
+        stem.setAttribute("d", bcmpStemPath());
+        stem.setAttribute("fill", "rgba(255,255,255,0.05)");
+        stem.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        stem.setAttribute("stroke-width", "1.2");
+        container.appendChild(stem);
+        BCMP_REGIONS.forEach((r) => {
+          const circle = document.createElementNS(ns, "circle");
+          circle.setAttribute("id", `${idPrefix}-${r.key}`);
+          circle.setAttribute("cx", r.cx);
+          circle.setAttribute("cy", r.cy);
+          circle.setAttribute("r", r.r);
+          circle.setAttribute("fill", r.accent);
+          circle.setAttribute("fill-opacity", "0.4");
+          circle.style.transition = "r 0.5s ease, fill-opacity 0.5s ease, fill 0.5s ease";
+          container.appendChild(circle);
+        });
+      }
+      buildBcmpSvg(bcmpSvgNormal, "bcmp-n");
+      buildBcmpSvg(bcmpSvgCondition, "bcmp-c");
+
+      /* level: -1 (severely under-active/atrophied) .. 0 (typical) .. +1 (over-active).
+         Maps to a cool blue for hypo-, warm orange/red for hyper-, and a neutral
+         accent color at 0 — plus a radius change so the shift also reads at a glance. */
+      function bcmpColorForLevel(baseAccent, level) {
+        if (level > 0.05) return `rgba(255,${Math.round(150 - level * 60)},${Math.round(110 - level * 70)},${(0.4 + level * 0.45).toFixed(2)})`;
+        if (level < -0.05) return `rgba(${Math.round(90 + level * -20)},${Math.round(130 + level * 40)},255,${(0.4 - level * 0.35).toFixed(2)})`;
+        return baseAccent;
+      }
+      function setRegionVisual(idPrefix, region, level) {
+        const el = document.getElementById(`${idPrefix}-${region.key}`);
+        if (!el) return;
+        const opacity = level === null ? 0.4 : Math.min(0.92, 0.32 + Math.abs(level) * 0.5);
+        const radiusMult = level === null ? 1 : 1 + level * 0.35;
+        el.setAttribute("fill-opacity", opacity.toFixed(2));
+        el.setAttribute("r", Math.max(4, region.r * radiusMult).toFixed(1));
+        el.setAttribute("fill", level === null || Math.abs(level) < 0.05 ? region.accent : bcmpColorForLevel(region.accent, level));
+      }
+
+      function buildBcmpPills() {
+        bcmpPillsEl.innerHTML = "";
+        Object.keys(BRAIN_CONDITIONS[currentLang]).forEach((key) => {
+          const btn = document.createElement("button");
+          btn.className = "bcmp-pill" + (key === bcmpCondition ? " active" : "");
+          btn.textContent = BRAIN_CONDITIONS[currentLang][key].name;
+          btn.addEventListener("click", () => {
+            bcmpCondition = key;
+            renderBrainCompare();
+          });
+          bcmpPillsEl.appendChild(btn);
+        });
+      }
+
+      function renderBrainCompare() {
+        buildBcmpPills();
+        const cond = BRAIN_CONDITIONS[currentLang][bcmpCondition];
+        bcmpConditionTitleEl.textContent = cond.name;
+        bcmpSubtitleEl.textContent = cond.subtitle;
+        bcmpSummaryEl.textContent = cond.summary;
+        bcmpNotesEl.innerHTML = "";
+        BCMP_REGIONS.forEach((r) => {
+          setRegionVisual("bcmp-n", r, null);
+          const data = cond.regions[r.key];
+          const level = data ? data.level : 0;
+          setRegionVisual("bcmp-c", r, level);
+          const row = document.createElement("div");
+          row.className = "bcmp-note-row";
+          const swatch = document.createElement("div");
+          swatch.className = "bcmp-note-swatch";
+          swatch.style.background = Math.abs(level) < 0.05 ? r.accent : bcmpColorForLevel(r.accent, level);
+          const label = document.createElement("div");
+          label.className = "bcmp-note-label";
+          label.textContent = t(r.labelKey) + ":";
+          const text = document.createElement("div");
+          text.className = "bcmp-note-text";
+          text.textContent = data ? data.note : "";
+          row.appendChild(swatch);
+          row.appendChild(label);
+          row.appendChild(text);
+          bcmpNotesEl.appendChild(row);
+        });
+      }
+
+      function toggleBrainCompare(open, skipCloseOthers) {
+        brainComparePanelEl.classList.toggle("open", open);
+        btnBrainCompare.classList.toggle("on", open);
+        if (open) {
+          renderBrainCompare();
+          if (!skipCloseOthers) {
+            toggleCompare(false, true);
+            toggleHelp(false, true);
+            toggleBrainPanel(false, true);
+            toggleLearningPanel(false, true);
+            if (typeof toggleActivityPanel === "function") toggleActivityPanel(false, true);
+          }
+        }
+        refreshModalBackdrop();
+      }
+      btnBrainCompare.addEventListener("click", () => toggleBrainCompare(!brainComparePanelEl.classList.contains("open")));
+      document.getElementById("brain-compare-close").addEventListener("click", () => toggleBrainCompare(false));
+      document.getElementById("brain-to-compare-btn").addEventListener("click", () => {
+        toggleBrainPanel(false, true);
+        toggleBrainCompare(true, true);
+        refreshModalBackdrop();
+      });
+      document.getElementById("compare-to-brain-btn").addEventListener("click", () => {
+        toggleBrainCompare(false, true);
+        toggleBrainPanel(true, true);
+        refreshModalBackdrop();
       });
 
       /* ================= "How a Network of Neurons Learns" deep-dive panel =================
@@ -3077,9 +3986,11 @@
         if (open) {
           renderLearningStep(learningIndex);
           if (!skipCloseOthers) {
-            toggleCompare(false);
+            toggleCompare(false, true);
             toggleHelp(false, true);
             toggleBrainPanel(false, true);
+            toggleBrainCompare(false, true);
+            if (typeof toggleActivityPanel === "function") toggleActivityPanel(false, true);
           }
         } else {
           stopSpeaking();
@@ -3635,6 +4546,7 @@
 
       function setInsideMode(on) {
         if (on && typeof explorerActive !== "undefined" && explorerActive) setExplorerMode(false);
+        if (on && typeof lesionModeActive !== "undefined" && lesionModeActive) setLesionMode(false);
         insideMode = on;
         interiorGroup.visible = on;
         applyInsideClipping(on);
@@ -4724,6 +5636,17 @@
         pointerNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(pointerNDC, camera);
 
+        /* Lesion mode: taps on an anatomical region toggle it damaged/healthy
+           instead of stimulating or firing anything — checked first since it
+           uses the same hidden-neuron, brain-only view as Explorer mode. */
+        if (lesionModeActive) {
+          const anatHits = raycaster.intersectObjects(anatClickables, false);
+          if (anatHits.length > 0) {
+            toggleLesion(anatHits[0].object.userData.anatKey, anatHits[0].object);
+          }
+          return;
+        }
+
         /* Brain Explorer mode: the primary neuron and cortical field are
            hidden, so every tap is exclusively about the anatomical regions —
            tapping empty space just orbits, it never falls through to firing
@@ -5414,6 +6337,7 @@
           if (tourActive) endTour();
           if (brainTourActive) endBrainTour();
           if (insideMode) setInsideMode(false);
+          if (typeof lesionModeActive !== "undefined" && lesionModeActive) setLesionMode(false);
           explorerPrevAutoRotate = controls.autoRotate;
           controls.autoRotate = false;
           networkGroup.visible = false;
@@ -5451,6 +6375,507 @@
         const tally = count > 1 ? ` (${t("explorerStimulated")} \u00d7${count})` : "";
         showExplorerHint(`${label}: ${fact} ${effect}${tally}`, 4200);
       }
+
+      /* ================= Lesion mode: educational "what if this region were
+         damaged?" simulation =================
+         Reuses the same anatomical region meshes and anatKey system as Brain
+         Explorer, but instead of a stimulus pulse, a tap toggles that region
+         between healthy and "lesioned": the mesh dims and shrinks (standing
+         in for reduced activity / atrophy) and a plain-language readout
+         explains what that kind of damage tends to cause in real brains.
+         Tapping an already-lesioned region restores it. ================= */
+      const LESION_EFFECTS = {
+        en: {
+          labelCerebrum: "Losing cerebral cortex tissue here can impair whichever function that patch of cortex specialized in — from movement or sensation to language or personality, depending on exactly where.",
+          labelCerebellum: "Cerebellar damage classically causes ataxia: jerky, poorly coordinated movement, trouble with balance, and imprecise timing — even though muscles themselves stay strong.",
+          labelBrainstem: "The brainstem controls core survival functions, so damage here is the most dangerous of all — it can disrupt breathing, heart rate, and consciousness itself.",
+          labelThalamus: "Since nearly every sense passes through the thalamus, damage here can blunt or distort sensation on one side of the body, or dull alertness altogether.",
+          labelHippocampus: "Hippocampal damage classically causes anterograde amnesia — the inability to form new long-term memories — while old memories from before the damage often stay largely intact.",
+          labelAmygdala: "Amygdala damage tends to blunt fear and threat responses — famous case studies describe patients no longer recognizing danger or reading fear in others' faces.",
+          labelCallosum: "Cutting or damaging the corpus callosum disconnects the hemispheres — famous \"split-brain\" studies show each side can end up processing information almost independently.",
+          labelHypothalamus: "Hypothalamic damage disrupts the body's internal regulation — appetite, temperature, thirst, and sleep-wake cycles can all become erratic.",
+          labelPituitary: "Because the pituitary controls hormone release throughout the body, damage here can throw off growth, metabolism, stress response, and reproductive hormones all at once.",
+          labelPineal: "Pineal damage disrupts melatonin release, which can scramble the body's circadian rhythm and sleep-wake timing.",
+          labelBasalGanglia: "Basal ganglia damage disrupts smooth, well-timed voluntary movement — this is the circuit behind both Parkinson's (too little movement) and some involuntary-movement disorders (too much).",
+          labelPrefrontal: "Prefrontal damage often impairs planning, impulse control, and decision-making — a change in personality and judgment is a classic sign, famously seen in the 19th-century case of Phineas Gage.",
+          labelMotorCortex: "Damage to a strip of motor cortex causes weakness or paralysis in the specific body part that strip controls, on the opposite side of the body.",
+          labelVisualCortex: "Visual cortex damage causes blind spots or blindness in part of the visual field — the eyes still work fine, but the brain can't process what they're seeing.",
+        },
+        es: {
+          labelCerebrum: "Perder tejido de la corteza cerebral aquí puede afectar la función en la que se especializaba esa zona — desde el movimiento o la sensación hasta el lenguaje o la personalidad, según la ubicación exacta.",
+          labelCerebellum: "El daño cerebeloso causa clásicamente ataxia: movimientos bruscos y poco coordinados, problemas de equilibrio y una sincronización imprecisa — aunque los músculos en sí sigan siendo fuertes.",
+          labelBrainstem: "El tronco encefálico controla funciones vitales básicas, por lo que dañarlo es lo más peligroso de todo — puede alterar la respiración, el ritmo cardíaco e incluso la conciencia misma.",
+          labelThalamus: "Como casi todos los sentidos pasan por el tálamo, dañarlo puede embotar o distorsionar la sensación en un lado del cuerpo, o reducir el estado de alerta en general.",
+          labelHippocampus: "El daño al hipocampo causa clásicamente amnesia anterógrada — la incapacidad de formar nuevos recuerdos de largo plazo — mientras que los recuerdos previos al daño suelen mantenerse en gran parte intactos.",
+          labelAmygdala: "El daño a la amígdala tiende a embotar las respuestas de miedo y amenaza — casos famosos describen pacientes que ya no reconocen el peligro ni leen el miedo en el rostro de otros.",
+          labelCallosum: "Cortar o dañar el cuerpo calloso desconecta los hemisferios — los famosos estudios de \"cerebro dividido\" muestran que cada lado puede terminar procesando información casi de forma independiente.",
+          labelHypothalamus: "El daño hipotalámico altera la regulación interna del cuerpo — el apetito, la temperatura, la sed y los ciclos de sueño-vigilia pueden volverse erráticos.",
+          labelPituitary: "Como la pituitaria controla la liberación de hormonas en todo el cuerpo, dañarla puede alterar a la vez el crecimiento, el metabolismo, la respuesta al estrés y las hormonas reproductivas.",
+          labelPineal: "El daño a la glándula pineal altera la liberación de melatonina, lo que puede desordenar el ritmo circadiano y el ciclo de sueño-vigilia.",
+          labelBasalGanglia: "El daño a los ganglios basales altera el movimiento voluntario suave y bien sincronizado — este es el circuito detrás tanto del Párkinson (muy poco movimiento) como de algunos trastornos de movimiento involuntario (demasiado movimiento).",
+          labelPrefrontal: "El daño prefrontal suele afectar la planificación, el control de impulsos y la toma de decisiones — un cambio de personalidad y de juicio es un signo clásico, famoso desde el caso de Phineas Gage en el siglo XIX.",
+          labelMotorCortex: "El daño a una franja de la corteza motora causa debilidad o parálisis en la parte específica del cuerpo que esa franja controla, en el lado opuesto del cuerpo.",
+          labelVisualCortex: "El daño a la corteza visual causa puntos ciegos o ceguera en parte del campo visual — los ojos siguen funcionando bien, pero el cerebro no puede procesar lo que ven.",
+        },
+      };
+
+      let lesionModeActive = false;
+      let lesionPrevAutoRotate = true;
+      const lesionedKeys = new Set();
+      const btnLesion = document.getElementById("btn-lesion");
+      const lesionHintEl = document.getElementById("lesion-hint");
+      const lesionHintTextEl = document.getElementById("lesion-hint-text");
+      const lesionResetBtn = document.getElementById("lesion-reset-btn");
+
+      function getRegionRoots(key) {
+        const roots = new Set();
+        anatClickables.forEach((m) => {
+          if (m.userData.anatKey === key) {
+            roots.add(m.parent && m.parent !== brainRegionsGroup ? m.parent : m);
+          }
+        });
+        return roots;
+      }
+
+      function applyLesionVisual(key, on) {
+        getRegionRoots(key).forEach((root) => {
+          if (!root.userData._lesionBaseScale) root.userData._lesionBaseScale = root.scale.clone();
+          const base = root.userData._lesionBaseScale;
+          root.scale.set(base.x * (on ? 0.68 : 1), base.y * (on ? 0.55 : 1), base.z * (on ? 0.68 : 1));
+        });
+        anatClickables.forEach((m) => {
+          if (m.userData.anatKey !== key) return;
+          m.userData.lesioned = on;
+          const base = m.userData.baseOpacity ?? m.material.opacity;
+          m.material.opacity = on ? base * 0.1 : base;
+        });
+      }
+
+      function refreshLesionHint() {
+        if (lesionedKeys.size === 0) {
+          lesionHintTextEl.textContent = t("lesion_hint_default");
+          return;
+        }
+        const names = Array.from(lesionedKeys)
+          .map((k) => t(k))
+          .join(", ");
+        lesionHintTextEl.textContent = `${t("lesion_hint_default")} — ${names}`;
+      }
+
+      function toggleLesion(key, mesh) {
+        const wasLesioned = lesionedKeys.has(key);
+        ensureAudio();
+        playZap();
+        haptic(wasLesioned ? 10 : 22);
+        if (wasLesioned) {
+          lesionedKeys.delete(key);
+          applyLesionVisual(key, false);
+          showLesionHint(`${t(key)}: ${t("toastLesionRestored")}.`);
+        } else {
+          lesionedKeys.add(key);
+          applyLesionVisual(key, true);
+          if (mesh) pulseRegionMesh(mesh);
+          const effect = (LESION_EFFECTS[currentLang] && LESION_EFFECTS[currentLang][key]) || "";
+          showLesionHint(`${t(key)}: ${effect}`, 6000);
+        }
+        refreshLesionHint();
+      }
+
+      let lesionHintRevertTimer = null;
+      function showLesionHint(text, revertAfterMs) {
+        lesionHintTextEl.textContent = text;
+        lesionHintEl.classList.add("show");
+        clearTimeout(lesionHintRevertTimer);
+        if (revertAfterMs) {
+          lesionHintRevertTimer = setTimeout(() => {
+            if (lesionModeActive) refreshLesionHint();
+          }, revertAfterMs);
+        }
+      }
+
+      function resetAllLesions() {
+        Array.from(lesionedKeys).forEach((key) => applyLesionVisual(key, false));
+        lesionedKeys.clear();
+        refreshLesionHint();
+        showToast(t("toastBrainReset"));
+      }
+      lesionResetBtn.addEventListener("click", resetAllLesions);
+
+      function setLesionMode(on) {
+        if (on === lesionModeActive) return;
+        lesionModeActive = on;
+        btnLesion.classList.toggle("on", on);
+        if (on) {
+          if (tourActive) endTour();
+          if (brainTourActive) endBrainTour();
+          if (insideMode) setInsideMode(false);
+          if (explorerActive) setExplorerMode(false);
+          lesionPrevAutoRotate = controls.autoRotate;
+          controls.autoRotate = false;
+          networkGroup.visible = false;
+          brainBaseGroup.visible = false;
+          stopFactCycle();
+          refreshLesionHint();
+          lesionHintEl.classList.add("show");
+          showToast(t("toastLesionOn"));
+        } else {
+          controls.autoRotate = lesionPrevAutoRotate;
+          networkGroup.visible = true;
+          brainBaseGroup.visible = true;
+          lesionHintEl.classList.remove("show");
+          clearTimeout(lesionHintRevertTimer);
+          showToast(t("toastLesionOff"));
+          startFactCycle();
+        }
+      }
+      btnLesion.addEventListener("click", () => setLesionMode(!lesionModeActive));
+
+      /* ================= Neurotransmitter pathway overlay =================
+         Two independently-toggleable, separately-colored systems traced as
+         glowing routes with particles flowing along them. A simplified,
+         educational approximation of real circuitry (not the literal path
+         of any single axon), reusing the anatomical region meshes already
+         placed around the neuron field. ================= */
+      const dopamineColor = new THREE.Color("#ffb238");
+      const serotoninColor = new THREE.Color("#3fe8c9");
+      const midbrainPoint = new THREE.Vector3(0, -26, -21);
+      const raphePoint = new THREE.Vector3(0, -31, -14);
+
+      function buildPathwayVisual(waypoints, color, particleCount) {
+        const curve = new THREE.CatmullRomCurve3(waypoints);
+        const grp = new THREE.Group();
+        const tubeMat = new THREE.MeshBasicMaterial({
+          color,
+          transparent: true,
+          opacity: 0.14,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        grp.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 40, 0.5, 6, false), tubeMat));
+
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(particleCount * 3), 3));
+        const mat = new THREE.PointsMaterial({
+          color,
+          size: 0.85,
+          transparent: true,
+          opacity: 0.9,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const pts = new THREE.Points(geo, mat);
+        grp.add(pts);
+
+        grp.visible = false;
+        brainRegionsGroup.add(grp);
+        return { group: grp, curve, pts, count: particleCount };
+      }
+
+      const dopaminePathways = [
+        buildPathwayVisual([midbrainPoint.clone(), new THREE.Vector3(-4, -14, -9), basalGanglia1.position.clone()], dopamineColor, 20),
+        buildPathwayVisual([midbrainPoint.clone(), new THREE.Vector3(4, -14, -9), basalGanglia2.position.clone()], dopamineColor, 20),
+        buildPathwayVisual(
+          [midbrainPoint.clone(), new THREE.Vector3(0, -8, 8), new THREE.Vector3(0, 4, 24), prefrontalCortex.position.clone()],
+          dopamineColor,
+          26
+        ),
+      ];
+
+      const serotoninPathways = [
+        buildPathwayVisual([raphePoint.clone(), new THREE.Vector3(0, -8, -4), thalamus.position.clone()], serotoninColor, 18),
+        buildPathwayVisual([raphePoint.clone(), new THREE.Vector3(-9, -9, -6), hippocampusLeft.position.clone()], serotoninColor, 18),
+        buildPathwayVisual([raphePoint.clone(), new THREE.Vector3(9, -9, -6), hippocampusRight.position.clone()], serotoninColor, 18),
+        buildPathwayVisual([raphePoint.clone(), new THREE.Vector3(-9, -12, 0), amygdalaLeft.position.clone()], serotoninColor, 16),
+        buildPathwayVisual([raphePoint.clone(), new THREE.Vector3(9, -12, 0), amygdalaRight.position.clone()], serotoninColor, 16),
+        buildPathwayVisual(
+          [raphePoint.clone(), new THREE.Vector3(0, -4, 10), new THREE.Vector3(0, 8, 26), prefrontalCortex.position.clone()],
+          serotoninColor,
+          24
+        ),
+      ];
+
+      const NEUROCHEM_SYSTEMS = {
+        dopamine: { pathways: dopaminePathways, speed: 0.22 },
+        serotonin: { pathways: serotoninPathways, speed: 0.14 },
+      };
+      const activeChemSystems = new Set();
+
+      function updateNeurochemPathways(time) {
+        if (!activeChemSystems.size) return;
+        activeChemSystems.forEach((key) => {
+          const sys = NEUROCHEM_SYSTEMS[key];
+          sys.pathways.forEach((p, gi) => {
+            const posAttr = p.pts.geometry.attributes.position;
+            for (let i = 0; i < p.count; i++) {
+              const tt = (time * sys.speed + i / p.count + gi * 0.5) % 1;
+              const pos = p.curve.getPointAt(tt);
+              posAttr.setXYZ(i, pos.x, pos.y, pos.z);
+            }
+            posAttr.needsUpdate = true;
+          });
+        });
+      }
+
+      const btnChem = document.getElementById("btn-chem");
+      const chemHintEl = document.getElementById("chem-hint");
+      const chemHintTextEl = document.getElementById("chem-hint-text");
+      const chemToggleDopamine = document.getElementById("chem-toggle-dopamine");
+      const chemToggleSerotonin = document.getElementById("chem-toggle-serotonin");
+      const CHEM_TOGGLE_BTNS = { dopamine: chemToggleDopamine, serotonin: chemToggleSerotonin };
+
+      function refreshChemHint() {
+        if (activeChemSystems.size === 0) {
+          chemHintTextEl.textContent = t("chem_hint_default");
+          return;
+        }
+        chemHintTextEl.textContent = Array.from(activeChemSystems)
+          .map((k) => t(`chem_desc_${k}`))
+          .join(" ");
+      }
+
+      function setChemSystem(key, on) {
+        if (!NEUROCHEM_SYSTEMS[key] || on === activeChemSystems.has(key)) return;
+        ensureAudio();
+        playZap();
+        haptic(on ? 18 : 10);
+        const label = key.charAt(0).toUpperCase() + key.slice(1);
+        if (on) {
+          activeChemSystems.add(key);
+          NEUROCHEM_SYSTEMS[key].pathways.forEach((p) => (p.group.visible = true));
+          showToast(t(`toastChem${label}On`));
+        } else {
+          activeChemSystems.delete(key);
+          NEUROCHEM_SYSTEMS[key].pathways.forEach((p) => (p.group.visible = false));
+          showToast(t(`toastChem${label}Off`));
+        }
+        CHEM_TOGGLE_BTNS[key].classList.toggle("on", on);
+        refreshChemHint();
+      }
+
+      chemToggleDopamine.addEventListener("click", () => setChemSystem("dopamine", !activeChemSystems.has("dopamine")));
+      chemToggleSerotonin.addEventListener("click", () => setChemSystem("serotonin", !activeChemSystems.has("serotonin")));
+
+      let chemPanelOpen = false;
+      function setChemPanel(on) {
+        if (on === chemPanelOpen) return;
+        chemPanelOpen = on;
+        btnChem.classList.toggle("on", on);
+        chemHintEl.classList.toggle("show", on);
+        if (on) {
+          if (typeof brainStateHintOpen !== "undefined" && brainStateHintOpen) setBrainStatePanel(false);
+          refreshChemHint();
+        }
+      }
+      btnChem.addEventListener("click", () => setChemPanel(!chemPanelOpen));
+
+      /* ================= "Brain in different states" mode =================
+         Highlights and rhythmically pulses the region set most associated
+         with a given state — sleep, stress, or focused concentration — as a
+         simplified, educational stand-in for real activity patterns.
+         Reuses the same region meshes as lesion mode / brain explorer. ================= */
+      const BRAIN_STATES = {
+        sleep: { descKey: "state_desc_sleep", speed: 1.6, scaleAmp: 0.16, opacityAmp: 1.3, regions: [hypothalamus, pineal, brainstem], pulseThalamus: true, keys: ["labelHypothalamus", "labelPineal", "labelBrainstem", "labelThalamus"] },
+        stress: { descKey: "state_desc_stress", speed: 6.0, scaleAmp: 0.32, opacityAmp: 1.9, regions: [amygdalaLeft, amygdalaRight, hypothalamus, pituitary], pulseThalamus: false, keys: ["labelAmygdala", "labelHypothalamus", "labelPituitary"] },
+        focus: { descKey: "state_desc_focus", speed: 4.0, scaleAmp: 0.22, opacityAmp: 1.5, regions: [prefrontalCortex, basalGanglia1, basalGanglia2], pulseThalamus: true, keys: ["labelPrefrontal", "labelBasalGanglia", "labelThalamus"] },
+      };
+      let activeBrainState = null;
+
+      function getRegionMeshes(root) {
+        return root.isMesh ? [root] : root.children.filter((c) => c.isMesh);
+      }
+
+      function resetStateRegionVisual(root) {
+        if (root.userData._stateBaseScale) root.scale.copy(root.userData._stateBaseScale);
+        getRegionMeshes(root).forEach((m) => {
+          if (m.userData._stateBaseOpacity !== undefined) m.material.opacity = m.userData._stateBaseOpacity;
+        });
+      }
+
+      function updateBrainStatePulses(time) {
+        if (!activeBrainState) return;
+        const cfg = BRAIN_STATES[activeBrainState];
+        cfg.regions.forEach((root, i) => {
+          const pulse = 0.5 + 0.5 * Math.sin(time * cfg.speed + i * 1.1);
+          if (!root.userData._stateBaseScale) root.userData._stateBaseScale = root.scale.clone();
+          const base = root.userData._stateBaseScale;
+          const boost = 1 + pulse * cfg.scaleAmp;
+          root.scale.set(base.x * boost, base.y * boost, base.z * boost);
+          getRegionMeshes(root).forEach((m) => {
+            if (m.userData._stateBaseOpacity === undefined) m.userData._stateBaseOpacity = m.material.opacity;
+            m.material.opacity = Math.min(1, m.userData._stateBaseOpacity * (1 + pulse * cfg.opacityAmp));
+          });
+        });
+        if (cfg.pulseThalamus) {
+          const pulse = 0.5 + 0.5 * Math.sin(time * cfg.speed + 2.2);
+          thalamusMat.opacity = Math.max(thalamusMat.opacity, 0.25 + pulse * 0.5);
+        }
+      }
+
+      const btnBrainState = document.getElementById("btn-brainstate");
+      const stateHintEl = document.getElementById("state-hint");
+      const stateHintTextEl = document.getElementById("state-hint-text");
+      const stateBtns = {
+        sleep: document.getElementById("state-btn-sleep"),
+        stress: document.getElementById("state-btn-stress"),
+        focus: document.getElementById("state-btn-focus"),
+        off: document.getElementById("state-btn-off"),
+      };
+
+      function refreshStateHint() {
+        stateHintTextEl.textContent = activeBrainState ? t(BRAIN_STATES[activeBrainState].descKey) : t("state_hint_default");
+      }
+
+      function setBrainState(key) {
+        if (key === activeBrainState) return;
+        ensureAudio();
+        playZap();
+        haptic(key ? 18 : 10);
+        if (activeBrainState) BRAIN_STATES[activeBrainState].regions.forEach(resetStateRegionVisual);
+        activeBrainState = key || null;
+        Object.entries(stateBtns).forEach(([k, btn]) => btn.classList.toggle("active", k === (key || "off")));
+        refreshStateHint();
+        if (!key) showToast(t("toastStateOff"));
+      }
+
+      stateBtns.sleep.addEventListener("click", () => setBrainState("sleep"));
+      stateBtns.stress.addEventListener("click", () => setBrainState("stress"));
+      stateBtns.focus.addEventListener("click", () => setBrainState("focus"));
+      stateBtns.off.addEventListener("click", () => setBrainState(null));
+
+      let brainStateHintOpen = false;
+      function setBrainStatePanel(on) {
+        if (on === brainStateHintOpen) return;
+        brainStateHintOpen = on;
+        btnBrainState.classList.toggle("on", on);
+        stateHintEl.classList.toggle("show", on);
+        if (on) {
+          if (chemPanelOpen) setChemPanel(false);
+          refreshStateHint();
+        }
+      }
+      btnBrainState.addEventListener("click", () => setBrainStatePanel(!brainStateHintOpen));
+
+      /* ================= Brain Activity Dashboard =================
+         A dedicated modal panel that turns everything already happening
+         elsewhere in this piece — neuron firing, an active brain state, an
+         active neurotransmitter pathway, or a lesioned region — into one
+         legible readout: a live bar per anatomical region plus one per
+         neurotransmitter system. A stylized summary, not a measurement of
+         real neural activity. ================= */
+      const ACTIVITY_REGIONS = anatLabelAnchors;
+      const DOPAMINE_TARGET_KEYS = ["labelBasalGanglia", "labelPrefrontal"];
+      const SEROTONIN_TARGET_KEYS = ["labelThalamus", "labelHippocampus", "labelAmygdala", "labelPrefrontal"];
+
+      function activityKeyPhase(key) {
+        let h = 0;
+        for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) % 1000;
+        return (h / 1000) * Math.PI * 2;
+      }
+
+      function computeRegionActivity(key, time) {
+        let level = 20 + 7 * Math.sin(time * 0.5 + activityKeyPhase(key));
+        if (STATE.phase === 2 || STATE.phase === 3) level += 10;
+        if (activeBrainState) {
+          const relevant = BRAIN_STATES[activeBrainState].keys.includes(key);
+          if (relevant) {
+            level += 32 + 26 * (0.5 + 0.5 * Math.sin(time * 3.4 + activityKeyPhase(key)));
+          } else {
+            level *= 0.7;
+          }
+        }
+        if (activeChemSystems.has("dopamine") && DOPAMINE_TARGET_KEYS.includes(key)) {
+          level += 18 + 12 * (0.5 + 0.5 * Math.sin(time * 1.4 + activityKeyPhase(key)));
+        }
+        if (activeChemSystems.has("serotonin") && SEROTONIN_TARGET_KEYS.includes(key)) {
+          level += 15 + 10 * (0.5 + 0.5 * Math.sin(time * 1.0 + activityKeyPhase(key)));
+        }
+        if (lesionedKeys.has(key)) level = Math.min(level, 10) * 0.4;
+        return Math.max(2, Math.min(100, level));
+      }
+
+      function computeChemActivity(key, time) {
+        if (activeChemSystems.has(key)) {
+          return 55 + 30 * (0.5 + 0.5 * Math.sin(time * (key === "dopamine" ? 1.4 : 1.0)));
+        }
+        return 8 + 4 * Math.sin(time * 0.4 + (key === "dopamine" ? 0 : 2));
+      }
+
+      const activityRegionEls = {};
+      const activityChemEls = {};
+
+      function buildActivityRow(container, key, label, accent, store) {
+        const row = document.createElement("div");
+        row.className = "activity-row";
+        const labelEl = document.createElement("span");
+        labelEl.className = "activity-label";
+        labelEl.textContent = label;
+        const track = document.createElement("div");
+        track.className = "activity-track";
+        const fill = document.createElement("div");
+        fill.className = "activity-fill";
+        fill.style.background = accent;
+        fill.style.color = accent;
+        track.appendChild(fill);
+        const pct = document.createElement("span");
+        pct.className = "activity-pct";
+        pct.textContent = "0%";
+        row.appendChild(labelEl);
+        row.appendChild(track);
+        row.appendChild(pct);
+        container.appendChild(row);
+        store[key] = { labelEl, fill, pct };
+      }
+
+      const activityRegionsEl = document.getElementById("activity-regions");
+      const activityChemEl = document.getElementById("activity-chem");
+      ACTIVITY_REGIONS.forEach((r) => buildActivityRow(activityRegionsEl, r.key, t(r.key), r.accent, activityRegionEls));
+      buildActivityRow(activityChemEl, "dopamine", t("chem_toggle_dopamine"), "#ffb238", activityChemEls);
+      buildActivityRow(activityChemEl, "serotonin", t("chem_toggle_serotonin"), "#3fe8c9", activityChemEls);
+
+      function refreshActivityLabels() {
+        ACTIVITY_REGIONS.forEach((r) => {
+          if (activityRegionEls[r.key]) activityRegionEls[r.key].labelEl.textContent = t(r.key);
+        });
+        if (activityChemEls.dopamine) activityChemEls.dopamine.labelEl.textContent = t("chem_toggle_dopamine");
+        if (activityChemEls.serotonin) activityChemEls.serotonin.labelEl.textContent = t("chem_toggle_serotonin");
+      }
+
+      function updateActivityDashboard(time) {
+        if (!activityPanelEl.classList.contains("open")) return;
+        ACTIVITY_REGIONS.forEach((r) => {
+          const level = computeRegionActivity(r.key, time);
+          const cell = activityRegionEls[r.key];
+          cell.fill.style.width = level.toFixed(0) + "%";
+          cell.pct.textContent = level.toFixed(0) + "%";
+        });
+        ["dopamine", "serotonin"].forEach((key) => {
+          const level = computeChemActivity(key, time);
+          const cell = activityChemEls[key];
+          cell.fill.style.width = level.toFixed(0) + "%";
+          cell.pct.textContent = level.toFixed(0) + "%";
+        });
+      }
+
+      const btnActivity = document.getElementById("btn-activity");
+      const activityPanelEl = document.getElementById("activity-panel");
+      function toggleActivityPanel(open, skipCloseOthers) {
+        activityPanelEl.classList.toggle("open", open);
+        btnActivity.classList.toggle("on", open);
+        if (open) {
+          if (!skipCloseOthers) {
+            toggleCompare(false, true);
+            toggleHelp(false, true);
+            toggleBrainPanel(false, true);
+            toggleBrainCompare(false, true);
+            toggleLearningPanel(false, true);
+          }
+          refreshActivityLabels();
+          updateActivityDashboard(clock.getElapsedTime());
+        }
+        refreshModalBackdrop();
+      }
+      btnActivity.addEventListener("click", () => toggleActivityPanel(!activityPanelEl.classList.contains("open")));
+      document.getElementById("activity-close").addEventListener("click", () => toggleActivityPanel(false));
 
       /* ================= Swipe gestures: on touch devices, a left/right
          swipe over the caption steps through either active tour, mirroring
@@ -5545,7 +6970,9 @@
         if (open && !skipCloseOthers) {
           toggleCompare(false, true);
           toggleBrainPanel(false, true);
+          toggleBrainCompare(false, true);
           toggleLearningPanel(false, true);
+          if (typeof toggleActivityPanel === "function") toggleActivityPanel(false, true);
         }
         refreshModalBackdrop();
       }
@@ -5651,6 +7078,26 @@
           case "B":
             toggleBrainPanel(!brainPanelEl.classList.contains("open"));
             break;
+          case "v":
+          case "V":
+            toggleBrainCompare(!brainComparePanelEl.classList.contains("open"));
+            break;
+          case "x":
+          case "X":
+            setLesionMode(!lesionModeActive);
+            break;
+          case "p":
+          case "P":
+            setChemPanel(!chemPanelOpen);
+            break;
+          case "s":
+          case "S":
+            setBrainStatePanel(!brainStateHintOpen);
+            break;
+          case "a":
+          case "A":
+            toggleActivityPanel(!activityPanelEl.classList.contains("open"));
+            break;
           case "k":
           case "K":
             toggleLearningPanel(!learningPanelEl.classList.contains("open"));
@@ -5670,11 +7117,16 @@
             toggleHelp(false);
             toggleCompare(false);
             toggleBrainPanel(false);
+            toggleBrainCompare(false);
             toggleLearningPanel(false);
+            if (typeof toggleActivityPanel === "function") toggleActivityPanel(false);
             if (insideMode) setInsideMode(false);
             if (tourActive) endTour();
             if (brainTourActive) endBrainTour();
             if (explorerActive) setExplorerMode(false);
+            if (lesionModeActive) setLesionMode(false);
+            if (chemPanelOpen) setChemPanel(false);
+            if (brainStateHintOpen) setBrainStatePanel(false);
             break;
         }
       });
@@ -5775,6 +7227,13 @@
             break;
         }
 
+        /* Educational touch: every currently-"lesioned" region knocks the
+           network's synaptic coherence down a notch, so damaging several
+           regions visibly (not just anecdotally) degrades overall function. */
+        if (typeof lesionedKeys !== "undefined" && lesionedKeys.size) {
+          targetSync = Math.max(3, targetSync - lesionedKeys.size * 7);
+        }
+
         STATE.membraneV += (targetMembrane - STATE.membraneV) * 0.15;
         STATE.axonLoad += (targetAxon - STATE.axonLoad) * 0.15;
         STATE.sync += (targetSync - STATE.sync) * 0.15;
@@ -5826,6 +7285,7 @@
         const thalamusPulse = 1 + 0.16 * Math.sin(time * 2.2) + (STATE.isAnimating ? 0.3 : 0);
         thalamus.scale.setScalar(thalamusPulse);
         thalamusMat.opacity = 0.24 + 0.08 * Math.sin(time * 2.2) + (STATE.isAnimating ? 0.25 : 0);
+        updateBrainStatePulses(time);
 
         /* Whole-brain "breathing": a slow, barely-there rotation plus a gentle
            scale pulse across the anatomical shell, independent of the
@@ -5852,6 +7312,8 @@
           grp.mat.opacity = STATE.phase === 3 ? 1.0 : 0.5;
           grp.mat.size = STATE.phase === 3 ? 0.8 : 0.4;
         });
+
+        updateNeurochemPathways(time);
 
         if (STATE.isAnimating) {
           let speed = 1.0;
