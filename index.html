@@ -2212,6 +2212,21 @@
           factPrefrontal: "The prefrontal cortex, at the very front of the brain, handles planning, decision-making, impulse control, and much of what makes up personality.",
           factMotorCortex: "The motor cortex, a strip running across the top of the brain, sends the precise signals that drive voluntary muscle movement throughout the body.",
           factVisualCortex: "The visual cortex, at the back of the brain, turns raw signals from the eyes into the shapes, colors, and motion you consciously see.",
+          explorerStimulated: "Stimulated",
+          effectCerebrum: "Direct stimulation here can trigger a sudden sensation, memory, or even an involuntary movement, depending on exactly which patch of cortex is activated.",
+          effectCerebellum: "A pulse here throws off fine motor coordination — movements turn jerky or overshoot their target rather than being blocked outright.",
+          effectBrainstem: "Even a small pulse here can shift heart rate, breathing, or alertness, since it runs the body's core survival functions.",
+          effectThalamus: "A pulse here floods the cortex with a burst of sensory-like signal, since virtually every sense passes through this relay first.",
+          effectHippocampus: "Stimulation can trigger a vivid, spontaneous memory or a sudden sense of déjà vu — a classic finding from early brain-mapping surgery.",
+          effectAmygdala: "A jolt here can spark a rush of fear or unease with no real threat present — it's the brain's alarm switch.",
+          effectCallosum: "Stimulating this bridge kicks off a burst of cross-talk, syncing activity between the left and right hemispheres.",
+          effectHypothalamus: "A pulse here can shift body temperature, hunger, or arousal almost instantly — it's the body's internal thermostat and dispatcher.",
+          effectPituitary: "Stimulation nudges the master gland to release a burst of hormones that ripple out to glands throughout the body.",
+          effectPineal: "A pulse here can nudge the body's sense of time of day, since this tiny gland sets the sleep-wake clock via melatonin.",
+          effectBasalGanglia: "Stimulation here can trigger or suppress a habitual movement — the same deep circuit targeted by therapies for movement disorders.",
+          effectPrefrontal: "A pulse here can momentarily sharpen or scramble planning and decision-making, since this region governs judgment and impulse control.",
+          effectMotorCortex: "The classic result from early brain-mapping surgery: a pulse here twitches one very specific muscle on the opposite side of the body.",
+          effectVisualCortex: "Stimulating it can conjure phantom flashes of light or color — called phosphenes — with no actual light entering the eyes.",
         },
         es: {
           title: "Catedral Neuronal",
@@ -2359,6 +2374,21 @@
           factPrefrontal: "La corteza prefrontal, en la parte más frontal del cerebro, gestiona la planificación, la toma de decisiones, el control de impulsos y buena parte de lo que conforma la personalidad.",
           factMotorCortex: "La corteza motora, una franja que recorre la parte superior del cerebro, envía las señales precisas que impulsan el movimiento muscular voluntario en todo el cuerpo.",
           factVisualCortex: "La corteza visual, en la parte posterior del cerebro, convierte las señales crudas de los ojos en las formas, colores y movimiento que percibes consciente­mente.",
+          explorerStimulated: "Estimulada",
+          effectCerebrum: "Estimularlo directamente puede provocar una sensación repentina, un recuerdo o incluso un movimiento involuntario, según qué parche exacto de la corteza se active.",
+          effectCerebellum: "Un pulso aquí descoordina el movimiento fino — los gestos se vuelven bruscos o se pasan de largo, en vez de bloquearse por completo.",
+          effectBrainstem: "Incluso un pulso pequeño aquí puede alterar el ritmo cardíaco, la respiración o el nivel de alerta, ya que controla las funciones vitales básicas.",
+          effectThalamus: "Un pulso aquí inunda la corteza con una ráfaga de señal de tipo sensorial, ya que casi todos los sentidos pasan primero por este relevo.",
+          effectHippocampus: "La estimulación puede provocar un recuerdo vívido y espontáneo o una sensación repentina de déjà vu — un hallazgo clásico de las primeras cirugías de mapeo cerebral.",
+          effectAmygdala: "Una descarga aquí puede desatar miedo o inquietud sin ninguna amenaza real presente — es la alarma del cerebro.",
+          effectCallosum: "Estimular este puente desata una ráfaga de comunicación cruzada, sincronizando la actividad entre ambos hemisferios.",
+          effectHypothalamus: "Un pulso aquí puede alterar casi al instante la temperatura corporal, el hambre o la activación — es el termostato y despachador interno del cuerpo.",
+          effectPituitary: "La estimulación empuja a la glándula maestra a liberar una ráfaga de hormonas que repercuten en glándulas de todo el cuerpo.",
+          effectPineal: "Un pulso aquí puede alterar la percepción de la hora del día, ya que esta pequeña glándula regula el reloj de sueño-vigilia mediante melatonina.",
+          effectBasalGanglia: "La estimulación aquí puede provocar o suprimir un movimiento habitual — el mismo circuito profundo al que apuntan las terapias para trastornos del movimiento.",
+          effectPrefrontal: "Un pulso aquí puede agudizar o desordenar momentáneamente la planificación y la toma de decisiones, ya que esta región gobierna el juicio y el control de impulsos.",
+          effectMotorCortex: "El resultado clásico de las primeras cirugías de mapeo cerebral: un pulso aquí hace contraer un músculo muy específico del lado opuesto del cuerpo.",
+          effectVisualCortex: "Estimularla puede provocar destellos fantasma de luz o color — llamados fosfenos — sin que entre luz real por los ojos.",
         },
       };
 
@@ -3604,6 +3634,7 @@
       }
 
       function setInsideMode(on) {
+        if (on && typeof explorerActive !== "undefined" && explorerActive) setExplorerMode(false);
         insideMode = on;
         interiorGroup.visible = on;
         applyInsideClipping(on);
@@ -4459,6 +4490,26 @@
         labelMotorCortex: "factMotorCortex",
         labelVisualCortex: "factVisualCortex",
       };
+      /* Parallel map: what tends to happen when a region is directly
+         stimulated, as opposed to anatFactKeys' "what it normally does" —
+         used by Brain Explorer mode to make each tap feel like an actual
+         experiment rather than a repeat of the same fact. */
+      const anatStimKeys = {
+        labelCerebrum: "effectCerebrum",
+        labelCerebellum: "effectCerebellum",
+        labelBrainstem: "effectBrainstem",
+        labelThalamus: "effectThalamus",
+        labelHippocampus: "effectHippocampus",
+        labelAmygdala: "effectAmygdala",
+        labelCallosum: "effectCallosum",
+        labelHypothalamus: "effectHypothalamus",
+        labelPituitary: "effectPituitary",
+        labelPineal: "effectPineal",
+        labelBasalGanglia: "effectBasalGanglia",
+        labelPrefrontal: "effectPrefrontal",
+        labelMotorCortex: "effectMotorCortex",
+        labelVisualCortex: "effectVisualCortex",
+      };
       /* Every clickable mesh remembers its own resting opacity so the
          whole-brain function tour can dim/spotlight regions and cleanly
          restore them afterwards. */
@@ -4673,6 +4724,18 @@
         pointerNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(pointerNDC, camera);
 
+        /* Brain Explorer mode: the primary neuron and cortical field are
+           hidden, so every tap is exclusively about the anatomical regions —
+           tapping empty space just orbits, it never falls through to firing
+           a (hidden) neuron. */
+        if (explorerActive) {
+          const anatHits = raycaster.intersectObjects(anatClickables, false);
+          if (anatHits.length > 0) {
+            stimulateRegion(anatHits[0].object.userData.anatKey, anatHits[0].object);
+          }
+          return;
+        }
+
         /* Field neurons are independent from the primary soma: clicking one fires
            only that neuron instead of the whole cathedral. Checked first since
            these are small, precise targets — the big anatomy shells further
@@ -4697,7 +4760,7 @@
            meant for the field. */
         const anatHits = raycaster.intersectObjects(anatClickables, false);
         if (anatHits.length > 0) {
-          triggerAnatRegion(anatHits[0].object.userData.anatKey);
+          triggerAnatRegion(anatHits[0].object.userData.anatKey, anatHits[0].object);
           return;
         }
 
@@ -4965,6 +5028,7 @@
 
       function startTour() {
         if (typeof brainTourActive !== "undefined" && brainTourActive) endBrainTour();
+        if (typeof explorerActive !== "undefined" && explorerActive) setExplorerMode(false);
         tourActive = true;
         tourPaused = false;
         tourPauseBtn.textContent = "\u23F8";
@@ -5220,6 +5284,7 @@
       function startBrainTour() {
         if (tourActive) endTour();
         if (insideMode) setInsideMode(false);
+        if (typeof explorerActive !== "undefined" && explorerActive) setExplorerMode(false);
         brainTourActive = true;
         brainTourPaused = false;
         brainTourPauseBtn.textContent = "\u23F8";
@@ -5316,6 +5381,75 @@
           }
           m.material.opacity += (target - m.material.opacity) * 0.09;
         });
+      }
+
+      /* ================= Brain Explorer: a dedicated section that strips the
+         scene down to exclusively the anatomical brain-region shells (no
+         primary neuron, no cortical field) with a free, user-controlled
+         camera, so every part can be found and "stimulated" on its own —
+         unlike the scripted, narrated whole-brain tour above. ================= */
+      let explorerActive = false;
+      let explorerPrevAutoRotate = true;
+      const explorerStimCounts = {};
+      let explorerHintRevertTimer = null;
+      const btnExplorer = document.getElementById("btn-explorer");
+      const explorerHintEl = document.getElementById("explorer-hint");
+
+      function showExplorerHint(text, revertAfterMs) {
+        explorerHintEl.textContent = text;
+        explorerHintEl.classList.add("show");
+        clearTimeout(explorerHintRevertTimer);
+        if (revertAfterMs) {
+          explorerHintRevertTimer = setTimeout(() => {
+            if (explorerActive) explorerHintEl.textContent = t("explorerHint");
+          }, revertAfterMs);
+        }
+      }
+
+      function setExplorerMode(on) {
+        if (on === explorerActive) return;
+        explorerActive = on;
+        btnExplorer.classList.toggle("on", on);
+        if (on) {
+          if (tourActive) endTour();
+          if (brainTourActive) endBrainTour();
+          if (insideMode) setInsideMode(false);
+          explorerPrevAutoRotate = controls.autoRotate;
+          controls.autoRotate = false;
+          networkGroup.visible = false;
+          brainBaseGroup.visible = false;
+          stopFactCycle();
+          showExplorerHint(t("explorerHint"));
+          showToast(t("explorerOn"));
+        } else {
+          controls.autoRotate = explorerPrevAutoRotate;
+          networkGroup.visible = true;
+          brainBaseGroup.visible = true;
+          clearTimeout(explorerHintRevertTimer);
+          explorerHintEl.classList.remove("show");
+          showToast(t("explorerOff"));
+          startFactCycle();
+        }
+      }
+      btnExplorer.addEventListener("click", () => setExplorerMode(!explorerActive));
+
+      /* Tapping a region while exploring gives it a "stimulus": the same
+         visual scale-pulse used elsewhere, plus a combined readout — what the
+         region normally does, and what directly stimulating it tends to
+         produce — with a running per-region tally so repeated taps build on
+         each other instead of repeating the same line. */
+      function stimulateRegion(key, mesh) {
+        ensureAudio();
+        playZap();
+        if (mesh) pulseRegionMesh(mesh);
+        haptic(10);
+        explorerStimCounts[key] = (explorerStimCounts[key] || 0) + 1;
+        const count = explorerStimCounts[key];
+        const label = t(key);
+        const fact = t(anatFactKeys[key] || "");
+        const effect = t(anatStimKeys[key] || "");
+        const tally = count > 1 ? ` (${t("explorerStimulated")} \u00d7${count})` : "";
+        showExplorerHint(`${label}: ${fact} ${effect}${tally}`, 4200);
       }
 
       /* ================= Swipe gestures: on touch devices, a left/right
@@ -5483,6 +5617,10 @@
           case "G":
             btnBrainTour.click();
             break;
+          case "e":
+          case "E":
+            btnExplorer.click();
+            break;
           case "n":
           case "N":
             setNarration(!narrationEnabled);
@@ -5536,6 +5674,7 @@
             if (insideMode) setInsideMode(false);
             if (tourActive) endTour();
             if (brainTourActive) endBrainTour();
+            if (explorerActive) setExplorerMode(false);
             break;
         }
       });
