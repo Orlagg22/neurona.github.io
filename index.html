@@ -1397,6 +1397,9 @@
         opacity: 0;
         transition: opacity 0.4s ease, transform 0.4s ease;
         border-color: rgba(255, 170, 0, 0.3);
+        background: rgba(6, 8, 12, 0.92) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
       }
       #tour-caption.open {
         display: block;
@@ -4212,6 +4215,11 @@
       composer.addPass(renderPass);
 
       const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.8, 0.6, 0.1);
+      /* Dimmer bloom target used specifically while the narrated neuron tour
+         (btn-tour / TOUR_STOPS) is active, so the glowing neurons read a
+         bit softer during the guided walkthrough than in free exploration. */
+      const TOUR_BLOOM_BASE = 0.85;
+      const TOUR_BLOOM_FIRE_PEAK = 1.4;
       composer.addPass(bloomPass);
 
       const controls = new OrbitControls(camera, renderer.domElement);
@@ -4449,7 +4457,7 @@
       const nucleusMat = new THREE.MeshBasicMaterial({
         color: CONFIG.colors.violet,
         transparent: true,
-        opacity: 0.55,
+        opacity: 0.32,
         blending: THREE.AdditiveBlending,
         wireframe: true,
       });
@@ -4460,7 +4468,7 @@
       const nucleusCoreMat = new THREE.MeshBasicMaterial({
         color: CONFIG.colors.violet,
         transparent: true,
-        opacity: 0.18,
+        opacity: 0.11,
         blending: THREE.AdditiveBlending,
       });
       const nucleusCoreMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(CONFIG.somaRadius * 0.38, 2), nucleusCoreMat);
@@ -4470,7 +4478,7 @@
       const mitoMat = new THREE.MeshBasicMaterial({
         color: CONFIG.colors.orange,
         transparent: true,
-        opacity: 0.75,
+        opacity: 0.45,
         blending: THREE.AdditiveBlending,
       });
       const mitochondria = [];
@@ -4489,7 +4497,7 @@
       const erMat = new THREE.MeshBasicMaterial({
         color: CONFIG.colors.cyan,
         transparent: true,
-        opacity: 0.4,
+        opacity: 0.26,
         wireframe: true,
         blending: THREE.AdditiveBlending,
       });
@@ -4503,7 +4511,7 @@
       const channelMat = new THREE.MeshBasicMaterial({
         color: CONFIG.colors.gold,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.55,
         blending: THREE.AdditiveBlending,
       });
       const ionChannels = [];
@@ -7332,7 +7340,7 @@
             if (STATE.phase === 2) {
               const target = camera.position.clone().multiplyScalar(0.85);
               camera.position.lerp(target, 0.5);
-              bloomPass.strength = 2.5;
+              bloomPass.strength = (typeof tourActive !== "undefined" && tourActive) ? TOUR_BLOOM_FIRE_PEAK : 2.5;
             }
             if (STATE.phase === 3) {
               const target = camera.position.clone().multiplyScalar(1.2);
@@ -7347,7 +7355,8 @@
             }
           }
         } else {
-          bloomPass.strength += (1.8 - bloomPass.strength) * 0.05;
+          const idleBloomTarget = (typeof tourActive !== "undefined" && tourActive) ? TOUR_BLOOM_BASE : 1.8;
+          bloomPass.strength += (idleBloomTarget - bloomPass.strength) * 0.05;
         }
 
         uniforms.uPhase.value = STATE.phase;
