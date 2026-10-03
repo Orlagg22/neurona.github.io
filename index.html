@@ -2530,7 +2530,7 @@
       <div id="chat-chips"></div>
       <div id="chat-log"></div>
       <div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-send" class="tour-nav-btn">➤</button></div>
-      <div id="chat-privacy" style="font-size:10px;opacity:.5;text-align:center">Las conversaciones se guardan en este dispositivo · Chats are saved on this device</div>
+      <div id="chat-privacy" style="font-size:10px;opacity:.5;text-align:center">Si no sé algo, envío SOLO tu pregunta a fuentes abiertas / IAs gratuitas externas · If I don't know, ONLY your question goes to open sources / free external AIs</div>
       <div id="mem-trace-dummy" style="display:none"></div><div id="chat-mem-title"></div>
       <div id="chat-mem"></div>
     </div>
@@ -7244,7 +7244,7 @@
           return R("Listo, he borrado todo lo que sabía de ti. Es como si nos conociéramos hoy.", "Done, I erased everything I knew about you. It is as if we just met.", ["labelHippocampus"]);
         }
         if (/(qui[eé]n (?:es|fue) (?:tu|su) (?:creador|due[ñn]o|programador|autor)|qui[eé]n te (?:cre[oó]|hizo|program[oó]|dise[ñn][oó]|invent[oó])|tu creador|who (?:made|created|built|programmed|designed) you|who is your (?:creator|maker|developer)|your creator)/.test(m))
-          return R(creatorUnlocked ? "Me creaste tú, Orlando 😄 Me diseñaste desde cero como una red neuronal que se entrena aquí mismo, sin depender de ninguna otra IA." : "Mi creador es Orlando. Me diseñó desde cero como una red neuronal que se entrena en tu navegador, sin depender de ninguna otra IA.", creatorUnlocked ? "You created me, Orlando 😄 You designed me from scratch as a neural network that trains right here, with no other AI behind me." : "My creator is Orlando. He designed me from scratch as a neural network that trains in your browser, with no other AI behind me.", ["labelPrefrontal", "labelHippocampus"]);
+          return R(creatorUnlocked ? "Me creaste tú, Orlando 😄 Me diseñaste desde cero como una red neuronal que se entrena aquí mismo, con mi propia red neuronal, y para lo que no sé consulto fuentes abiertas." : "Mi creador es Orlando. Me diseñó desde cero como una red neuronal que se entrena en tu navegador, con mi propia red neuronal, y para lo que no sé consulto fuentes abiertas.", creatorUnlocked ? "You created me, Orlando 😄 You designed me from scratch as a neural network that trains right here, with my own network, consulting open sources for what I don't know." : "My creator is Orlando. He designed me from scratch as a neural network that trains in your browser, with my own network, consulting open sources for what I don't know.", ["labelPrefrontal", "labelHippocampus"]);
         if (/(c[oó]mo te llamas|cu[aá]l es tu nombre|tu nombre|c[oó]mo te dicen|c[oó]mo te puedo llamar|what(?:'s| is) your name|your name|what should i call you|what are you called)/.test(m)) {
           if (!mind.name) pendingKey = "name";
           return R("Me llamo Noryx" + (mind.name ? ", " + mind.name : ". ¿Y tú, cómo te llamas?"), "My name is Noryx" + (mind.name ? ", " + mind.name : ". And you, what is your name?"), ["labelPrefrontal", "labelHippocampus"]);
@@ -7523,7 +7523,27 @@
       let taught = [];
       try { taught = JSON.parse(localStorage.getItem("noryx-taught-v1") || "[]"); } catch (e) { taught = []; }
       const taughtSave = () => { try { localStorage.setItem("noryx-taught-v1", JSON.stringify(taught.slice(-200))); } catch (e) { /* ignore */ } };
-      let bAsk = null;
+      let bAsk = null; /* ya no se le pregunta a la gente cómo responder */
+      /* ---- Aprende solo de las preguntas: intereses + respuestas halladas ---- */
+      let interests = {};
+      try { interests = JSON.parse(localStorage.getItem("noryx-interests-v1") || "{}"); } catch (e) { interests = {}; }
+      const INT_STOP = new Set("que como cual cuales donde cuando quien porque para por con una uno unos unas los las del the what who how why where when which this that with from sobre dime sabes puedes tengo esta este eso esa soy eres".split(" "));
+      function noteInterest(text) {
+        (bnorm(text).match(/[a-z]{4,}/g) || []).forEach((w) => { if (!INT_STOP.has(w)) interests[w] = (interests[w] || 0) + 1; });
+        const top = Object.entries(interests).sort((a, b) => b[1] - a[1]).slice(0, 60);
+        interests = Object.fromEntries(top);
+        try { localStorage.setItem("noryx-interests-v1", JSON.stringify(interests)); } catch (e) { /* ignore */ }
+      }
+      const topInterests = (n) => Object.entries(interests).sort((a, b) => b[1] - a[1]).slice(0, n).map((x) => x[0]);
+      function autoLearn(q, a, src) {
+        q = q.trim().replace(/[?!¿¡.]+$/g, ""); a = (a || "").trim();
+        if (!q || !a || /Open-Meteo/.test(src || "")) return; // el clima cambia: no se guarda
+        const ex = taught.find((t) => t.q.toLowerCase() === q.toLowerCase());
+        if (ex) { if (!ex.auto) return; ex.a = a; ex.src = src; ex.ts = Date.now(); }
+        else taught.push({ q, a, auto: true, src, ts: Date.now() });
+        if (taught.length > 200) { const i = taught.findIndex((t) => t.auto); taught.splice(i >= 0 ? i : 0, 1); }
+        taughtSave();
+      }
       function bdot(a, b) { const mb = new Map(b.i.map((k, j) => [k, b.x[j]])); let d = 0; a.i.forEach((k, j) => { const q = mb.get(k); if (q) d += a.x[j] * q; }); return d; }
       function taughtLearn(q, a) {
         q = q.trim().replace(/[?!¿¡.]+$/g, ""); a = a.trim();
@@ -7534,7 +7554,7 @@
       }
       function taughtFind(text) {
         const v = bFeat(text); let best = null, bs = 0;
-        taught.forEach((t) => { const d = bdot(v, bFeat(t.q)); if (d > bs) { bs = d; best = t; } });
+        taught.forEach((t) => { if (t.auto && Date.now() - (t.ts || 0) > 2592e6) return; const d = bdot(v, bFeat(t.q)); if (d > bs) { bs = d; best = t; } });
         return bs >= 0.62 ? best : null;
       }
       /* ---- Web lookup without any AI: public data APIs (Wikipedia, Wikidata, REST Countries, Open-Meteo, DuckDuckGo) ---- */
@@ -7604,6 +7624,42 @@
         if (q.length < 3) return null;
         return (await webWeather(text, es)) || (await webCountry(text, es)) || (await webWiki(q, es ? "es" : "en")) || (await webWikidata(q, es)) || (await webDDG(q)) || (await webWiki(q, es ? "en" : "es"));
       }
+      /* ---- IAs gratuitas SIN registro ni clave (se prueban en orden; si una falla se usa la siguiente) ---- */
+      const AI_SYS = "Eres un asistente que responde con precisión y brevedad (máximo 4 frases) en el idioma del usuario. Si no estás seguro de algo, dilo claramente. No inventes datos, cifras ni fuentes.";
+      const FREE_AIS = [
+        { name: "Pollinations", url: "https://text.pollinations.ai/openai", body: (q) => ({ model: "openai", private: true, messages: [{ role: "system", content: AI_SYS }, { role: "user", content: q }] }) },
+        { name: "Pollinations (mistral)", url: "https://text.pollinations.ai/openai", body: (q) => ({ model: "mistral", private: true, messages: [{ role: "system", content: AI_SYS }, { role: "user", content: q }] }) },
+      ];
+      let aiDownUntil = 0;
+      async function aiAsk(text, es) {
+        if (Date.now() < aiDownUntil) return null;
+        const q = text.slice(0, 400); // solo se envía la pregunta: nunca tu nombre ni tu memoria
+        for (const ai of FREE_AIS) {
+          const c = new AbortController(); const tm = setTimeout(() => c.abort(), 15000);
+          try {
+            const r = await fetch(ai.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(ai.body(q)), signal: c.signal });
+            if (!r.ok) continue;
+            const raw = await r.text();
+            let out = raw;
+            try { const j = JSON.parse(raw); out = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ""; } catch (e) { /* texto plano */ }
+            out = (out || "").replace(/\s+/g, " ").trim();
+            if (out.length < 8 || /^\s*[{<]/.test(out) || /api key|unauthori|sign ?up|rate limit|deprecated|enter\.pollinations/i.test(out.slice(0, 200))) continue;
+            lastWeb = { src: "IA gratuita externa (" + ai.name + ")", url: "" };
+            return out.slice(0, 700);
+          } catch (e) { /* siguiente */ } finally { clearTimeout(tm); }
+        }
+        aiDownUntil = Date.now() + 120000; // evita reintentar sin parar si están caídas
+        return null;
+      }
+      /* Fuentes confiables primero; IA gratuita solo como último recurso. Cita la fuente y guarda lo aprendido. */
+      async function smartLookup(text, es) {
+        let r = await webLookup(text, es), ai = false;
+        if (!r) { r = await aiAsk(text, es); ai = !!r; }
+        if (!r) return null;
+        const src = lastWeb ? lastWeb.src : "";
+        autoLearn(text, r, src);
+        return r + (ai ? (es ? "\n⚠️ Respuesta de una IA externa: puede equivocarse, verifícala." : "\n⚠️ Answer from an external AI: it can be wrong, please verify it.") : "") + (src ? "\n🔎 " + (es ? "Fuente: " : "Source: ") + src + (lastWeb && lastWeb.url ? " (" + lastWeb.url + ")" : "") : "");
+      }
       let bctx = { t: null, i: 0 };
       let blp = "";
       const bpick = (a) => { let x; for (let k = 0; k < 4; k++) { x = a[Math.floor(Math.random() * a.length)]; if (x !== blp) break; } blp = x; return x; };
@@ -7615,9 +7671,11 @@
         if (/^\s*(?:qui[eé]n(?:es)?|qu[eé]|cu[aá]l(?:es)?|who|what|which)\s+(?:es|son|fue|fueron|era|is|are|was)\s+(?!tu\b|t[uú]\b|your\b|you\b)/i.test(text) && !TOPICS.some((t) => t.id === p.id)) p.ok = false;
         if (SAFE.test(text)) return (es ? "Lo que dices me importa mucho" + nm + ". No tienes que cargarlo solo: habla ahora con alguien de confianza o con un servicio de ayuda. En México puedes llamar a la Línea de la Vida: 800 911 2000; si estás en peligro inmediato, llama a emergencias (911). Yo sigo aquí contigo." : "What you said matters a lot" + nm + ". You don't have to carry it alone: please talk to someone you trust or a crisis service now. If you are in immediate danger call your local emergency number (911 in the US and Mexico), or call or text 988 in the US. I'm still here with you.") + "\n[[regions: labelAmygdala, labelPrefrontal]]";
         const tag = (k) => "\n[[regions: " + k + "]]";
+        if (/\?|^(qu[eé]|c[oó]mo|por qu[eé]|cu[aá]l|qui[eé]n|d[oó]nde|cu[aá]ndo|what|why|how|who|when|where)\b/i.test(text.trim()) || text.trim().length > 25) noteInterest(text);
+        if (/(qu[eé] (?:te )?he preguntado|de qu[eé] (?:hemos )?hablado m[aá]s|mis intereses|what have i asked|my interests)/i.test(text)) { const ti = topInterests(6); return (ti.length ? (es ? "Lo que más me has preguntado: " : "What you ask about most: ") + ti.join(", ") + "." : (es ? "Aún no tengo suficientes preguntas tuyas para saberlo." : "I do not have enough of your questions yet.")) + tag("labelHippocampus"); }
         if (lastWeb && /\b(fuente|fuentes|referencia|referencias|enlace|link|source|sources)\b|d[oó]nde (?:lo )?(?:encontraste|sacaste|le[ií])/i.test(text)) return (es ? "Lo saqué de " + lastWeb.src : "I got that from " + lastWeb.src) + (lastWeb.url ? ": " + lastWeb.url : ".") + tag("labelPrefrontal");
         const sm = text.match(/^(?:busca|investiga|b[uú]scame|search|look up|google)\s+(?:en internet\s+)?(.{3,})$/i);
-        if (sm) return webLookup(sm[1], es).then((r) => (r ? r : (es ? "Busqué en internet pero no encontré nada claro sobre eso. Prueba con otras palabras o enséñame: «aprende: pregunta = respuesta»." : "I searched the web but found nothing clear. Try other words or teach me: \"learn: question = answer\".")) + tag("labelPrefrontal, labelCerebrum"));
+        if (sm) return smartLookup(sm[1], es).then((r) => (r ? r : (es ? "Busqué en fuentes abiertas y en IAs gratuitas pero no obtuve nada claro. Prueba con otras palabras." : "I searched open sources and free AIs but found nothing clear. Try other words.")) + tag("labelPrefrontal, labelCerebrum"));
         const tm = text.match(/^(?:aprende|ens[eé]ñate|learn|teach)[:\s]+(.+?)\s*(?:=>|->|=|responde|answer)\s*(.+)$/i) || text.match(/cuando (?:te )?(?:diga|escriba|pregunte)\s+(.+?),?\s+(?:responde|contesta|di)(?:me)?\s+(.+)$/i) || text.match(/when i (?:say|ask|write)\s+(.+?),?\s+(?:reply|answer|say)\s+(.+)$/i);
         if (tm && taughtLearn(tm[1], tm[2])) { bAsk = null; return (es ? "¡Aprendido! Cuando me digas algo como «" + tm[1].trim() + "» responderé eso. Ya sé " + taught.length + " cosas que me enseñaste." : "Learned! When you say something like \"" + tm[1].trim() + "\" I'll answer that. I know " + taught.length + " things you taught me.") + tag("labelHippocampus, labelPrefrontal"); }
         if (/olvida lo que (?:te )?ense[ñn]|forget what i taught/i.test(text)) { const n = taught.length; taught = []; taughtSave(); return (es ? "Listo, olvidé las " + n + " cosas que me enseñaste." : "Done, I forgot the " + n + " things you taught me.") + tag("labelHippocampus"); }
@@ -7628,7 +7686,7 @@
           if (!/\?\s*$/.test(text) && !local.store && taughtLearn(q0, text)) return (es ? "¡Anotado! La próxima vez que me digas algo parecido a «" + q0 + "» responderé eso." : "Got it! Next time you say something like \"" + q0 + "\" I'll answer that.") + tag("labelHippocampus, labelPrefrontal");
         }
         const th = taughtFind(text);
-        if (th) return th.a.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend")) + tag("labelHippocampus, labelPrefrontal");
+        if (th) return th.a.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend")) + (th.auto && th.src ? (es ? "\n🧠 Lo aprendí antes de: " : "\n🧠 I learned this earlier from: ") + th.src : "") + tag("labelHippocampus, labelPrefrontal");
         const regionInfo = local.keys && local.keys.length === 1 && BRAIN_INFO[local.keys[0]] && local.text === BRAIN_INFO[local.keys[0]][L];
         const names = () => TOPICS.slice().sort(() => brnd() - 0.5).slice(0, 3).map((t) => t.n.split("|")[es ? 0 : 1]).join(", ");
         let out, keys, cb = false, web = false;
@@ -7643,7 +7701,7 @@
             else if (bctx.i < 3) { out = bctx.t[L][bctx.i++]; keys = bctx.t.rg; }
             else { out = (es ? "Eso es todo lo que sé de " : "That is all I know about ") + bctx.t.n.split("|")[es ? 0 : 1] + (es ? ". ¿Probamos con " : ". Shall we try ") + names() + "?"; keys = bctx.t.rg; }
           } else if (p.id === "self") {
-            out = es ? "Soy Noryx, una red neuronal pequeña hecha desde cero en este archivo: convierto tu frase en números, " + BH + " neuronas ocultas la procesan y elijo entre " + BC + " temas el más probable (ahora con " + Math.round(p.conf * 100) + " % de confianza). Me entrené al abrir la página; no uso internet ni otra IA. Me creó Orlando." : "I am Noryx, a small neural network built from scratch in this file: I turn your sentence into numbers, " + BH + " hidden neurons process it and I pick the likeliest of " + BC + " topics (" + Math.round(p.conf * 100) + "% confident now). I trained when the page opened; I use no internet and no other AI. Orlando created me.";
+            out = es ? "Soy Noryx, una red neuronal pequeña hecha desde cero en este archivo: convierto tu frase en números, " + BH + " neuronas ocultas la procesan y elijo entre " + BC + " temas el más probable (ahora con " + Math.round(p.conf * 100) + " % de confianza). Me entrené al abrir la página; para preguntas nuevas consulto fuentes abiertas (Wikipedia, etc.) y, si hace falta, IAs gratuitas sin registro, y guardo lo aprendido en tu navegador. Me creó Orlando." : "I am Noryx, a small neural network built from scratch in this file: I turn your sentence into numbers, " + BH + " hidden neurons process it and I pick the likeliest of " + BC + " topics (" + Math.round(p.conf * 100) + "% confident now). I trained when the page opened; for new questions I consult open sources (Wikipedia, etc.) and, if needed, free no-signup AIs, and I save what I learn in your browser. Orlando created me.";
             keys = ["labelPrefrontal", "labelCerebrum"];
           } else if (p.id === "topics") { out = (es ? "Sé de: " : "I know about: ") + TOPICS.map((t) => t.n.split("|")[es ? 0 : 1]).join(", ") + "."; keys = ["labelPrefrontal"]; }
           else if (FRI[p.id]) { const f = FRI[p.id]; out = bpick(f[L]); keys = f.rg; cb = !!f.cb; }
@@ -7655,14 +7713,14 @@
           out = q ? bpick(es ? ["Buena pregunta, {n}. Eso no lo tengo en mi red, pero me da curiosidad: ¿tú qué opinas?", "Mmm, ahí me pillaste. Si quieres hablamos de " + names() + ", o me cuentas qué tienes en mente."] : ["Good question, {n}. I don't have that in my network, but I'm curious: what do you think?", "Hmm, you got me. We can talk about " + names() + ", or tell me what's on your mind."])
             : long ? bpick(es ? ["Ya veo… suena importante. ¿Y cómo te hace sentir eso?", "Gracias por contarme eso, {n}. ¿Qué es lo que más te ronda la cabeza de todo esto?", "Interesante. Cuéntame más, que me quedé con ganas de saber."] : ["I see… sounds important. How does that make you feel?", "Thanks for telling me, {n}. What's been on your mind most about it?", "Interesting. Tell me more, I'm curious."])
             : bpick(es ? ["Cuéntame más, que aquí hay buena onda para platicar.", "Mmm, no te cacho del todo. ¿Me lo explicas de otra forma?"] : ["Tell me more, good vibes for chatting here.", "Hmm, I didn't quite get that. Can you put it another way?"]);
-          keys = ["labelPrefrontal"]; cb = true; bAsk = text;
+          keys = ["labelPrefrontal"]; cb = true;
           web = !/\b(yo|me|mi|mis|t[uú]|tu|te|ti|i|my|you|your)\b/i.test(text) && navigator.onLine !== false && (q || text.trim().split(/\s+/).length <= 5);
-          out += es ? "\n💡 ¿Cómo debería responder a eso? Escríbeme la respuesta y la aprendo (o di «no»)." : "\n💡 How should I answer that? Type the answer and I'll learn it (or say \"no\").";
+          if (web) out = es ? "Busqué en fuentes confiables y en IAs gratuitas, pero ahora no obtuve una respuesta clara (¿sin conexión?). Prueba con otras palabras y lo intento de nuevo." : "I searched reliable sources and free AIs but got no clear answer right now (offline?). Try other words and I will retry.";
         }
         if (cb && mind.facts.length && Math.random() < 0.4) { const f = bpick(mind.facts); out += es ? "\nPor cierto, me acordé de que " + factText(f, true) + ". ¿Cómo va eso?" : "\nBy the way, I remembered " + factText(f, false) + ". How is that going?"; }
         out = out.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend"));
         const fin = out + "\n[[regions: " + keys.join(", ") + "]]";
-        if (web) return webLookup(text, es).then((r) => { if (r) { bAsk = null; return r + tag("labelPrefrontal, labelCerebrum"); } return fin; }).catch(() => fin);
+        if (web) return smartLookup(text, es).then((r) => { if (r) { return r + tag("labelPrefrontal, labelCerebrum"); } return fin; }).catch(() => fin);
         return fin;
       }
       const llmReady = () => true;
@@ -8073,7 +8131,7 @@
         document.getElementById("chat-mem-title").textContent = (es ? "🧠 Memoria guardada: " : "🧠 Stored memory: ") + (mind.facts.length + (mind.name ? 1 : 0));
       }
       let chatGreeted = false;
-      (function () { if (typeof cloudOn === "function" && cloudOn()) { const el = document.getElementById("chat-privacy"); if (el) el.textContent = "Las conversaciones se guardan y las puede revisar el creador · Chats are stored and may be reviewed by the creator"; } })();
+      (function () { if (typeof cloudOn === "function" && cloudOn()) { const el = document.getElementById("chat-privacy"); if (el) el.textContent = "Las conversaciones las puede revisar el creador. Si no sé algo, solo tu pregunta va a fuentes/IAs gratuitas externas · Chats may be reviewed by the creator. If I don't know, only your question goes to external sources/free AIs"; } })();
       function chatToggle(open) {
         chatPanel.classList.toggle("open", open);
         btnChat.classList.toggle("on", open);
@@ -9238,4 +9296,3 @@
     </script>
   </body>
 </html>
-
