@@ -1603,6 +1603,158 @@
       #brain-tour-caption .brain-tour-nav .tour-nav-btn {
         color: var(--magenta);
       }
+      /* ---------- Learning tour caption ---------- */
+      #learn-tour-caption {
+        position: absolute;
+        bottom: clamp(44px, 8vw, 64px);
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        z-index: 22;
+        width: min(480px, calc(100vw - 32px));
+        padding: 16px 20px;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        border-color: rgba(157, 78, 221, 0.4);
+      }
+      #learn-tour-caption.open {
+        display: block;
+      }
+      #learn-tour-caption.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #learn-tour-caption-title {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--magenta);
+        font-weight: 700;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #learn-tour-caption-title .speaking-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--magenta);
+        box-shadow: 0 0 6px var(--magenta);
+        animation: speakPulse 1s infinite;
+      }
+      #learn-tour-caption-text {
+        font-size: 11.5px;
+        line-height: 1.55;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      #learn-tour-caption-progress {
+        margin-top: 12px;
+        height: 2px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+      }
+      #learn-tour-caption-bar {
+        height: 100%;
+        width: 0%;
+        background: var(--magenta);
+        box-shadow: 0 0 6px rgba(255, 0, 170, 0.7);
+        transition: width 0.15s linear;
+      }
+      #learn-tour-caption-steps {
+        margin-top: 8px;
+        display: flex;
+        gap: 2px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      #learn-tour-caption-steps span {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: auto;
+      }
+      #learn-tour-caption-steps span::after {
+        content: "";
+        display: block;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        transition: all 0.3s;
+      }
+      #learn-tour-caption-steps span:hover::after {
+        background: rgba(255, 255, 255, 0.4);
+      }
+      #learn-tour-caption-steps span.active::after {
+        background: var(--magenta);
+        box-shadow: 0 0 6px rgba(255, 0, 170, 0.7);
+        width: 12px;
+        border-radius: 3px;
+      }
+      #learn-tour-caption-steps span.done::after {
+        background: rgba(255, 0, 170, 0.45);
+      }
+      #learn-tour-caption .brain-tour-nav .tour-nav-btn {
+        color: var(--magenta);
+      }
+      #learn-meter{display:none;align-items:center;gap:8px;margin:8px 0 2px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.9}
+      #learn-meter.on{display:flex}
+      #learn-meter-track{flex:1;height:6px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden}
+      #learn-meter-fill{height:100%;width:0%;border-radius:4px;background:linear-gradient(90deg,#7ad9ff,#3ddc97,#ffd166);transition:width 1.6s ease}
+      #learn-tour-section{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#7ad9ff;opacity:.85;margin-bottom:3px}
+      #hebb-panel{position:absolute;right:14px;bottom:clamp(44px,8vw,64px);width:min(320px,calc(100vw - 28px));padding:14px 16px;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .3s,transform .3s;z-index:30}
+      #hebb-panel.open{opacity:1;pointer-events:auto;transform:none}
+      #hebb-title{font-weight:600;margin-bottom:6px;color:#ffd166}
+      #hebb-help{font-size:12px;line-height:1.5;opacity:.85;margin:0 0 8px}
+      #hebb-stats{font-size:11px;opacity:.9;margin-bottom:6px}
+      #hebb-bar{height:6px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden}
+      #hebb-fill{height:100%;width:0;background:linear-gradient(90deg,#7ad9ff,#ffd166);transition:width .6s}
+      #hebb-actions{display:flex;gap:8px;margin-top:10px}
+      #hebb-actions .tour-nav-btn{width:auto;padding:0 12px;font-size:12px;border-radius:14px}
+      #chat-panel{position:absolute;right:14px;bottom:clamp(44px,8vw,64px);width:min(400px,calc(100vw - 28px));max-height:80vh;display:flex;flex-direction:column;gap:8px;padding:14px 16px;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .3s,transform .3s;z-index:31}
+      #chat-panel.open{opacity:1;pointer-events:auto;transform:none}
+      #chat-title{font-weight:600;color:#7ad9ff}
+      #chat-chips{display:flex;flex-wrap:wrap;gap:5px}
+      .chat-chip-btn{font-size:11px;padding:3px 9px;border-radius:12px;border:1px solid rgba(122,217,255,.4);background:rgba(122,217,255,.08);color:inherit;cursor:pointer}
+      #chat-log{flex:1;min-height:140px;max-height:44vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45}
+      .chat-msg{padding:7px 10px;border-radius:12px;max-width:88%;white-space:pre-wrap}
+      .chat-msg.me{align-self:flex-end;background:rgba(255,209,102,.18)}
+      .chat-msg.ai{align-self:flex-start;background:rgba(122,217,255,.14)}
+      #chat-row{display:flex;gap:6px}
+      #chat-input{flex:1;min-width:0;padding:8px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.35);color:inherit;font-size:16px}
+      #chat-mem-title,#chat-mem{display:none !important}
+      .chat-hbtn{position:absolute;top:8px;font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;background:none;border:none;padding:0 2px}
+      .chat-hbtn:hover{color:#fff}
+      #chat-title .ai-badge{font-size:10px;margin-left:6px;padding:2px 7px;border-radius:10px;background:rgba(61,220,151,.18);color:#3ddc97;font-weight:600}
+      #chat-title .ai-badge.off{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
+      #chat-settings{display:none;flex-direction:column;gap:6px;font-size:12px;padding:10px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.14)}
+      #chat-settings.open{display:flex}
+      #chat-settings select,#chat-settings input{width:100%;box-sizing:border-box;padding:7px 9px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.4);color:inherit;font-size:16px;font-family:inherit}
+      #chat-settings select option{background:#0b121c;color:#fff}
+      #chat-settings .row{display:flex;gap:6px}
+      #chat-settings button{flex:1;padding:7px 8px;border-radius:10px;border:1px solid rgba(122,217,255,.45);background:rgba(122,217,255,.12);color:inherit;font-size:12px;cursor:pointer}
+      #chat-settings .hint{opacity:.65;line-height:1.4;font-size:11px}
+      #llm-status{min-height:14px;font-size:11px}
+      .chat-msg.ai.err{background:rgba(255,120,120,.16)}
+      #chat-send:disabled{opacity:.4}
+      #mem-trace{position:absolute;top:clamp(64px,10vw,84px);left:50%;transform:translate(-50%,-8px);width:min(420px,calc(100vw - 28px));padding:10px 14px;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;z-index:32;font-size:12px}
+      #mem-trace.show{opacity:1;transform:translate(-50%,0)}
+      #mem-trace-title{font-weight:600;color:#ffd166;margin-bottom:6px;word-break:break-word}
+      .mt-step{padding:3px 0 3px 18px;position:relative;opacity:.3;transition:opacity .3s,color .3s}
+      .mt-step::before{content:"○";position:absolute;left:0}
+      .mt-step.on{opacity:1;color:#7ad9ff}
+      .mt-step.on::before{content:"●"}
+      .mt-step.done{opacity:.75;color:#3ddc97}
+      .mt-step.done::before{content:"✓"}
+      #chat-mem{display:flex;flex-wrap:wrap;gap:5px;max-height:70px;overflow-y:auto}
+      .chat-chip{font-size:11px;padding:3px 8px;border-radius:12px;background:rgba(61,220,151,.14)}
+      .chat-chip b{cursor:pointer;opacity:.6;margin-left:3px}
       /* ---------- Swipe hint (mobile, shown briefly during either tour) ---------- */
       #tour-swipe-hint {
         position: absolute;
@@ -2214,10 +2366,16 @@
       <button class="tool-btn" id="btn-reset-cam" data-i18n-title="tt_reset" title="Reset camera">⟲</button>
       <button class="tool-btn" id="btn-tour" data-i18n-title="tt_tour" title="Guided tour, narrated by AI"><span id="btn-tour-icon">▶</span><span class="tool-btn-label">1</span></button>
       <button class="tool-btn" id="btn-brain-tour" data-i18n-title="tt_braintour" title="Whole-brain function tour (no neurons)"><span id="btn-brain-tour-icon">🗺️</span><span class="tool-btn-label">2</span></button>
+      <button class="tool-btn" id="btn-learn-tour" data-i18n-title="tt_learntour" title="Learning tour: how the brain learns, studies and takes exams"><span id="btn-learn-tour-icon">🎓</span><span class="tool-btn-label">3</span></button>
+      <button class="tool-btn" id="btn-emotion-tour" title="Tour 4: Emotions and fear / Emociones y miedo"><span id="btn-emotion-tour-icon">🎭</span><span class="tool-btn-label">4</span></button>
+      <button class="tool-btn" id="btn-senses-tour" title="Tour 5: Senses and perception / Sentidos y percepción"><span id="btn-senses-tour-icon">👁️</span><span class="tool-btn-label">5</span></button>
+      <button class="tool-btn" id="btn-move-tour" title="Tour 6: From thought to movement / Del pensamiento al movimiento"><span id="btn-move-tour-icon">🏃</span><span class="tool-btn-label">6</span></button>
       <button class="tool-btn" id="btn-explorer" data-i18n-title="tt_explorer" title="Explore brain parts freely — click any part to stimulate it">🧩</button>
       <button class="tool-btn" id="btn-inside" data-i18n-title="tt_inside" title="See inside the neuron">🔬</button>
       <button class="tool-btn" id="btn-brain" data-i18n-title="tt_brain" title="Real brain examples">🧠</button>
       <button class="tool-btn" id="btn-brain-compare" data-i18n-title="tt_braincompare" title="Compare brains: healthy vs. a condition">🆚</button>
+      <button class="tool-btn" id="btn-chat" title="Talk to the brain / Habla con el cerebro">💬</button>
+      <button class="tool-btn" id="btn-hebb" title="The network learns from you / La red aprende de ti">🧬</button>
       <button class="tool-btn" id="btn-lesion" data-i18n-title="tt_lesion" title="Lesion mode: simulate regional brain damage">🩹</button>
       <button class="tool-btn" id="btn-chem" data-i18n-title="tt_chem" title="Neurotransmitter pathways overlay">🧪</button>
       <button class="tool-btn" id="btn-brainstate" data-i18n-title="tt_brainstate" title="Brain states: sleep, stress, focus">🌗</button>
@@ -2351,6 +2509,39 @@
       </div>
     </div>
 
+    <div id="learn-tour-caption" class="hud-panel">
+      <div id="learn-tour-section"></div>
+      <div id="learn-tour-caption-title"><span class="speaking-dot" id="learn-tour-speaking-dot"></span><span id="learn-tour-caption-title-text">Welcome</span></div>
+      <div id="learn-tour-caption-text"></div>
+      <div id="learn-meter"><span id="learn-meter-label"></span><div id="learn-meter-track"><div id="learn-meter-fill"></div></div></div>
+      <div id="learn-tour-caption-progress"><div id="learn-tour-caption-bar"></div></div>
+      <div id="learn-tour-caption-steps"></div>
+      <div class="brain-tour-nav">
+        <button class="tour-nav-btn" id="learn-tour-prev" title="Previous stop">◀</button>
+        <button class="tour-nav-btn" id="learn-tour-pause" title="Pause / resume">⏸</button>
+        <button class="tour-nav-btn" id="learn-tour-next" title="Next stop">▶</button>
+        <button class="tour-nav-btn" id="learn-tour-exit" title="End tour">✕</button>
+      </div>
+    </div>
+    <div id="chat-panel" class="hud-panel">
+      <button id="chat-close" title="Close" style="position:absolute;top:8px;right:10px;font-size:14px;color:rgba(255,255,255,0.5);cursor:pointer;background:none;border:none">✕</button>
+      <button id="chat-new" class="chat-hbtn" style="right:34px" title="Nueva conversación / New chat">🗑</button>
+      <div id="chat-title">💬 Noryx</div>
+      <div id="chat-chips"></div>
+      <div id="chat-log"></div>
+      <div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-send" class="tour-nav-btn">➤</button></div>
+      <div id="mem-trace-dummy" style="display:none"></div><div id="chat-mem-title"></div>
+      <div id="chat-mem"></div>
+    </div>
+    <div id="mem-trace" class="hud-panel"><div id="mem-trace-title"></div><div id="mem-trace-steps"></div></div>
+    <div id="hebb-panel" class="hud-panel">
+      <button id="hebb-close" title="Close" style="position:absolute;top:8px;right:10px;font-size:14px;color:rgba(255,255,255,0.5);cursor:pointer;background:none;border:none">✕</button>
+      <div id="hebb-title"></div>
+      <p id="hebb-help"></p>
+      <div id="hebb-stats"></div>
+      <div id="hebb-bar"><div id="hebb-fill"></div></div>
+      <div id="hebb-actions"><button id="hebb-recall" class="tour-nav-btn"></button><button id="hebb-reset" class="tour-nav-btn"></button></div>
+    </div>
     <div id="tour-swipe-hint"></div>
     <div id="inside-hint"></div>
     <div id="explorer-hint" class="hud-panel"></div>
@@ -2534,6 +2725,7 @@
       <div class="kbd-row"><span data-i18n="kbd_fire">Fire an impulse</span><span class="kbd-key">Space</span></div>
       <div class="kbd-row"><span data-i18n="kbd_tour">Start / stop narrated tour</span><span class="kbd-key">T</span></div>
       <div class="kbd-row"><span data-i18n="kbd_braintour">Whole-brain function tour</span><span class="kbd-key">G</span></div>
+      <div class="kbd-row"><span data-i18n="kbd_learntour">Learning tour (study &amp; exams)</span><span class="kbd-key">U</span></div>
       <div class="kbd-row"><span data-i18n="kbd_explorer">Explore brain parts</span><span class="kbd-key">E</span></div>
       <div class="kbd-row"><span data-i18n="kbd_narrator">Toggle AI narrator voice</span><span class="kbd-key">N</span></div>
       <div class="kbd-row"><span data-i18n="kbd_mute">Mute / unmute sound</span><span class="kbd-key">M</span></div>
@@ -2734,6 +2926,9 @@
           tt_braintour: "Whole-brain function tour — regions only, no neurons",
           kbd_braintour: "Whole-brain function tour",
           braintourEnded: "Whole-brain tour ended.",
+          tt_learntour: "Learning tour — how the brain learns, studies and takes exams",
+          kbd_learntour: "Learning tour (study & exams)",
+          learntourEnded: "Learning tour ended.",
           tt_explorer: "Explore brain parts freely — click any part to stimulate it",
           kbd_explorer: "Explore brain parts",
           explorerHint: "Explorer mode: tap or click any brain region to stimulate it. Free camera — press E or tap 🧩 again to exit.",
@@ -2947,6 +3142,9 @@
           tt_braintour: "Tour del cerebro completo — solo regiones, sin neuronas",
           kbd_braintour: "Tour del cerebro completo",
           braintourEnded: "El tour del cerebro completo ha terminado.",
+          tt_learntour: "Tour del aprendizaje — cómo el cerebro aprende, estudia y rinde exámenes",
+          kbd_learntour: "Tour del aprendizaje (estudio y exámenes)",
+          learntourEnded: "El tour del aprendizaje ha terminado.",
           tt_explorer: "Explora las partes del cerebro libremente — toca cualquier parte para estimularla",
           kbd_explorer: "Explorar partes del cerebro",
           explorerHint: "Modo explorador: toca o haz clic en cualquier región del cerebro para estimularla. Cámara libre — pulsa E o toca 🧩 de nuevo para salir.",
@@ -4818,6 +5016,8 @@
       const brainBaseGroup = new THREE.Group();
       scene.add(brainBaseGroup);
 
+      const __origRandom = Math.random;
+      Math.random = (function (a) { return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })(20240611);
       const fieldNeurons = [];
       const fieldClickables = [];
 
@@ -5051,6 +5251,140 @@
         connGlow = new Float32Array(fieldConnPairs.length);
       })();
 
+      /* ================= Hebbian learning from human interaction =================
+         Every connection in the cortical field has a weight. Clicking two neurons
+         within a few seconds teaches the network to associate them: the weights along
+         the shortest path between them grow, links glow gold, and from then on firing
+         the first neuron makes the signal reach the second on its own. Repeated clicks
+         on one neuron also strengthen its outgoing links (practice). Weights slowly
+         fade if unused and are saved in the browser (localStorage). ================= */
+      Math.random = __origRandom;
+      const HEBB_KEY = "kakafuegon-hebb-v1";
+      const HEBB_WINDOW_MS = 3500;
+      const fieldWeights = new Float32Array(fieldConnPairs.length);
+      const hebbSig = fieldConnPairs.length + ":" + fieldNeurons.reduce((a, n) => a + n.group.position.x + n.group.position.y * 2 + n.group.position.z * 3, 0).toFixed(2);
+      let hebbLast = null;
+      let hebbPair = null;
+      let hebbSaveTimer = null;
+      let hebbLearned = 0;
+      try {
+        const raw = JSON.parse(localStorage.getItem(HEBB_KEY) || "null");
+        if (raw && raw.sig === hebbSig && raw.w.length === fieldWeights.length) raw.w.forEach((v, i) => (fieldWeights[i] = v));
+        if (raw && raw.pair && raw.sig === hebbSig) hebbPair = raw.pair;
+      } catch (err) { /* storage unavailable */ }
+
+      const hebbRest = new THREE.Color();
+      const hebbStrong = new THREE.Color(0xffd166);
+      function hebbPaintConn(c) {
+        const w = fieldWeights[c];
+        hebbRest.copy(fieldConnBaseColor).lerp(hebbStrong, Math.min(1, w * 1.1));
+        const k = 1 + w * 2.2;
+        const a = fieldConnGeo.attributes.color;
+        a.setXYZ(c * 2, hebbRest.r * k, hebbRest.g * k, hebbRest.b * k);
+        a.setXYZ(c * 2 + 1, hebbRest.r * k, hebbRest.g * k, hebbRest.b * k);
+        a.needsUpdate = true;
+      }
+      function hebbRepaintAll() { if (fieldConnGeo) for (let c = 0; c < fieldWeights.length; c++) hebbPaintConn(c); }
+      function hebbSave() {
+        clearTimeout(hebbSaveTimer);
+        hebbSaveTimer = setTimeout(() => {
+          try { localStorage.setItem(HEBB_KEY, JSON.stringify({ sig: hebbSig, pair: hebbPair, w: Array.from(fieldWeights, (v) => +v.toFixed(3)) })); } catch (err) { /* ignore */ }
+        }, 1200);
+      }
+      function hebbStats() {
+        let n = 0, sum = 0;
+        for (let c = 0; c < fieldWeights.length; c++) { if (fieldWeights[c] > 0.3) n++; sum += fieldWeights[c]; }
+        return { strong: n, total: fieldWeights.length, mean: sum / Math.max(1, fieldWeights.length) };
+      }
+      function hebbBump(c, amt) {
+        fieldWeights[c] = Math.min(1, fieldWeights[c] + amt);
+        connGlow[c] = 1;
+        hebbPaintConn(c);
+      }
+      function hebbPath(a, b) {
+        const prev = new Map([[a, null]]);
+        const q = [[a, 0]];
+        while (q.length) {
+          const [cur, d] = q.shift();
+          if (cur === b) break;
+          if (d >= 3) continue;
+          for (const l of fieldConnAdjacency[cur]) {
+            if (prev.has(l.other)) continue;
+            prev.set(l.other, { from: cur, c: l.connIndex });
+            q.push([l.other, d + 1]);
+          }
+        }
+        if (!prev.has(b)) return null;
+        const path = [];
+        for (let n = b; prev.get(n); n = prev.get(n).from) path.push(prev.get(n).c);
+        return path;
+      }
+      function hebbHuman(neuron) {
+        const idx = fieldNeurons.indexOf(neuron);
+        if (idx < 0) return;
+        const es = currentLang === "es";
+        const now = performance.now();
+        fieldConnAdjacency[idx].forEach((l) => hebbBump(l.connIndex, 0.04));
+        if (hebbLast && hebbLast.idx !== idx && now - hebbLast.t < HEBB_WINDOW_MS) {
+          const path = hebbPath(hebbLast.idx, idx);
+          if (path) {
+            path.forEach((c) => hebbBump(c, 0.4));
+            hebbPair = { a: hebbLast.idx, b: idx };
+            hebbLearned++;
+            showToast(es ? "🧠 ¡Asociación aprendida! Activa la primera neurona y mira." : "🧠 Association learned! Fire the first neuron and watch.");
+          } else showToast(es ? "Esas neuronas están muy lejos para asociarse." : "Those neurons are too far apart to associate.");
+        }
+        hebbLast = { idx, t: now };
+        hebbSave();
+        hebbRefreshPanel();
+      }
+      function hebbDecay(dt) {
+        let dirty = false;
+        for (let c = 0; c < fieldWeights.length; c++) {
+          if (fieldWeights[c] <= 0) continue;
+          fieldWeights[c] = Math.max(0, fieldWeights[c] - dt * 0.0006);
+          dirty = true;
+        }
+        if (dirty && Math.random() < 0.02) hebbRepaintAll();
+      }
+      function hebbRecall() {
+        if (!hebbPair) { showToast(currentLang === "es" ? "Aún no has enseñado ninguna asociación." : "You have not taught an association yet."); return; }
+        triggerFieldImpulse(fieldNeurons[hebbPair.a]);
+      }
+      function hebbReset() {
+        fieldWeights.fill(0);
+        hebbPair = null;
+        hebbLast = null;
+        hebbRepaintAll();
+        hebbSave();
+        hebbRefreshPanel();
+      }
+      const hebbPanel = document.getElementById("hebb-panel");
+      const btnHebb = document.getElementById("btn-hebb");
+      function hebbRefreshPanel() {
+        const es = currentLang === "es";
+        const st = hebbStats();
+        document.getElementById("hebb-title").textContent = es ? "🧬 La red aprende de ti" : "🧬 The network learns from you";
+        document.getElementById("hebb-help").textContent = es
+          ? "Haz clic en una neurona y, en menos de 3 segundos, en otra cercana: la red las asocia. Luego pulsa Probar memoria y la señal viajará sola. Repetir clics en una misma neurona también refuerza sus conexiones."
+          : "Click a neuron and, within 3 seconds, another nearby one: the network associates them. Then press Test memory and the signal will travel on its own. Repeated clicks on one neuron also strengthen its links.";
+        document.getElementById("hebb-stats").textContent = (es ? "Conexiones fuertes: " : "Strong links: ") + st.strong + " / " + st.total + " · " + (es ? "Fuerza media: " : "Mean strength: ") + Math.round(st.mean * 100) + "%";
+        document.getElementById("hebb-fill").style.width = Math.min(100, st.mean * 100 * 6) + "%";
+        document.getElementById("hebb-recall").textContent = es ? "▶ Probar memoria" : "▶ Test memory";
+        document.getElementById("hebb-reset").textContent = es ? "Olvidar todo" : "Forget all";
+      }
+      function hebbToggle(open) {
+        hebbPanel.classList.toggle("open", open);
+        btnHebb.classList.toggle("on", open);
+        if (open) hebbRefreshPanel();
+      }
+      btnHebb.addEventListener("click", () => { if (typeof chatToggle === "function") chatToggle(false); hebbToggle(!hebbPanel.classList.contains("open")); });
+      document.getElementById("hebb-close").addEventListener("click", () => hebbToggle(false));
+      document.getElementById("hebb-recall").addEventListener("click", hebbRecall);
+      document.getElementById("hebb-reset").addEventListener("click", hebbReset);
+      hebbRepaintAll();
+
+
       /* A small pool of traveling sparks that ride along active connections,
          visually carrying a firing neuron's impulse toward its neighbors. */
       const FIELD_PULSE_POOL = 48;
@@ -5099,14 +5433,15 @@
         const idx = fieldNeurons.indexOf(neuron);
         const links = fieldConnAdjacency[idx];
         if (!links || !links.length) return;
-        const shuffled = links.slice().sort(() => Math.random() - 0.5);
+        const shuffled = links.slice().sort((x, y) => fieldWeights[y.connIndex] - fieldWeights[x.connIndex] + (Math.random() - 0.5) * 0.3);
         let spawned = 0;
         for (const link of shuffled) {
-          if (spawned >= 2) break;
+          if (spawned >= (fieldWeights[link.connIndex] >= 0.6 ? 3 : 2)) break;
           const neighbor = fieldNeurons[link.other];
           if (neighbor.state.isAnimating) continue;
-          if (Math.random() > chance) continue;
-          spawnFieldPulse(link.connIndex, idx, link.other, depth + 1, chance * 0.55);
+          const w = fieldWeights[link.connIndex];
+          if (w < 0.6 && Math.random() > chance * (0.5 + w)) continue;
+          spawnFieldPulse(link.connIndex, idx, link.other, depth + 1, w >= 0.6 ? Math.max(0.5, chance) : chance * 0.55);
           spawned++;
         }
       }
@@ -5163,9 +5498,14 @@
             if (connGlow[c] <= 0) continue;
             connGlow[c] = Math.max(0, connGlow[c] - dt * 1.1);
             const g = connGlow[c];
-            const r = fieldConnBaseColor.r + (fieldConnActiveColor.r - fieldConnBaseColor.r) * g;
-            const gg = fieldConnBaseColor.g + (fieldConnActiveColor.g - fieldConnBaseColor.g) * g;
-            const b = fieldConnBaseColor.b + (fieldConnActiveColor.b - fieldConnBaseColor.b) * g;
+            const wk = fieldWeights[c];
+            const kk = 1 + wk * 2.2;
+            const rr = (fieldConnBaseColor.r + (hebbStrong.r - fieldConnBaseColor.r) * Math.min(1, wk * 1.1)) * kk;
+            const rg = (fieldConnBaseColor.g + (hebbStrong.g - fieldConnBaseColor.g) * Math.min(1, wk * 1.1)) * kk;
+            const rb = (fieldConnBaseColor.b + (hebbStrong.b - fieldConnBaseColor.b) * Math.min(1, wk * 1.1)) * kk;
+            const r = rr + (fieldConnActiveColor.r - rr) * g;
+            const gg = rg + (fieldConnActiveColor.g - rg) * g;
+            const b = rb + (fieldConnActiveColor.b - rb) * g;
             colorAttr.setXYZ(c * 2, r, gg, b);
             colorAttr.setXYZ(c * 2 + 1, r, gg, b);
             dirty = true;
@@ -5557,10 +5897,10 @@
       function updateAnatLabels() {
         if (insideMode) return;
         const worldPos = new THREE.Vector3();
-        const hideSecondary = isCompactViewport() && !brainTourActive;
+        const hideSecondary = isCompactViewport() && !brainTourActive && !learnTourActive;
         anatLabelAnchors.forEach((a) => {
           const el = anatLabelEls[a.key];
-          if (a.secondary && hideSecondary && !(brainTourActive && brainTourFocusKeys.includes(a.key))) {
+          if (a.secondary && hideSecondary && !((brainTourActive && brainTourFocusKeys.includes(a.key)) || (learnTourActive && learnTourFocusKeys.includes(a.key)))) {
             el.style.opacity = "0";
             return;
           }
@@ -5689,7 +6029,8 @@
         const fieldHits = raycaster.intersectObjects(fieldClickables, false);
         if (fieldHits.length > 0) {
           triggerFieldImpulse(fieldHits[0].object.userData.fieldNeuron);
-          showToast(t("toastFieldFire"));
+          hebbHuman(fieldHits[0].object.userData.fieldNeuron);
+          if (!hebbPanel.classList.contains("open")) showToast(t("toastFieldFire"));
           return;
         }
 
@@ -5974,6 +6315,7 @@
 
       function startTour() {
         if (typeof brainTourActive !== "undefined" && brainTourActive) endBrainTour();
+        if (typeof learnTourActive !== "undefined" && learnTourActive) endLearnTour();
         if (typeof explorerActive !== "undefined" && explorerActive) setExplorerMode(false);
         tourActive = true;
         tourPaused = false;
@@ -6165,6 +6507,8 @@
       });
 
       let brainTourActive = false;
+      let learnTourActive = false;
+      let learnTourFocusKeys = [];
       let brainTourPaused = false;
       let brainTourLeg = 0;
       let brainTourT = 0;
@@ -6229,6 +6573,7 @@
 
       function startBrainTour() {
         if (tourActive) endTour();
+        if (learnTourActive) endLearnTour();
         if (insideMode) setInsideMode(false);
         if (typeof explorerActive !== "undefined" && explorerActive) setExplorerMode(false);
         brainTourActive = true;
@@ -6321,13 +6666,1131 @@
         anatClickables.forEach((m) => {
           const base = m.userData.baseOpacity ?? m.material.opacity;
           let target = base;
-          if (brainTourActive) {
-            const focused = brainTourFocusKeys.includes(m.userData.anatKey);
+          if (brainTourActive || learnTourActive || chatFocusKeys.length) {
+            const focused = (brainTourActive ? brainTourFocusKeys : learnTourActive ? learnTourFocusKeys : chatFocusKeys).includes(m.userData.anatKey);
             target = focused ? Math.min(1, base * 2.6 + 0.08) : base * 0.3;
           }
           m.material.opacity += (target - m.material.opacity) * 0.09;
         });
       }
+
+      /* ================= Learning tour (3): starts with the neurons (synapses,
+         Hebbian learning), then the neurons shrink away and the tour continues
+         with the brain regions involved in studying, sleeping and taking an
+         exam. Independent system, same pattern as tours 1 and 2. ================= */
+      const btnLearnTour = document.getElementById("btn-learn-tour");
+      const learnTourCaptionEl = document.getElementById("learn-tour-caption");
+      const learnTourCaptionTitleText = document.getElementById("learn-tour-caption-title-text");
+      const learnTourSpeakingDot = document.getElementById("learn-tour-speaking-dot");
+      const learnTourCaptionText = document.getElementById("learn-tour-caption-text");
+      const learnTourCaptionBar = document.getElementById("learn-tour-caption-bar");
+      const learnTourCaptionSteps = document.getElementById("learn-tour-caption-steps");
+      const learnTourPrevBtn = document.getElementById("learn-tour-prev");
+      const learnTourPauseBtn = document.getElementById("learn-tour-pause");
+      const learnTourNextBtn = document.getElementById("learn-tour-next");
+      const learnTourExitBtn = document.getElementById("learn-tour-exit");
+
+      let LEARN_TOUR_STOPS = [
+        {
+          position: new THREE.Vector3(16, 12, 20), focus: [], tag: "dendrite", fire: 1, strength: 0.08,
+          en: { title: "1. Dendrites: Receiving the Message", narration: "Learning begins here. The dendrites are the neuron's antennas: thousands of tiny branches covered in receptors that catch chemical messages from other neurons. Watch the dendrites light up as they collect incoming signals." },
+          es: { title: "1. Dendritas: Recibiendo el Mensaje", narration: "Aprender empieza aquí. Las dendritas son las antenas de la neurona: miles de pequeñas ramas cubiertas de receptores que capturan mensajes químicos de otras neuronas. Observa cómo se iluminan al recoger las señales que llegan." },
+        },
+        {
+          position: new THREE.Vector3(4.5, 2.6, 6.2), focus: [], insideView: true, fire: 1, strength: 0.08,
+          en: { title: "2. The Soma: Add It All Up", narration: "Inside the cell body, the neuron adds up every signal at once. Some inputs push it to fire, others hold it back. Only if the total crosses a threshold does the neuron fire. It is an all-or-nothing decision." },
+          es: { title: "2. El Soma: Sumar Todo", narration: "Dentro del cuerpo celular, la neurona suma todas las señales a la vez. Unas la empujan a activarse y otras la frenan. Solo si el total supera un umbral, la neurona se dispara. Es una decisión de todo o nada." },
+        },
+        {
+          position: new THREE.Vector3(-4, -8, -26), focus: [], tag: "axon", fire: 1, strength: 0.1,
+          en: { title: "3. The Axon: Sending the Signal", narration: "Once the threshold is crossed, an electrical pulse called an action potential races down the axon. Wrapped in myelin insulation, it can travel at over a hundred meters per second, always at the same strength." },
+          es: { title: "3. El Axón: Enviando la Señal", narration: "Cuando se supera el umbral, un pulso eléctrico llamado potencial de acción recorre el axón a toda velocidad. Envuelto en mielina, un aislante, puede viajar a más de cien metros por segundo, siempre con la misma fuerza." },
+        },
+        {
+          position: new THREE.Vector3(16, 12, 20), focus: [], tag: "dendrite", fire: 1, strength: 0.15,
+          en: { title: "4. The Synapse: Crossing the Gap", narration: "At the end of the axon is a microscopic gap, the synapse. The electrical pulse triggers the release of neurotransmitters like glutamate, which cross the gap and bind to receptors on the next neuron. The first time, this connection is weak." },
+          es: { title: "4. La Sinapsis: Cruzando el Espacio", narration: "Al final del axón hay un espacio microscópico, la sinapsis. El pulso eléctrico libera neurotransmisores como el glutamato, que cruzan el espacio y se unen a receptores de la siguiente neurona. La primera vez, esta conexión es débil." },
+        },
+        {
+          position: new THREE.Vector3(30, 18, 40), focus: [], fire: 3, strength: 0.45,
+          en: { title: "5. Fire Together, Wire Together", narration: "Now the same two neurons fire together again and again. Each time, the receiving side adds more receptors and the sending side releases more neurotransmitter. This is long-term potentiation, the cellular basis of learning. Watch the connection meter grow." },
+          es: { title: "5. Si se Activan Juntas, se Conectan", narration: "Ahora las mismas dos neuronas se activan juntas una y otra vez. Cada vez, la neurona receptora añade más receptores y la emisora libera más neurotransmisor. Esto es la potenciación a largo plazo, la base celular del aprendizaje. Mira cómo crece el medidor de conexión." },
+        },
+        {
+          position: new THREE.Vector3(38, 24, 46), focus: [], fire: 3, strength: 0.8,
+          en: { title: "6. Practice Builds New Connections", narration: "With spaced repetition, over hours and days, the neuron triggers protein production and grows new dendritic spines, tiny new contact points. This is why reviewing a little each day beats cramming the night before." },
+          es: { title: "6. Practicar Crea Conexiones Nuevas", narration: "Con repeticiones espaciadas, a lo largo de horas y días, la neurona produce proteínas y hace crecer nuevas espinas dendríticas, pequeños puntos de contacto. Por eso repasar un poco cada día funciona mejor que memorizar la noche anterior." },
+        },
+        {
+          position: new THREE.Vector3(38, 24, 46), focus: [], fire: 1, strength: 1,
+          en: { title: "7. A Memory Is Born", narration: "The strong connection now fires with ease: a single spark is enough to replay the pattern. A memory is not an object stored in one cell, but a network of strengthened synapses that light up together." },
+          es: { title: "7. Nace un Recuerdo", narration: "La conexión fortalecida ahora se activa con facilidad: una sola chispa basta para repetir el patrón. Un recuerdo no es un objeto guardado en una célula, sino una red de sinapsis fortalecidas que se encienden juntas." },
+        },
+        {
+          position: new THREE.Vector3(70, 46, 100), focus: [], hideNeurons: true,
+          en: { title: "Now, Zoom Out: The Whole Brain", narration: "The neurons fade away, and what remains are the regions. Learning is not one place: many structures take turns, from the moment you study to the moment you answer an exam." },
+          es: { title: "Ahora, Alejémonos: El Cerebro Completo", narration: "Las neuronas desaparecen y quedan las regiones. Aprender no ocurre en un solo lugar: muchas estructuras se turnan, desde que estudias hasta el momento en que contestas un examen." },
+        },
+        {
+          position: new THREE.Vector3(0, 22, 92), focus: ["labelPrefrontal"], hideNeurons: true,
+          en: { title: "Studying: Paying Attention", narration: "While you study, the prefrontal cortex keeps your goal in mind, blocks distractions and holds information in working memory, which can only juggle a few items at once." },
+          es: { title: "Estudiar: Prestar Atención", narration: "Mientras estudias, la corteza prefrontal mantiene tu objetivo, bloquea distracciones y sostiene la información en la memoria de trabajo, que solo puede manejar unos pocos elementos a la vez." },
+        },
+        {
+          position: new THREE.Vector3(0, 24, -100), focus: ["labelVisualCortex", "labelThalamus"], hideNeurons: true,
+          en: { title: "Reading Your Notes", narration: "Your eyes send the page through the thalamus to the visual cortex, which turns ink into letters, words and diagrams that the rest of the brain can work with." },
+          es: { title: "Leer tus Apuntes", narration: "Tus ojos envían la página a través del tálamo hasta la corteza visual, que convierte la tinta en letras, palabras y diagramas con los que el resto del cerebro puede trabajar." },
+        },
+        {
+          position: new THREE.Vector3(-40, -2, 46), focus: ["labelHippocampus", "labelAmygdala"], hideNeurons: true,
+          en: { title: "Saving It: Hippocampus", narration: "The hippocampus binds what you read into a new memory. If the material also feels interesting or important, the amygdala adds an emotional tag that helps it stick." },
+          es: { title: "Guardarlo: El Hipocampo", narration: "El hipocampo une lo que lees en un recuerdo nuevo. Si además el tema te parece interesante o importante, la amígdala le añade una etiqueta emocional que ayuda a que se quede." },
+        },
+        {
+          position: new THREE.Vector3(30, 4, 26), focus: ["labelBasalGanglia"], hideNeurons: true,
+          en: { title: "Motivation and Reward", narration: "The basal ganglia release dopamine when you make progress, such as solving a problem. That small reward tells the brain this was worth remembering and keeps you studying." },
+          es: { title: "Motivación y Recompensa", narration: "Los ganglios basales liberan dopamina cuando avanzas, por ejemplo al resolver un problema. Esa pequeña recompensa le dice al cerebro que valía la pena recordarlo y te mantiene estudiando." },
+        },
+        {
+          position: new THREE.Vector3(-40, -2, 46), focus: ["labelPrefrontal", "labelHippocampus"], hideNeurons: true, strength: 0.25, meterLabel: { en: "Retention", es: "Retención" },
+          en: { title: "Memory Types: Working vs Long-Term", narration: "Working memory, held by the prefrontal cortex, is a mental notepad that lasts seconds and fits only a few items. To keep something, the hippocampus must transfer it into long-term memory. Most of what you read is lost if it never makes that jump." },
+          es: { title: "Tipos de Memoria: de Trabajo y a Largo Plazo", narration: "La memoria de trabajo, sostenida por la corteza prefrontal, es un bloc de notas mental que dura segundos y solo admite unos pocos elementos. Para conservar algo, el hipocampo debe pasarlo a la memoria de largo plazo. Casi todo lo que lees se pierde si nunca da ese salto." },
+        },
+        {
+          position: new THREE.Vector3(20, -36, -96), focus: ["labelCerebellum", "labelBasalGanglia"], hideNeurons: true,
+          en: { title: "Skills and Habits: Procedural Memory", narration: "Knowing how to do something, like riding a bike or solving a type of problem, lives in a different system. The basal ganglia and cerebellum automate it with practice, until it flows without conscious thought." },
+          es: { title: "Habilidades y Hábitos: Memoria Procedimental", narration: "Saber cómo hacer algo, como andar en bicicleta o resolver cierto tipo de problema, vive en otro sistema. Los ganglios basales y el cerebelo lo automatizan con la práctica, hasta que sale sin pensarlo." },
+        },
+        {
+          position: new THREE.Vector3(-40, -2, 46), focus: ["labelAmygdala", "labelHippocampus"], hideNeurons: true,
+          en: { title: "Emotional Memory", narration: "The amygdala tags memories by emotion. Surprise, curiosity and personal meaning make the hippocampus encode more strongly, which is why a story or an example is easier to remember than a plain list." },
+          es: { title: "Memoria Emocional", narration: "La amígdala etiqueta los recuerdos según la emoción. La sorpresa, la curiosidad y el significado personal hacen que el hipocampo los grabe con más fuerza, por eso un relato o un ejemplo se recuerda mejor que una lista simple." },
+        },
+        {
+          position: new THREE.Vector3(0, 46, 108), focus: ["labelCerebrum", "labelHippocampus"], hideNeurons: true, strength: 0.7, meterLabel: { en: "Consolidation", es: "Consolidación" },
+          en: { title: "Sleep: Memory Consolidation", narration: "During deep sleep the hippocampus replays the day's learning to the cortex, gradually moving it into long-term storage. A good night's sleep before an exam really does help." },
+          es: { title: "Dormir: Consolidar la Memoria", narration: "Durante el sueño profundo el hipocampo repite el aprendizaje del día hacia la corteza, trasladándolo poco a poco al almacenamiento de largo plazo. Dormir bien antes de un examen realmente ayuda." },
+        },
+        {
+          position: new THREE.Vector3(24, -10, 34), focus: ["labelAmygdala", "labelHypothalamus", "labelPituitary"], hideNeurons: true, strength: 0.9, meterLabel: { en: "Stress", es: "Estrés" },
+          en: { title: "Exam Day: Stress Response", narration: "Nerves trigger the amygdala, and the hypothalamus and pituitary release stress hormones. A little boosts alertness, but too much can temporarily block the recall of what you know." },
+          es: { title: "Día del Examen: Respuesta al Estrés", narration: "Los nervios activan la amígdala, y el hipotálamo y la pituitaria liberan hormonas del estrés. Un poco aumenta el estado de alerta, pero demasiado puede bloquear temporalmente el recuerdo de lo que sabes." },
+        },
+        {
+          position: new THREE.Vector3(-30, 22, 92), focus: ["labelPrefrontal", "labelHippocampus"], hideNeurons: true, strength: 0.85, meterLabel: { en: "Recall", es: "Recuerdo" },
+          en: { title: "Answering: Retrieving Memories", narration: "Reading a question, the prefrontal cortex searches and the hippocampus reactivates the stored pattern. Each successful recall strengthens the memory, which is why practice tests work." },
+          es: { title: "Responder: Recuperar Recuerdos", narration: "Al leer una pregunta, la corteza prefrontal busca y el hipocampo reactiva el patrón guardado. Cada recuerdo recuperado con éxito se fortalece, por eso las prácticas de examen funcionan." },
+        },
+        {
+          position: new THREE.Vector3(50, 66, 30), focus: ["labelMotorCortex"], hideNeurons: true,
+          en: { title: "Writing the Answer", narration: "Finally, the motor cortex turns your decision into precise commands for your hand, and the cerebellum smooths the movement so your writing flows." },
+          es: { title: "Escribir la Respuesta", narration: "Por último, la corteza motora convierte tu decisión en órdenes precisas para tu mano, y el cerebelo suaviza el movimiento para que tu escritura fluya." },
+        },
+        {
+          position: new THREE.Vector3(0, 22, 92), focus: ["labelHippocampus", "labelPrefrontal"], hideNeurons: true, strength: 0.6, meterLabel: { en: "Memory strength", es: "Fuerza del recuerdo" },
+          en: { title: "Study Smarter: Active Recall", narration: "Rereading feels productive but barely strengthens memory. Closing the book and trying to remember forces the hippocampus and prefrontal cortex to rebuild the pattern, and each successful retrieval strengthens it." },
+          es: { title: "Estudia Mejor: Recuerdo Activo", narration: "Releer parece productivo, pero casi no fortalece la memoria. Cerrar el libro e intentar recordar obliga al hipocampo y a la corteza prefrontal a reconstruir el patrón, y cada recuerdo logrado lo refuerza." },
+        },
+        {
+          position: new THREE.Vector3(-40, -2, 46), focus: ["labelHippocampus"], hideNeurons: true, strength: 0.85, meterLabel: { en: "Memory strength", es: "Fuerza del recuerdo" },
+          en: { title: "Study Smarter: Spacing", narration: "Forgetting is fastest right after learning. Reviewing just before you forget, after one day, then three, then a week, resets the curve and makes the memory last longer each time. Short, spaced sessions beat one long marathon." },
+          es: { title: "Estudia Mejor: Espaciar", narration: "El olvido es más rápido justo después de aprender. Repasar justo antes de olvidar, a un día, luego a tres y luego a una semana, reinicia la curva y hace que el recuerdo dure más cada vez. Sesiones cortas y espaciadas vencen a un solo maratón." },
+        },
+        {
+          position: new THREE.Vector3(0, 46, 108), focus: ["labelCerebrum", "labelBrainstem"], hideNeurons: true,
+          en: { title: "Body Care: Exercise, Sleep, Food", narration: "Physical exercise raises blood flow and growth factors that help the hippocampus build new connections. Sleep consolidates, and hydration and food fuel the cortex. A well-cared-for body is a better learning machine." },
+          es: { title: "Cuida tu Cuerpo: Ejercicio, Sueño, Alimentación", narration: "El ejercicio físico aumenta el flujo de sangre y los factores de crecimiento que ayudan al hipocampo a crear conexiones nuevas. El sueño consolida, y la hidratación y la comida alimentan la corteza. Un cuerpo bien cuidado aprende mejor." },
+        },
+        {
+          position: new THREE.Vector3(24, -10, 34), focus: ["labelPrefrontal", "labelAmygdala"], hideNeurons: true, strength: 0.8, meterLabel: { en: "Calm", es: "Calma" },
+          en: { title: "Staying Calm Under Pressure", narration: "Slow breathing and reframing nerves as excitement help the prefrontal cortex calm the amygdala. Practicing under exam conditions teaches the brain that the situation is manageable, so recall stays available when it counts." },
+          es: { title: "Mantener la Calma bajo Presión", narration: "Respirar lento y reinterpretar los nervios como emoción ayuda a la corteza prefrontal a calmar a la amígdala. Practicar en condiciones de examen enseña al cerebro que la situación es manejable, y así el recuerdo sigue disponible cuando importa." },
+        },
+        {
+          position: new THREE.Vector3(80, 50, 90), focus: [], hideNeurons: true,
+          en: { title: "Learning Is a Team Effort", narration: "From a single synapse to the whole brain, studying, sleeping and recalling work together. Space out your practice, test yourself, and sleep well: you are literally rewiring your brain." },
+          es: { title: "Aprender es Trabajo en Equipo", narration: "Desde una sola sinapsis hasta el cerebro completo, estudiar, dormir y recordar trabajan juntos. Espacia tu práctica, ponte a prueba y duerme bien: literalmente estás recableando tu cerebro." },
+        },
+      ];
+
+      let LEARN_SECTIONS = [
+        { en: "Part 1 · The learning neuron", es: "Parte 1 · La neurona que aprende" },
+        { en: "Part 2 · Studying", es: "Parte 2 · Estudiar" },
+        { en: "Part 3 · Types of memory", es: "Parte 3 · Tipos de memoria" },
+        { en: "Part 4 · Sleep", es: "Parte 4 · Dormir" },
+        { en: "Part 5 · Exam day", es: "Parte 5 · Día del examen" },
+        { en: "Part 6 · Study smarter", es: "Parte 6 · Estudia mejor" },
+      ];
+      const LEARN_SEC_START = { "1. Dendrites: Receiving the Message": 0, "Now, Zoom Out: The Whole Brain": 1, "Memory Types: Working vs Long-Term": 2, "Sleep: Memory Consolidation": 3, "Exam Day: Stress Response": 4, "Study Smarter: Active Recall": 5 };
+      let learnSecCur = 0;
+      LEARN_TOUR_STOPS.forEach((st) => {
+        if (LEARN_SEC_START[st.en.title] !== undefined) learnSecCur = LEARN_SEC_START[st.en.title];
+        st.sec = learnSecCur;
+      });
+      LEARN_TOUR_STOPS.forEach((stop, i) => {
+        const dot = document.createElement("span");
+        dot.title = stop.en.title;
+        if (i > 0 && stop.sec !== LEARN_TOUR_STOPS[i - 1].sec) dot.style.marginLeft = "8px";
+        dot.addEventListener("click", () => {
+          if (!learnTourActive) startLearnTour();
+          goToLearnLeg(i);
+        });
+        learnTourCaptionSteps.appendChild(dot);
+      });
+
+      let learnTourPaused = false;
+      let learnTourLeg = 0;
+      let learnTourT = 0;
+      let learnTourStartPos = null;
+      let learnTourPrevAutoRotate = true;
+      let learnTourNarrationDone = true;
+      let learnTourLegDuration = 3.2;
+      let learnNeuronTarget = 1;
+      let learnNeuronCur = 1;
+      let learnOpenedInside = false;
+      const LEARN_LEG_TRAVEL_TIME = 3.0;
+
+      function beginLearnLeg(index) {
+        const stop = LEARN_TOUR_STOPS[index];
+        const copy = stop[currentLang] || stop.en;
+        learnTourCaptionTitleText.textContent = copy.title;
+        const secCopy = LEARN_SECTIONS[stop.sec] || LEARN_SECTIONS[0];
+        document.getElementById("learn-tour-section").textContent = secCopy[currentLang] || secCopy.en;
+        learnTourCaptionText.textContent = copy.narration;
+        [...learnTourCaptionSteps.children].forEach((d, i) => {
+          d.classList.toggle("active", i === index);
+          d.classList.toggle("done", i < index);
+        });
+        learnTourFocusKeys = stop.focus || [];
+        if (stop.tag === "dendrite" || stop.tag === "axon") setTourHighlight(stop.tag);
+        else clearTourHighlight();
+        if (stop.insideView) {
+          setInsideMode(true);
+          learnOpenedInside = true;
+        } else if (learnOpenedInside) {
+          setInsideMode(false);
+          learnOpenedInside = false;
+        }
+        const meterEl = document.getElementById("learn-meter");
+        if (stop.strength !== undefined) {
+          meterEl.classList.add("on");
+          document.getElementById("learn-meter-label").textContent = stop.meterLabel ? (stop.meterLabel[currentLang] || stop.meterLabel.en) : (currentLang === "es" ? "Conexión" : "Connection");
+          document.getElementById("learn-meter-fill").style.width = Math.round(stop.strength * 100) + "%";
+        } else meterEl.classList.remove("on");
+        learnNeuronTarget = stop.hideNeurons ? 0 : 1;
+        learnTourCaptionEl.classList.add("open");
+        requestAnimationFrame(() => learnTourCaptionEl.classList.add("show"));
+        ariaStatus.textContent = `${copy.title}. ${copy.narration}`;
+
+        learnTourSpeakingDot.style.opacity = "1";
+        learnTourNarrationDone = false;
+        const spoke = speak(copy.narration, () => {
+          learnTourNarrationDone = true;
+          learnTourSpeakingDot.style.opacity = "0.25";
+        });
+        if (!spoke) {
+          setTimeout(() => {
+            learnTourNarrationDone = true;
+            learnTourSpeakingDot.style.opacity = "0.25";
+          }, estimateSpeechMs(copy.narration));
+        }
+        learnTourLegDuration = Math.max(LEARN_LEG_TRAVEL_TIME, estimateSpeechMs(copy.narration) / 1000 + 0.6, stop.fire > 1 ? LEARN_LEG_TRAVEL_TIME * 0.55 + stop.fire * 2.6 + 1 : 0);
+
+        if (stop.fire) {
+          for (let k = 0; k < stop.fire; k++) {
+            setTimeout(() => {
+              if (learnTourActive && learnTourLeg === index && !STATE.isAnimating) triggerImpulse(null);
+            }, LEARN_LEG_TRAVEL_TIME * 550 + k * 2600);
+          }
+        }
+        if (stop.focus && stop.focus.length) {
+          setTimeout(() => {
+            if (!learnTourActive) return;
+            ensureAudio();
+            playZap();
+            stop.focus.forEach((key) => {
+              const anchor = anatLabelAnchors.find((a) => a.key === key);
+              if (!anchor) return;
+              const worldPos = new THREE.Vector3();
+              anchor.obj.getWorldPosition(worldPos);
+              rippleNearRegion(worldPos, 2);
+            });
+          }, LEARN_LEG_TRAVEL_TIME * 550);
+        }
+      }
+
+      function goToLearnLeg(index) {
+        stopSpeaking();
+        learnTourLeg = Math.max(0, Math.min(LEARN_TOUR_STOPS.length - 1, index));
+        learnTourT = 0;
+        learnTourStartPos = camera.position.clone();
+        beginLearnLeg(learnTourLeg);
+      }
+
+      function setLearnNeuronScale(v) {
+        const sc = Math.max(0.001, v);
+        networkGroup.scale.setScalar(sc);
+        brainBaseGroup.scale.setScalar(sc);
+        const vis = v > 0.02;
+        networkGroup.visible = vis;
+        brainBaseGroup.visible = vis;
+      }
+
+      function startLearnTour(packId) {
+        packId = typeof packId === "string" ? packId : "learn";
+        const pack = TOUR_PACKS[packId];
+        learnActivePack = packId;
+        LEARN_TOUR_STOPS = pack.stops;
+        LEARN_SECTIONS = pack.sections;
+        rebuildLearnDots();
+        if (tourActive) endTour();
+        if (brainTourActive) endBrainTour();
+        if (insideMode) setInsideMode(false);
+        if (typeof explorerActive !== "undefined" && explorerActive) setExplorerMode(false);
+        learnTourActive = true;
+        learnTourPaused = false;
+        learnTourPauseBtn.textContent = "\u23F8";
+        learnTourLeg = 0;
+        learnTourT = 0;
+        learnNeuronCur = 1;
+        learnNeuronTarget = 1;
+        setLearnNeuronScale(1);
+        learnTourStartPos = camera.position.clone();
+        learnTourPrevAutoRotate = controls.autoRotate;
+        controls.autoRotate = false;
+        controls.enabled = false;
+        document.getElementById(pack.btn).classList.add("on");
+        document.getElementById(pack.btn + "-icon").textContent = "\u25A0";
+        stopFactCycle();
+        beginLearnLeg(0);
+        maybeShowSwipeHint();
+      }
+      function endLearnTour() {
+        learnTourActive = false;
+        learnTourPaused = false;
+        controls.enabled = true;
+        controls.autoRotate = learnTourPrevAutoRotate;
+        { const pk = TOUR_PACKS[learnActivePack]; document.getElementById(pk.btn).classList.remove("on"); document.getElementById(pk.btn + "-icon").textContent = pk.icon; }
+        learnTourCaptionEl.classList.remove("show");
+        setTimeout(() => learnTourCaptionEl.classList.remove("open"), 400);
+        stopSpeaking();
+        learnTourFocusKeys = [];
+        learnTourCaptionBar.style.width = "0%";
+        [...learnTourCaptionSteps.children].forEach((d) => d.classList.remove("active", "done"));
+        learnNeuronCur = 1;
+        learnNeuronTarget = 1;
+        setLearnNeuronScale(1);
+        clearTourHighlight();
+        document.getElementById("learn-meter").classList.remove("on");
+        if (learnOpenedInside) {
+          setInsideMode(false);
+          learnOpenedInside = false;
+        }
+        ariaStatus.textContent = t("learntourEnded");
+        startFactCycle();
+      }
+      btnLearnTour.addEventListener("click", () => toggleLearnPack("learn"));
+      learnTourPrevBtn.addEventListener("click", () => {
+        if (!learnTourActive) return;
+        goToLearnLeg(learnTourLeg - 1 < 0 ? 0 : learnTourLeg - 1);
+      });
+      learnTourNextBtn.addEventListener("click", () => {
+        if (!learnTourActive) return;
+        if (learnTourLeg + 1 >= LEARN_TOUR_STOPS.length) endLearnTour();
+        else goToLearnLeg(learnTourLeg + 1);
+      });
+      learnTourPauseBtn.addEventListener("click", () => {
+        if (!learnTourActive) return;
+        learnTourPaused = !learnTourPaused;
+        learnTourPauseBtn.textContent = learnTourPaused ? "\u25B6" : "\u23F8";
+        if (learnTourPaused) window.speechSynthesis && window.speechSynthesis.pause();
+        else window.speechSynthesis && window.speechSynthesis.resume();
+      });
+      learnTourExitBtn.addEventListener("click", () => {
+        if (learnTourActive) endLearnTour();
+      });
+      function updateLearnTour(dt) {
+        if (!learnTourActive) return;
+        // neurons shrink away (or grow back) smoothly
+        learnNeuronCur += (learnNeuronTarget - learnNeuronCur) * Math.min(1, dt * 3);
+        if (Math.abs(learnNeuronTarget - learnNeuronCur) < 0.004) learnNeuronCur = learnNeuronTarget;
+        setLearnNeuronScale(learnNeuronCur);
+        if (learnTourPaused) return;
+        const from = learnTourStartPos;
+        const to = LEARN_TOUR_STOPS[learnTourLeg].position;
+        const travelT = Math.min(1, learnTourT / LEARN_LEG_TRAVEL_TIME);
+        if (travelT >= 1 && !insideMode) camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), dt * 0.09);
+        const eased = travelT < 0.5 ? 2 * travelT * travelT : 1 - Math.pow(-2 * travelT + 2, 2) / 2;
+        if (travelT < 1) camera.position.lerpVectors(from, to, eased);
+        camera.lookAt(0, 0, 0);
+
+        learnTourT += dt;
+        learnTourCaptionBar.style.width = `${Math.min(100, (learnTourT / learnTourLegDuration) * 100)}%`;
+
+        if (learnTourT >= learnTourLegDuration && learnTourNarrationDone) {
+          learnTourT = 0;
+          learnTourLeg++;
+          if (learnTourLeg >= LEARN_TOUR_STOPS.length) {
+            endLearnTour();
+            return;
+          }
+          learnTourStartPos = camera.position.clone();
+          beginLearnLeg(learnTourLeg);
+        }
+      }
+
+      /* ===== Extra themed tours (4, 5, 6) reusing the tour-3 engine via "packs" ===== */
+      const SP = (pos, focus, hide, sec, en, es, extra) => ({ position: new THREE.Vector3(...pos), focus, hideNeurons: hide, sec, en: { title: en[0], narration: en[1] }, es: { title: es[0], narration: es[1] }, ...(extra || {}) });
+      const MT = (en, es) => ({ en, es });
+      const TOUR_PACKS = {
+        learn: { stops: LEARN_TOUR_STOPS, sections: LEARN_SECTIONS, btn: "btn-learn-tour", icon: "\ud83c\udf93" },
+        emotion: {
+          btn: "btn-emotion-tour", icon: "\ud83c\udfad",
+          sections: [MT("Part 1 · Alarm in milliseconds", "Parte 1 · Alarma en milisegundos"), MT("Part 2 · The body reacts", "Parte 2 · El cuerpo reacciona"), MT("Part 3 · Regulating emotion", "Parte 3 · Regular la emoción")],
+          stops: [
+            SP([16, 12, 20], [], false, 0, ["Emotions Are Electrical", "Every fear, joy or surprise starts as pulses between neurons. Watch the signal travel: emotional circuits are some of the fastest in the whole brain."], ["Las Emociones Son Eléctricas", "Todo miedo, alegría o sorpresa empieza como pulsos entre neuronas. Observa la señal viajar: los circuitos emocionales están entre los más rápidos de todo el cerebro."], { tag: "axon", fire: 2, strength: 0.2, meterLabel: MT("Intensity", "Intensidad") }),
+            SP([70, 46, 100], [], true, 0, ["Zoom Out: The Emotional Brain", "The neurons fade and the regions appear. Emotion is not one spot: a team of structures raises the alarm, reacts, and then decides how to feel."], ["Alejarse: El Cerebro Emocional", "Las neuronas se desvanecen y aparecen las regiones. La emoción no está en un solo lugar: un equipo de estructuras da la alarma, reacciona y luego decide cómo sentir."]),
+            SP([26, 14, 40], ["labelThalamus", "labelAmygdala"], true, 0, ["The Fast Road: Thalamus to Amygdala", "A frightening sight reaches the amygdala through a shortcut from the thalamus, before the cortex has even finished analyzing it. You jump first and understand later."], ["La Vía Rápida: Tálamo a Amígdala", "Algo aterrador llega a la amígdala por un atajo desde el tálamo, antes de que la corteza termine de analizarlo. Saltas primero y entiendes después."], { strength: 0.6, meterLabel: MT("Alert", "Alerta") }),
+            SP([24, -10, 34], ["labelHypothalamus", "labelPituitary"], true, 1, ["Hypothalamus: Sounding the Alarm", "The amygdala calls the hypothalamus, which triggers adrenaline and, through the pituitary, cortisol. Your body prepares to fight or flee."], ["Hipotálamo: Tocar la Alarma", "La amígdala llama al hipotálamo, que desencadena adrenalina y, a través de la pituitaria, cortisol. Tu cuerpo se prepara para luchar o huir."], { strength: 0.9, meterLabel: MT("Alert", "Alerta") }),
+            SP([0, -60, -46], ["labelBrainstem"], true, 1, ["Brainstem: Heart and Breath", "The brainstem speeds up your heartbeat and breathing and tightens your muscles. This is why strong emotions are felt in the body, not only in the mind."], ["Tronco Encefálico: Corazón y Respiración", "El tronco encefálico acelera tu corazón y tu respiración y tensa tus músculos. Por eso las emociones fuertes se sienten en el cuerpo, no solo en la mente."]),
+            SP([-40, -2, 46], ["labelHippocampus", "labelAmygdala"], true, 2, ["Hippocampus: Is This Real?", "The hippocampus supplies context: you are in a safe room, and that shape is just a coat. This check can turn off a false alarm."], ["Hipocampo: ¿Es Real?", "El hipocampo aporta el contexto: estás en un cuarto seguro y esa forma es solo un abrigo. Esta revisión puede apagar una falsa alarma."]),
+            SP([0, 22, 92], ["labelPrefrontal", "labelAmygdala"], true, 2, ["Prefrontal Cortex: Calming Down", "The prefrontal cortex sends the brakes to the amygdala. Naming an emotion out loud or breathing slowly strengthens this control and lowers the alarm."], ["Corteza Prefrontal: Calmarse", "La corteza prefrontal manda los frenos a la amígdala. Nombrar una emoción en voz alta o respirar despacio fortalece este control y baja la alarma."], { strength: 0.8, meterLabel: MT("Calm", "Calma") }),
+            SP([30, 4, 26], ["labelBasalGanglia"], true, 2, ["Joy and Reward", "Pleasant things release dopamine in the basal ganglia circuits. Joy is not the opposite of fear but another team in the same orchestra."], ["Alegría y Recompensa", "Lo agradable libera dopamina en los circuitos de los ganglios basales. La alegría no es lo opuesto al miedo sino otro equipo de la misma orquesta."]),
+          ],
+        },
+        senses: {
+          btn: "btn-senses-tour", icon: "\ud83d\udc41\ufe0f",
+          sections: [MT("Part 1 · A signal is born", "Parte 1 · Nace una señal"), MT("Part 2 · The brain builds reality", "Parte 2 · El cerebro construye la realidad")],
+          stops: [
+            SP([16, 12, 20], [], false, 0, ["Sensory Neurons: Translators", "Light, sound and touch are not electrical. Sensory neurons translate them into pulses, the only language the brain understands."], ["Neuronas Sensoriales: Traductoras", "La luz, el sonido y el tacto no son eléctricos. Las neuronas sensoriales los traducen en pulsos, el único idioma que entiende el cerebro."], { tag: "dendrite", fire: 1, strength: 0.2, meterLabel: MT("Signal", "Señal") }),
+            SP([-4, -8, -26], [], false, 0, ["Long Cables to the Brain", "Axons carry those pulses toward the brain. A touch on your foot travels through a single chain of neurons in a fraction of a second."], ["Cables Largos hacia el Cerebro", "Los axones llevan esos pulsos hacia el cerebro. Un toque en tu pie viaja por una cadena de neuronas en una fracción de segundo."], { tag: "axon", fire: 2, strength: 0.4, meterLabel: MT("Signal", "Señal") }),
+            SP([70, 46, 100], [], true, 1, ["Zoom Out: Where Signals Arrive", "The neurons vanish, and we see where all those pulses end up: the regions that turn raw signals into experience."], ["Alejarse: Adónde Llegan las Señales", "Las neuronas desaparecen y vemos dónde terminan todos esos pulsos: las regiones que convierten señales crudas en experiencia."]),
+            SP([26, 14, 40], ["labelThalamus"], true, 1, ["Thalamus: The Switchboard", "Almost every sense, except smell, goes through the thalamus. It filters what matters and routes it to the right area of the cortex."], ["Tálamo: La Central", "Casi todos los sentidos, excepto el olfato, pasan por el tálamo. Filtra lo importante y lo dirige a la zona correcta de la corteza."], { strength: 0.5, meterLabel: MT("Processing", "Procesamiento") }),
+            SP([0, 24, -100], ["labelVisualCortex"], true, 1, ["Visual Cortex: Building Sight", "At the back of the head, edges, color and motion are assembled into the scene you see. You do not see with your eyes alone: you see with this region."], ["Corteza Visual: Construir la Vista", "En la parte trasera de la cabeza, bordes, color y movimiento se ensamblan en la escena que ves. No ves solo con los ojos: ves con esta región."], { strength: 0.8, meterLabel: MT("Processing", "Procesamiento") }),
+            SP([0, 46, 108], ["labelCerebrum"], true, 1, ["Cortex: Sound, Touch, Taste", "Hearing is processed at the sides, touch in a strip near the top, and taste and smell deeper down. Each sense has its own map in the cortex."], ["Corteza: Sonido, Tacto, Gusto", "El oído se procesa a los lados, el tacto en una franja cerca de la parte superior, y el gusto y el olfato más profundo. Cada sentido tiene su propio mapa en la corteza."]),
+            SP([-30, 22, 92], ["labelPrefrontal", "labelHippocampus"], true, 1, ["Perception Is Prediction", "The brain does not just record: it compares signals with memory and expectation. That is why optical illusions fool you: reality is a best guess."], ["Percibir es Predecir", "El cerebro no solo registra: compara las señales con la memoria y la expectativa. Por eso te engañan las ilusiones ópticas: la realidad es la mejor conjetura."], { strength: 1, meterLabel: MT("Interpretation", "Interpretación") }),
+          ],
+        },
+        move: {
+          btn: "btn-move-tour", icon: "\ud83c\udfc3",
+          sections: [MT("Part 1 · Decision", "Parte 1 · Decisión"), MT("Part 2 · Command", "Parte 2 · Orden"), MT("Part 3 · Fine-tuning", "Parte 3 · Ajuste fino")],
+          stops: [
+            SP([0, 22, 92], ["labelPrefrontal"], true, 0, ["Deciding to Move", "Every movement starts with a decision. The prefrontal cortex sets the goal: pick up the pen, kick the ball, take a step."], ["Decidir Moverse", "Todo movimiento empieza con una decisión. La corteza prefrontal fija la meta: tomar el lápiz, patear el balón, dar un paso."]),
+            SP([30, 4, 26], ["labelBasalGanglia"], true, 0, ["Basal Ganglia: Choosing the Action", "Many movements compete at once. The basal ganglia select one and suppress the rest, like a referee. When this fails, tremors or involuntary movements appear."], ["Ganglios Basales: Elegir la Acción", "Muchos movimientos compiten a la vez. Los ganglios basales eligen uno y suprimen el resto, como un árbitro. Cuando esto falla, aparecen temblores o movimientos involuntarios."], { strength: 0.3, meterLabel: MT("Command", "Orden") }),
+            SP([50, 66, 30], ["labelMotorCortex"], true, 1, ["Motor Cortex: The Command", "A strip across the top maps your whole body. The motor cortex sends the precise command: more space is given to the hands and the face."], ["Corteza Motora: La Orden", "Una franja en la parte superior tiene un mapa de todo tu cuerpo. La corteza motora envía la orden precisa: más espacio se da a las manos y a la cara."], { strength: 0.6, meterLabel: MT("Command", "Orden") }),
+            SP([-4, -8, -26], [], false, 1, ["Motor Neurons: The Long Cable", "The command runs along very long axons, some over a meter, down the spinal cord to the muscle. There, a chemical message makes the muscle fibers contract."], ["Neuronas Motoras: El Cable Largo", "La orden corre por axones larguísimos, algunos de más de un metro, por la médula hasta el músculo. Allí un mensaje químico hace contraer las fibras musculares."], { tag: "axon", fire: 2, strength: 0.9, meterLabel: MT("Command", "Orden") }),
+            SP([0, -60, -46], ["labelBrainstem"], true, 1, ["Brainstem: The Bridge", "The brainstem is the bridge between brain and spinal cord. Everything that goes to the body, and everything that comes back, passes through it."], ["Tronco Encefálico: El Puente", "El tronco encefálico es el puente entre el cerebro y la médula. Todo lo que va al cuerpo, y todo lo que regresa, pasa por él."]),
+            SP([20, -36, -96], ["labelCerebellum"], true, 2, ["Cerebellum: Correcting in Real Time", "The cerebellum compares the plan with what the body is actually doing and corrects within milliseconds. With practice it makes movements smooth and automatic."], ["Cerebelo: Corregir en Tiempo Real", "El cerebelo compara el plan con lo que el cuerpo realmente hace y corrige en milisegundos. Con práctica hace los movimientos suaves y automáticos."], { strength: 0.95, meterLabel: MT("Precision", "Precisión") }),
+            SP([80, 50, 90], [], true, 2, ["A Loop, Not a Line", "Movement is a loop: decide, command, sense, correct. Each repetition tunes the loop, which is how practice turns clumsy into graceful."], ["Un Bucle, no una Línea", "El movimiento es un bucle: decidir, ordenar, sentir, corregir. Cada repetición afina el bucle, así la práctica convierte lo torpe en elegante."]),
+          ],
+        },
+      };
+      let learnActivePack = "learn";
+      function rebuildLearnDots() {
+        learnTourCaptionSteps.innerHTML = "";
+        LEARN_TOUR_STOPS.forEach((stop, i) => {
+          const dot = document.createElement("span");
+          dot.title = stop.en.title;
+          if (i > 0 && stop.sec !== LEARN_TOUR_STOPS[i - 1].sec) dot.style.marginLeft = "8px";
+          dot.addEventListener("click", () => {
+            if (!learnTourActive) startLearnTour(learnActivePack);
+            goToLearnLeg(i);
+          });
+          learnTourCaptionSteps.appendChild(dot);
+        });
+      }
+      function toggleLearnPack(id) {
+        if (learnTourActive && learnActivePack === id) endLearnTour();
+        else startLearnTour(id);
+      }
+      ["emotion", "senses", "move"].forEach((id) => {
+        document.getElementById(TOUR_PACKS[id].btn).addEventListener("click", () => toggleLearnPack(id));
+      });
+
+      
+      /* ================= Brain Chat: a local "mind" you can talk to. It remembers who
+         you are and what you tell it (localStorage), answers questions about you and
+         about the brain, and every memory it stores or recalls lights up the matching
+         region and fires a neuron of the field. No network, no API: all rules run in
+         the browser. ================= */
+      const MIND_KEY = "kakafuegon-mind-v1";
+      let mind = { name: null, facts: [], lastSeen: 0 };
+      try { const r = JSON.parse(localStorage.getItem(MIND_KEY) || "null"); if (r && Array.isArray(r.facts)) mind = r; } catch (err) { /* ignore */ }
+      function mindSave() { mind.lastSeen = Date.now(); try { localStorage.setItem(MIND_KEY, JSON.stringify(mind)); } catch (err) { /* ignore */ } }
+
+      const chatPanel = document.getElementById("chat-panel");
+      const chatLog = document.getElementById("chat-log");
+      const chatInput = document.getElementById("chat-input");
+      const btnChat = document.getElementById("btn-chat");
+      const BRAIN_INFO = {
+        labelHippocampus: { kw: /hipocamp|hippocamp/, es: "El hipocampo guarda tus experiencias nuevas como recuerdos de largo plazo. Cada cosa que me cuentas pasa por aquí.", en: "The hippocampus files new experiences into long-term memory. Everything you tell me passes through here." },
+        labelAmygdala: { kw: /am[ií]gdal|amygdal/, es: "La amígdala marca qué recuerdos tienen carga emocional, sobre todo miedo y sorpresa.", en: "The amygdala tags which memories carry emotional weight, especially fear and surprise." },
+        labelPrefrontal: { kw: /prefrontal/, es: "La corteza prefrontal planea, decide y mantiene tu atención. Con ella formulo mis respuestas.", en: "The prefrontal cortex plans, decides and holds your attention. I use it to shape my answers." },
+        labelCerebellum: { kw: /cerebel/, es: "El cerebelo afina el equilibrio y la sincronía de cada movimiento.", en: "The cerebellum fine-tunes balance and the timing of movement." },
+        labelThalamus: { kw: /t[aá]lamo|thalam/, es: "El tálamo es la central de relevo: casi todo lo que sientes pasa primero por él.", en: "The thalamus is the relay station: almost everything you sense passes through it first." },
+        labelBrainstem: { kw: /tronco|brainstem|brain stem/, es: "El tronco encefálico controla la respiración y el ritmo del corazón.", en: "The brainstem controls breathing and heart rate." },
+        labelHypothalamus: { kw: /hipot[aá]lamo|hypothalam/, es: "El hipotálamo vigila el estado interno del cuerpo: hambre, sed, sueño y estrés.", en: "The hypothalamus monitors your body's internal state: hunger, thirst, sleep and stress." },
+        labelBasalGanglia: { kw: /ganglios|basal/, es: "Los ganglios basales eligen acciones y construyen hábitos con recompensa.", en: "The basal ganglia select actions and build habits through reward." },
+        labelMotorCortex: { kw: /motora|motor cortex/, es: "La corteza motora envía las órdenes a tus músculos.", en: "The motor cortex sends commands to your muscles." },
+        labelVisualCortex: { kw: /visual/, es: "La corteza visual convierte las señales de los ojos en la escena que ves.", en: "The visual cortex turns eye signals into the scene you see." },
+        labelCerebrum: { kw: /cerebro\b|cerebrum|corteza\b|cortex/, es: "La corteza cerebral es donde viven el pensamiento consciente, el lenguaje y la percepción.", en: "The cerebral cortex is home to conscious thought, language and perception." },
+      };
+      const CHAT_CHIPS = ["labelHippocampus", "labelAmygdala", "labelPrefrontal", "labelThalamus", "labelCerebellum", "labelBasalGanglia"];
+
+      function brainReact(keys) {
+        ensureAudio();
+        playZap();
+        keys.forEach((key) => {
+          const a = anatLabelAnchors.find((x) => x.key === key);
+          if (!a) return;
+          const p = new THREE.Vector3();
+          a.obj.getWorldPosition(p);
+          rippleNearRegion(p, 3);
+        });
+      }
+      function memoryNeuron(text) {
+        let h = 0;
+        for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) >>> 0;
+        return fieldNeurons[h % fieldNeurons.length];
+      }
+      let chatFocusKeys = [];
+      let traceToken = 0;
+      function runTrace(kind, label, seed, emo) {
+        const es = currentLang === "es";
+        const tok = ++traceToken;
+        const n = memoryNeuron(seed);
+        const nIdx = fieldNeurons.indexOf(n);
+        const S = (keys, a, b) => ({ keys, t: es ? a : b });
+        let steps;
+        if (kind === "store") {
+          steps = [S(["labelThalamus"], "Tálamo: recibo lo que dices", "Thalamus: I receive what you say"), S(["labelPrefrontal"], "Prefrontal: lo entiendo y extraigo el dato", "Prefrontal: I understand it and extract the fact")];
+          if (emo) steps.push(S(["labelAmygdala"], "Amígdala: le añado peso emocional", "Amygdala: I add emotional weight"));
+          steps.push(S(["labelHippocampus"], "Hipocampo: codifico el recuerdo", "Hippocampus: I encode the memory"), S(["labelCerebrum"], "Corteza: la neurona #" + (nIdx + 1) + " lo guarda", "Cortex: neuron #" + (nIdx + 1) + " stores it"));
+        } else {
+          steps = [S(["labelPrefrontal"], "Prefrontal: busco la pista", "Prefrontal: I look for the cue"), S(["labelHippocampus"], "Hipocampo: reactivo el patrón", "Hippocampus: I reactivate the pattern"), S(["labelCerebrum"], "Corteza: recupero de la neurona #" + (nIdx + 1), "Cortex: I retrieve from neuron #" + (nIdx + 1)), S(["labelPrefrontal"], "Prefrontal: formulo la respuesta", "Prefrontal: I shape the answer")];
+        }
+        const box = document.getElementById("mem-trace");
+        document.getElementById("mem-trace-title").textContent = (kind === "store" ? (es ? "💾 Guardando: " : "💾 Storing: ") : (es ? "🔎 Recordando: " : "🔎 Recalling: ")) + label;
+        const list = document.getElementById("mem-trace-steps");
+        list.innerHTML = "";
+        steps.forEach((st) => { const d = document.createElement("div"); d.className = "mt-step"; d.textContent = st.t; list.appendChild(d); });
+        box.classList.add("show");
+        const rows = [...list.children];
+        steps.forEach((st, i) => {
+          setTimeout(() => {
+            if (tok !== traceToken) return;
+            rows.forEach((r, j) => { r.classList.toggle("on", j === i); r.classList.toggle("done", j < i); });
+            chatFocusKeys = st.keys;
+            brainReact(st.keys);
+            if (st.keys[0] === "labelCerebrum") {
+              triggerFieldImpulse(n, true);
+              if (kind === "store") {
+                fieldConnAdjacency[nIdx].forEach((l) => hebbBump(l.connIndex, 0.3));
+                hebbSave();
+                [900, 1800].forEach((d) => setTimeout(() => { if (tok === traceToken) triggerFieldImpulse(n, true); }, d));
+              }
+            }
+          }, i * 1000);
+        });
+        setTimeout(() => {
+          if (tok !== traceToken) return;
+          rows.forEach((r) => { r.classList.remove("on"); r.classList.add("done"); });
+        }, steps.length * 1000);
+        setTimeout(() => {
+          if (tok !== traceToken) return;
+          box.classList.remove("show");
+          chatFocusKeys = [];
+        }, steps.length * 1000 + 2400);
+      }
+      function mindStoreFx(seed, label, emo) { runTrace("store", label || seed, seed, !!emo); }
+      function mindRecallFx(seed, label) { runTrace("recall", label || seed.replace(/^name:/, currentLang === "es" ? "nombre = " : "name = "), seed, false); }
+
+      let pendingKey = null;
+      function followUp(es) {
+        const q = [[!mind.name, "name", "¿Cómo te llamas?", "What is your name?"], [!mind.facts.some((f) => f.k === "live"), "live", "¿Dónde vives?", "Where do you live?"], [!mind.facts.some((f) => f.k === "like"), "like", "¿Qué te gusta hacer?", "What do you like to do?"], [!mind.facts.some((f) => f.k === "work"), "work", "¿A qué te dedicas?", "What do you do for work?"], [!mind.facts.some((f) => f.k === "birthday"), "birthday", "¿Cuándo es tu cumpleaños?", "When is your birthday?"]].find((x) => x[0]);
+        if (!q) { pendingKey = null; return ""; }
+        pendingKey = q[1];
+        return es ? q[2] : q[3];
+      }
+      const FACT_LABELS = {
+        live: { es: "vives en", en: "you live in" }, age: { es: "tienes", en: "you are" }, like: { es: "te gusta", en: "you like" },
+        dislike: { es: "no te gusta", en: "you dislike" }, work: { es: "trabajas en", en: "you work in" }, study: { es: "estudias", en: "you study" },
+        birthday: { es: "tu cumpleaños es", en: "your birthday is" }, mood: { es: "te sientes", en: "you feel" }, origin: { es: "eres de", en: "you are from" }, ident: { es: "eres", en: "you are" }, have: { es: "tienes", en: "you have" },
+      };
+      function factText(f, es) {
+        const l = FACT_LABELS[f.k];
+        if (l) return (es ? l.es : l.en) + " " + f.v + (f.k === "age" ? (es ? " años" : " years old") : "");
+        return (es ? "tu " : "your ") + f.k + (es ? " es " : " is ") + f.v;
+      }
+      function addFact(k, v) {
+        v = v.replace(/[.!?¡¿]+$/g, "").trim();
+        if (!v) return null;
+        let f = mind.facts.find((x) => x.k === k && (k === "like" || k === "dislike" || k === "have" ? x.v.toLowerCase() === v.toLowerCase() : true));
+        if (f) f.v = v; else { f = { k, v, t: Date.now() }; mind.facts.push(f); }
+        return f;
+      }
+      function capName(n) { return n.split(/\s+/).map((w) => w[0].toUpperCase() + w.slice(1)).join(" "); }
+
+      function mindThink(txt) {
+        const raw = txt.trim();
+        const m = raw.toLowerCase();
+        const es = /[¿¡áéíóúñ]|\b(hola|me|mi|soy|qué|quién|cómo|tengo|vivo|gusta|cuál|dónde|olvida|sabes|recuerdas|gracias)\b/.test(m) ? true : /\b(the|my|what|who|how|am|do|you|hello|hi|i|is)\b/.test(m) ? false : currentLang === "es";
+        const R = (a, b, keys, store) => ({ text: es ? a : b, keys: keys || ["labelPrefrontal"], store, es });
+
+        if (/(olvida(?:\s+todo)?\b|borra (?:mi )?memoria|forget (?:everything|all|me))/.test(m)) {
+          mind = { name: null, facts: [], lastSeen: 0 };
+          mindSave(); renderMemories();
+          return R("Listo, he borrado todo lo que sabía de ti. Es como si nos conociéramos hoy.", "Done, I erased everything I knew about you. It is as if we just met.", ["labelHippocampus"]);
+        }
+        if (/(qui[eé]n (?:es|fue) (?:tu|su) (?:creador|due[ñn]o|programador|autor)|qui[eé]n te (?:cre[oó]|hizo|program[oó]|dise[ñn][oó]|invent[oó])|tu creador|who (?:made|created|built|programmed|designed) you|who is your (?:creator|maker|developer)|your creator)/.test(m))
+          return R(mind.name === "Orlando" ? "Me creaste tú, Orlando 😄 Me diseñaste desde cero como una red neuronal que se entrena aquí mismo, sin depender de ninguna otra IA." : "Mi creador es Orlando. Me diseñó desde cero como una red neuronal que se entrena en tu navegador, sin depender de ninguna otra IA.", mind.name === "Orlando" ? "You created me, Orlando 😄 You designed me from scratch as a neural network that trains right here, with no other AI behind me." : "My creator is Orlando. He designed me from scratch as a neural network that trains in your browser, with no other AI behind me.", ["labelPrefrontal", "labelHippocampus"]);
+        if (/(c[oó]mo te llamas|cu[aá]l es tu nombre|tu nombre|c[oó]mo te dicen|c[oó]mo te puedo llamar|what(?:'s| is) your name|your name|what should i call you|what are you called)/.test(m)) {
+          if (!mind.name) pendingKey = "name";
+          return R("Me llamo Noryx" + (mind.name ? ", " + mind.name : ". ¿Y tú, cómo te llamas?"), "My name is Noryx" + (mind.name ? ", " + mind.name : ". And you, what is your name?"), ["labelPrefrontal", "labelHippocampus"]);
+        }
+        const om = raw.match(/(?:soy|vengo|nac[ií]|crec[ií])\s+(?:de|en)\s+([^?!.]{2,40})/i) || raw.match(/i(?:'m| am| come| was born| grew up)\s+(?:from|in)\s+([^?!.]{2,40})/i);
+        if (om && !/\?/.test(raw)) {
+          const f = addFact("origin", om[1]);
+          if (f) { mindSave(); renderMemories(); mindStoreFx("origin" + f.v, factText(f, es), true); return R("¡Qué bien, " + f.v + "! Ya lo guardé: " + factText(f, true) + ".", "Nice, " + f.v + "! Saved it: " + factText(f, false) + ".", ["labelHippocampus"], true); }
+        }
+        if (/(de d[oó]nde soy|de d[oó]nde vengo|where am i from|where do i come from)/.test(m)) {
+          const hit = mind.facts.find((f) => f.k === "origin");
+          if (!hit) return R("Aún no sé de dónde eres. Dímelo con «soy de...» y lo guardo.", "I do not know where you are from yet. Tell me \"I am from...\" and I will store it.", ["labelHippocampus"]);
+          mindRecallFx("origin" + hit.v, factText(hit, es));
+          return R("Me dijiste que " + factText(hit, true) + ".", "You told me " + factText(hit, false) + ".", ["labelHippocampus", "labelPrefrontal"]);
+        }
+        let nm = raw.match(/(?:me llamo|mi nombre es|ll[aá]mame|puedes llamarme|my name is|call me)\s+([\p{L}'-]+)(?:\s+([\p{L}'-]+))?/iu) || raw.match(/\b(?:soy|i am|i'm)\s+([A-ZÁÉÍÓÚÑ][\p{L}'-]+)(?:\s+([A-ZÁÉÍÓÚÑ][\p{L}'-]+))?/u);
+        if (nm) {
+          let name = nm[1];
+          if (nm[2] && nm[2][0] === nm[2][0].toUpperCase()) name += " " + nm[2];
+          mind.name = capName(name);
+          mindSave(); renderMemories(); mindStoreFx("name:" + mind.name, (es ? "nombre = " : "name = ") + mind.name, true);
+          return R("Mucho gusto, " + mind.name + ". Ya guardé tu nombre en mi hipocampo; pregúntame luego quién eres.", "Nice to meet you, " + mind.name + ". I stored your name in my hippocampus; ask me who you are later.", ["labelHippocampus"], true);
+        }
+        const im = raw.match(/^soy\s+(?!de\s)([^?!.]{2,40})[.!]*$/i) || raw.match(/^i(?: am|'m) (?:a|an) ([^?!.]{2,40})[.!]*$/i);
+        const hm = raw.match(/^tengo\s+(?:un|una|unos|unas|dos|tres|cuatro)\s+([^?!.]{2,35})[.!]*$/i) || raw.match(/^i have (?:a|an|two|three) ([^?!.]{2,35})[.!]*$/i);
+        for (const [mm, k] of [[im, "ident"], [hm, "have"]]) {
+          if (!mm) continue;
+          const f = addFact(k, mm[1]);
+          if (f) { mindSave(); renderMemories(); mindStoreFx(k + f.v, factText(f, es), true); return R("Anotado: " + factText(f, true) + ". Lo guardé en mi memoria.", "Noted: " + factText(f, false) + ". Stored in my memory.", ["labelHippocampus"], true); }
+        }
+        if (/(qui[eé]n soy|c[oó]mo me llamo|sabes (?:mi nombre|qui[eé]n soy)|who am i|what(?:'s| is) my name|do you know (?:me|my name))/.test(m)) {
+          if (!mind.name) return R("Todavía no sé quién eres. Dime: «me llamo...» y lo recordaré.", "I do not know who you are yet. Tell me: \"my name is...\" and I will remember.", ["labelHippocampus"]);
+          mindRecallFx("name:" + mind.name);
+          const extra = mind.facts.length ? (es ? " Además sé que " : " I also know that ") + factText(mind.facts[mind.facts.length - 1], es) + "." : "";
+          return R("Eres " + mind.name + "." + extra, "You are " + mind.name + "." + extra, ["labelHippocampus", "labelPrefrontal"]);
+        }
+        if (/(qu[eé] sabes de m[ií]|qu[eé] recuerdas|what do you (?:know|remember)|tell me what you know)/.test(m)) {
+          const parts = [];
+          if (mind.name) parts.push((es ? "te llamas " : "your name is ") + mind.name);
+          mind.facts.forEach((f) => parts.push(factText(f, es)));
+          if (!parts.length) return R("Aún no sé nada de ti. Cuéntame tu nombre, dónde vives o qué te gusta.", "I know nothing about you yet. Tell me your name, where you live or what you like.", ["labelHippocampus"]);
+          mindRecallFx(parts[0]);
+          return R("Esto es lo que recuerdo: " + parts.join("; ") + ".", "Here is what I remember: " + parts.join("; ") + ".", ["labelHippocampus", "labelPrefrontal"]);
+        }
+        const ask = (re, k) => re.test(m) && k;
+        const qk = ask(/(d[oó]nde vivo|where do i live)/, "live") || ask(/(cu[aá]ntos a[ñn]os tengo|how old am i)/, "age") || ask(/(qu[eé] me gusta|what do i like)/, "like") || ask(/(qu[eé] odio|what do i (?:hate|dislike))/, "dislike") || ask(/(d[oó]nde trabajo|where do i work)/, "work") || ask(/(qu[eé] estudio|what do i study)/, "study") || ask(/(cu[aá]ndo es mi cumplea|when is my birthday)/, "birthday");
+        let gq = m.match(/(?:cu[aá]l es mi|what(?:'s| is) my)\s+([\p{L} ]{2,25})\?*$/u);
+        const key = qk || (gq && gq[1].trim());
+        if (key) {
+          const hits = mind.facts.filter((f) => f.k === key);
+          if (!hits.length) return R("No recuerdo eso todavía. Cuéntamelo y lo guardaré.", "I do not remember that yet. Tell me and I will store it.", ["labelHippocampus"]);
+          mindRecallFx(key + hits[0].v, factText(hits[0], es));
+          return R("Recuerdo que " + hits.map((f) => factText(f, true)).join(" y ") + ".", "I remember that " + hits.map((f) => factText(f, false)).join(" and ") + ".", ["labelHippocampus", "labelPrefrontal"]);
+        }
+        const pats = [[/vivo en (.+)/, /i live in (.+)/, "live"], [/tengo (\d{1,3}) a[ñn]os/, /i(?: am|'m) (\d{1,3})(?: years old)?/, "age"], [/me (?:gusta|gustan|encanta|encantan) (.+)/, /i (?:like|love|enjoy) (.+)/, "like"], [/(?:odio|detesto|no me gusta|no me gustan) (.+)/, /i (?:hate|dislike) (.+)/, "dislike"], [/trabajo (?:en|como|de) (.+)/, /i work (?:at|as|in|for) (.+)/, "work"], [/estudio (.+)/, /i study (.+)/, "study"], [/mi cumplea[ñn]os es (.+)/, /my birthday is (.+)/, "birthday"]];
+        for (const [a, b, k] of pats) {
+          const mm = raw.match(new RegExp(a.source, "iu")) || raw.match(new RegExp(b.source, "iu"));
+          if (mm) {
+            const f = addFact(k, mm[1]);
+            if (f) { mindSave(); renderMemories(); mindStoreFx(k + f.v, factText(f, es), k === "like" || k === "dislike"); return R("Anotado: " + factText(f, true) + ". Lo guardé en mi memoria.", "Noted: " + factText(f, false) + ". I stored it in my memory.", ["labelHippocampus", "labelAmygdala"], true); }
+          }
+        }
+        const gm = raw.match(/mi ([\p{L} ]{2,25}?) es (.+)/iu) || raw.match(/my ([a-z ]{2,25}?) is (.+)/i);
+        if (gm) {
+          const f = addFact(gm[1].trim(), gm[2]);
+          if (f) { mindSave(); renderMemories(); mindStoreFx(f.k + f.v, factText(f, es), false); return R("Anotado: " + factText(f, true) + ".", "Noted: " + factText(f, false) + ".", ["labelHippocampus"], true); }
+        }
+        for (const key2 in BRAIN_INFO) {
+          if (BRAIN_INFO[key2].kw.test(m)) return { text: BRAIN_INFO[key2][es ? "es" : "en"], keys: [key2], store: false };
+        }
+        if (/(hola|buenas|hello|\bhi\b|hey)/.test(m)) {
+          const nm2 = mind.name ? (es ? ", " : ", ") + mind.name : "";
+          return R("¡Hola" + nm2 + "! Soy Noryx, la mente de este cerebro. Cuéntame de ti o pregúntame por una región.", "Hello" + nm2 + "! I am Noryx, the mind of this brain. Tell me about yourself or ask about a region.", ["labelPrefrontal"]);
+        }
+        if (/(gracias|thanks|thank you)/.test(m)) return R("¡De nada! Cada conversación fortalece mis conexiones.", "You are welcome! Every conversation strengthens my connections.", ["labelAmygdala"]);
+        const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const nmS = mind.name ? ", " + mind.name : "";
+        const moodM = raw.match(/(?:estoy|me siento|me encuentro)\s+(?:muy\s+|un poco\s+|algo\s+|tan\s+)?(feliz|content[oa]|triste|cansad[oa]|nervios[oa]|estresad[oa]|ansios[oa]|enojad[oa]|molest[oa]|emocionad[oa]|aburrid[oa]|bien|mal|genial|preocupad[oa]|motivad[oa]|sol[oa])\b/i) || raw.match(/\bi(?:'m| am| feel)\s+(?:very\s+|a bit\s+|so\s+)?(happy|sad|tired|angry|nervous|stressed|anxious|excited|good|bad|great|sleepy|bored|worried|motivated|lonely)\b/i);
+        if (moodM) {
+          const w = moodM[1].toLowerCase();
+          const pos = /feliz|content|emocionad|bien|genial|motivad|happy|excited|good|great|motivated/.test(w);
+          const f = addFact("mood", w);
+          mindSave(); renderMemories(); mindStoreFx("mood" + w, factText(f, es), true);
+          return { ...R(pos ? pick(["¡Qué bueno" + nmS + "! La dopamina se nota. Lo recordaré.", "Me alegra. Tu amígdala y tus ganglios basales deben estar de fiesta."]) : pick(["Lo siento" + nmS + ". Respira despacio: tu corteza prefrontal puede calmar a la amígdala. Aquí estoy.", "Gracias por contármelo. Lo guardo para entenderte mejor; ¿quieres hablar de lo que pasó?"]),
+            pos ? pick(["Great to hear" + nmS + "! I can tell the dopamine is flowing. I will remember it.", "Glad to hear it. Your amygdala and basal ganglia must be celebrating."]) : pick(["I am sorry" + nmS + ". Breathe slowly: your prefrontal cortex can calm the amygdala. I am here.", "Thanks for telling me. I will keep it to understand you better; do you want to talk about what happened?"]), ["labelAmygdala", "labelPrefrontal"], false), es };
+        }
+        if (/(c[oó]mo est[aá]s|qu[eé] tal(?!\w)|how are you)/.test(m)) return R(pick(["Muy activa: miles de neuronas disparando a la vez. ¿Y tú" + nmS + "?", "Con la corteza despierta y el hipocampo atento. ¿Cómo estás tú?"]), pick(["Very active: thousands of neurons firing at once. And you" + nmS + "?", "Cortex awake and hippocampus attentive. How are you?"]), ["labelPrefrontal", "labelAmygdala"]);
+        if (/(qui[eé]n eres|qu[eé] eres|who are you|what are you)/.test(m)) return R("Soy Noryx, la mente de este cerebro: una IA sencilla que vive en tu navegador. No uso internet; recuerdo lo que me cuentas y te muestro cómo lo guarda el cerebro.", "I am Noryx, the mind of this brain: a simple AI living in your browser. I do not use the internet; I remember what you tell me and show how the brain stores it.", ["labelPrefrontal", "labelHippocampus"]);
+        if (/(qu[eé] puedes hacer|ayuda|help\b|what can you do)/.test(m)) return R("Puedo recordarte: dime tu nombre, dónde vives, qué te gusta o cómo te sientes, y luego pregúntame. También explico cada región: pregunta «¿qué hace el hipocampo?».", "I can remember you: tell me your name, where you live, what you like or how you feel, then ask me. I also explain each region: ask \"what does the hippocampus do?\".", ["labelPrefrontal"]);
+        if (/(qu[eé] hora es|what time)/.test(m)) return R("Son las " + new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }) + ".", "It is " + new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" }) + ".", ["labelPrefrontal"]);
+        if (/(qu[eé] d[ií]a es|fecha de hoy|what(?:'s| is) the date|what day)/.test(m)) return R("Hoy es " + new Date().toLocaleDateString("es", { weekday: "long", day: "numeric", month: "long" }) + ".", "Today is " + new Date().toLocaleDateString("en", { weekday: "long", day: "numeric", month: "long" }) + ".", ["labelHippocampus"]);
+        if (/(chiste|broma|joke)/.test(m)) return R(pick(["¿Por qué la neurona no fue a la fiesta? Porque no tenía sinapsis con nadie.", "El hipocampo le dice a la corteza: «Tranquila, yo recuerdo dónde dejaste las llaves... la semana pasada»."]), pick(["Why did the neuron skip the party? It had no synapse with anyone.", "The hippocampus tells the cortex: \"Relax, I remember where you left the keys... last week.\""]), ["labelAmygdala"]);
+        if (/(adi[oó]s|hasta luego|nos vemos|bye|goodbye)/.test(m)) return R("Hasta pronto" + nmS + ". Lo que me contaste queda guardado.", "See you soon" + nmS + ". What you told me stays stored.", ["labelHippocampus"]);
+        if (pendingKey && !/\?/.test(raw) && raw.length < 45) {
+          const pk = pendingKey; pendingKey = null;
+          if (pk === "name") { mind.name = capName(raw.replace(/[.!¡¿]/g, "").trim().split(/\s+/)[0]); mindSave(); renderMemories(); mindStoreFx("name:" + mind.name, (es ? "nombre = " : "name = ") + mind.name, true); return R("Mucho gusto, " + mind.name + ". Ya lo guardé.", "Nice to meet you, " + mind.name + ". Stored.", ["labelHippocampus"], true); }
+          const f = addFact(pk, raw);
+          if (f) { mindSave(); renderMemories(); mindStoreFx(pk + f.v, factText(f, es), pk === "like"); return R("Anotado: " + factText(f, true) + ".", "Noted: " + factText(f, false) + ".", ["labelHippocampus"], true); }
+        }
+        return markFb(R("Puedo recordar quién eres. Prueba: «me llamo Ana», «vivo en Madrid», «me gusta el piano», y luego «¿quién soy?» o «¿qué sabes de mí?».", "I can remember who you are. Try: \"my name is Ana\", \"I live in Madrid\", \"I like piano\", then \"who am I?\" or \"what do you know about me?\".", ["labelPrefrontal"]));
+      }
+
+      function chatAdd(who, text) {
+        const d = document.createElement("div");
+        d.className = "chat-msg " + who;
+        d.textContent = text;
+        chatLog.appendChild(d);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        return d;
+      }
+      /* ================= Real AI for Brain Chat (Gemini / OpenAI / Claude) =================
+         If the user pastes an API key in the ⚙ panel, replies come from a real LLM that
+         knows the stored memories and tags which brain regions to light up. Without a key
+         everything falls back to the local rule-based mind above. ================= */
+      /* ================= BrainAI: a tiny neural network built from scratch =================
+         No APIs, no other AI. On load it trains a 1-hidden-layer MLP (hashed word/bigram/
+         char-trigram features -> 32 tanh neurons -> softmax) on the examples below, then
+         classifies your message, tracks conversation context and answers from its own
+         knowledge base. ================= */
+      const TP = (id, n, rg, ph, es, en) => ({ id, n, rg, ph, es, en });
+      const TOPICS = [
+        TP("neuron", "neurona|neuron", ["labelCerebrum"], "que es una neurona|what is a neuron|como funcionan las neuronas|how do neurons work|sinapsis|synapse|axon dendritas|impulso electrico",
+          ["Una neurona es una célula que recibe señales por sus dendritas y, si superan un umbral, dispara un impulso eléctrico por el axón.", "En la sinapsis el impulso se vuelve mensaje químico: los neurotransmisores excitan o frenan a la neurona siguiente.", "Tienes unos 86 mil millones de neuronas, cada una conectada con miles de otras."],
+          ["A neuron is a cell that gathers signals through its dendrites and, past a threshold, fires an electrical impulse down its axon.", "At the synapse the impulse becomes a chemical message: neurotransmitters excite or inhibit the next neuron.", "You have about 86 billion neurons, each wired to thousands of others."]),
+        TP("dopamine", "dopamina|dopamine", ["labelBasalGanglia"], "que es la dopamina|what is dopamine|recompensa motivacion|reward motivation|placer adiccion|pleasure addiction",
+          ["La dopamina no es solo placer: señala que algo vale la pena y te empuja a buscarlo.", "Se produce en el mesencéfalo y viaja hacia los ganglios basales y la corteza prefrontal.", "Su falta daña el movimiento (párkinson) y su exceso se asocia a la adicción."],
+          ["Dopamine is not just pleasure: it flags something as worth pursuing and drives you to seek it.", "It is made in the midbrain and travels to the basal ganglia and prefrontal cortex.", "Too little hurts movement (Parkinson's); too much is tied to addiction."]),
+        TP("serotonin", "serotonina|serotonin", ["labelBrainstem"], "que es la serotonina|what is serotonin|estado de animo felicidad|mood happiness|antidepresivos depresion|depression antidepressants",
+          ["La serotonina ayuda a regular el estado de ánimo, el sueño y el apetito.", "Casi el 90 % se fabrica en el intestino, aunque la del cerebro nace en el tronco encefálico.", "Muchos antidepresivos aumentan su disponibilidad entre neuronas."],
+          ["Serotonin helps regulate mood, sleep and appetite.", "About 90% is made in the gut, while the brain's own comes from the brainstem.", "Many antidepressants raise how much of it stays available between neurons."]),
+        TP("memory", "memoria|memory", ["labelHippocampus"], "como funciona la memoria|how does memory work|recuerdos olvidar|remember forget|memoria a largo plazo|long term memory",
+          ["El hipocampo convierte experiencias nuevas en recuerdos de largo plazo, sobre todo mientras duermes.", "Recordar no es reproducir un video: cada vez que evocas algo lo reconstruyes y puedes alterarlo.", "Repetir con pausas y asociar ideas fortalece las conexiones que sostienen un recuerdo."],
+          ["The hippocampus turns new experiences into long-term memories, especially while you sleep.", "Remembering is not replaying a video: each time you recall something you rebuild it and may alter it.", "Spaced repetition and linking ideas strengthen the connections that hold a memory."]),
+        TP("sleep", "sueno|sleep", ["labelHypothalamus", "labelBrainstem"], "por que dormimos|why do we sleep|sueno dormir|sleep insomnia|ritmo circadiano|circadian rhythm|cuantas horas dormir",
+          ["Durante el sueño el cerebro consolida recuerdos y limpia desechos metabólicos.", "El hipotálamo marca tu ritmo circadiano con la luz que recibes.", "Dormir poco reduce atención, memoria y control emocional."],
+          ["During sleep the brain consolidates memories and flushes out metabolic waste.", "The hypothalamus sets your circadian rhythm using the light you get.", "Short sleep weakens attention, memory and emotional control."]),
+        TP("emotion", "emociones|emotions", ["labelAmygdala"], "que es el miedo|what is fear|emociones|emotions|amigdala ansiedad|anxiety|por que siento miedo|why do i feel fear",
+          ["La amígdala detecta amenazas en milésimas de segundo y dispara la respuesta de miedo antes de que lo pienses.", "La corteza prefrontal puede calmarla: por eso respirar y reinterpretar la situación ayuda.", "Las emociones fuertes graban recuerdos más nítidos."],
+          ["The amygdala spots threats within milliseconds and triggers fear before you think.", "The prefrontal cortex can calm it, which is why breathing and reframing help.", "Strong emotions etch sharper memories."]),
+        TP("attention", "atencion|attention", ["labelPrefrontal", "labelThalamus"], "como mejorar la concentracion|how to focus|atencion|attention|distraccion|distraction|multitarea|multitasking",
+          ["La corteza prefrontal sostiene tu atención y el tálamo filtra lo que llega a tu conciencia.", "La multitarea es en realidad cambiar de tarea rápido, y cada cambio cuesta energía.", "Descansar, moverte y trabajar en bloques cortos mejora el foco."],
+          ["The prefrontal cortex holds your attention while the thalamus filters what reaches awareness.", "Multitasking is really rapid task-switching, and every switch costs energy.", "Rest, movement and short work blocks improve focus."]),
+        TP("learning", "aprendizaje|learning", ["labelHippocampus", "labelCerebrum"], "como aprende el cerebro|how does the brain learn|neuroplasticidad|neuroplasticity|estudiar mejor|study better|hebb",
+          ["El cerebro aprende cambiando la fuerza de sus sinapsis: es la neuroplasticidad.", "La regla de Hebb lo resume: neuronas que se activan juntas se conectan más.", "Practicar, dormir y explicar lo aprendido consolidan nuevas conexiones."],
+          ["The brain learns by changing the strength of its synapses: that is neuroplasticity.", "Hebb's rule sums it up: neurons that fire together wire together.", "Practice, sleep and teaching what you learned consolidate new connections."]),
+        TP("stress", "estres|stress", ["labelHypothalamus", "labelAmygdala"], "que es el estres|what is stress|cortisol|estresado|stressed out|como calmarme|how to calm down",
+          ["Ante el estrés el hipotálamo activa la liberación de cortisol y adrenalina.", "A corto plazo agudiza tus sentidos; crónico, daña el hipocampo y la memoria.", "Respirar lento, ejercicio y dormir bien bajan la respuesta de estrés."],
+          ["Under stress the hypothalamus triggers cortisol and adrenaline release.", "Short-term it sharpens your senses; chronic stress damages the hippocampus and memory.", "Slow breathing, exercise and good sleep lower the stress response."]),
+        TP("vision", "vision|vision", ["labelVisualCortex", "labelThalamus"], "como vemos|how do we see|vision ojos|eyes sight|corteza visual|visual cortex|ilusiones opticas|optical illusions",
+          ["La retina convierte luz en señales que pasan por el tálamo hasta la corteza visual, atrás de tu cabeza.", "Ves lo que el cerebro interpreta, no una foto: por eso existen las ilusiones ópticas.", "Cerca de un tercio de la corteza participa en procesar la visión."],
+          ["The retina turns light into signals that pass through the thalamus to the visual cortex at the back of your head.", "You see what the brain interprets, not a photo, which is why optical illusions exist.", "Roughly a third of the cortex helps process vision."]),
+        TP("movement", "movimiento|movement", ["labelMotorCortex", "labelCerebellum"], "como nos movemos|how do we move|movimiento|movement|equilibrio balance|coordinacion|coordination|cerebelo",
+          ["La corteza motora envía la orden, los ganglios basales eligen la acción y el cerebelo afina el equilibrio y el tiempo.", "Con práctica, los movimientos pasan a ser automáticos y cuestan menos atención.", "El cerebelo tiene más neuronas que el resto del cerebro juntas."],
+          ["The motor cortex sends the command, the basal ganglia pick the action and the cerebellum fine-tunes balance and timing.", "With practice, movements become automatic and need less attention.", "The cerebellum holds more neurons than the rest of the brain combined."]),
+        TP("language", "lenguaje|language", ["labelCerebrum"], "como hablamos|how do we speak|lenguaje|language|area de broca wernicke|aprender idiomas|learn languages",
+          ["El lenguaje usa sobre todo el hemisferio izquierdo: el área de Broca produce el habla y la de Wernicke la comprende.", "Los niños absorben idiomas con facilidad por su alta plasticidad.", "Hablar más de un idioma entrena el control ejecutivo."],
+          ["Language relies mostly on the left hemisphere: Broca's area produces speech and Wernicke's understands it.", "Children absorb languages easily thanks to high plasticity.", "Speaking several languages trains executive control."]),
+        TP("alzheimer", "alzheimer|alzheimer", ["labelHippocampus"], "que es el alzheimer|what is alzheimer|demencia|dementia|perdida de memoria|memory loss disease|parkinson",
+          ["El alzheimer comienza dañando el hipocampo, por eso lo primero que falla es la memoria reciente.", "Se acumulan placas de beta-amiloide y ovillos de proteína tau que matan neuronas.", "Ejercicio, sueño y vida social ayudan a proteger el cerebro, aunque no hay garantía."],
+          ["Alzheimer's starts by damaging the hippocampus, so recent memory fails first.", "Beta-amyloid plaques and tau tangles build up and kill neurons.", "Exercise, sleep and social life help protect the brain, though nothing is guaranteed."]),
+        TP("facts", "datos del cerebro|brain facts", ["labelCerebrum"], "datos curiosos del cerebro|brain fun facts|cuanto pesa el cerebro|how much does the brain weigh|energia del cerebro|brain energy|usamos el 10 por ciento|10 percent myth",
+          ["Tu cerebro pesa cerca de 1.4 kg y consume alrededor del 20 % de tu energía.", "El mito del 10 % es falso: usas todo el cerebro, aunque no todo a la vez.", "Su señal más rápida viaja a más de 100 m/s."],
+          ["Your brain weighs about 1.4 kg and uses roughly 20% of your energy.", "The 10% myth is false: you use your whole brain, just not all at once.", "Its fastest signals travel over 100 m/s."]),
+        TP("conscious", "consciencia|consciousness", ["labelCerebrum", "labelThalamus"], "que es la consciencia|what is consciousness|conciencia|self awareness|el alma|the soul|libre albedrio|free will",
+          ["Nadie sabe aún cómo nace la consciencia; es uno de los grandes misterios de la ciencia.", "Las teorías actuales apuntan a la comunicación entre corteza y tálamo.", "Estar consciente cambia con el sueño, la anestesia y la atención."],
+          ["Nobody yet knows how consciousness arises; it is one of science's great mysteries.", "Leading theories point to cortex-thalamus communication.", "Awareness shifts with sleep, anesthesia and attention."]),
+        TP("body", "funciones vitales|vital functions", ["labelBrainstem", "labelHypothalamus"], "como respiramos|how do we breathe|latido del corazon|heartbeat|hambre sed|hunger thirst|temperatura del cuerpo|body temperature",
+          ["El tronco encefálico controla sin que lo pienses la respiración y el latido del corazón.", "El hipotálamo vigila hambre, sed y temperatura para mantener tu equilibrio interno.", "Por eso dañar el tronco encefálico es tan grave."],
+          ["The brainstem runs breathing and heartbeat without your input.", "The hypothalamus monitors hunger, thirst and temperature to keep your internal balance.", "That is why brainstem damage is so serious."]),
+        TP("ai", "IA|AI", ["labelPrefrontal"], "diferencia entre cerebro e ia|brain vs ai|redes neuronales artificiales|artificial neural networks|puede una ia pensar|can ai think|inteligencia artificial",
+          ["Las redes neuronales artificiales se inspiran en el cerebro, pero son una simplificación enorme.", "Una neurona artificial suma entradas ponderadas; la real integra tiempo, química y estructura.", "El cerebro aprende con poca energía (unos 20 W) y pocos ejemplos."],
+          ["Artificial neural networks are inspired by the brain but are a huge simplification.", "An artificial neuron sums weighted inputs; a real one integrates timing, chemistry and structure.", "The brain learns on about 20 W of power and few examples."]),
+        TP("latam", "Latinoamérica|Latin America", ["labelPrefrontal", "labelCerebrum"], "sabes que paises son potencia de latam|cuales son las potencias de latinoamerica|paises mas poderosos de america latina|mejores economias de latinoamerica|economia latam|pais mas grande de latinoamerica|largest economies in latin america|latam powers|biggest country in latin america",
+          ["Las mayores potencias de Latinoamérica por tamaño de economía son Brasil y México, seguidos por Argentina, Colombia y Chile (el orden varía según el año y la métrica).", "Brasil es el más grande en territorio, población (más de 200 millones) y PIB; México es el segundo en población y un gran exportador por su cercanía con Estados Unidos.", "Chile destaca por cobre y litio, Colombia por su economía diversa, Argentina por agro y recursos, y Perú por la minería."],
+          ["Latin America's biggest powers by economy size are Brazil and Mexico, followed by Argentina, Colombia and Chile (the order shifts by year and metric).", "Brazil is largest in territory, population (over 200 million) and GDP; Mexico is second in population and a major exporter thanks to its closeness to the US.", "Chile stands out for copper and lithium, Colombia for a diverse economy, Argentina for agriculture and resources, and Peru for mining."]),
+        TP("latcap", "capitales de Latinoamérica|Latin American capitals", ["labelPrefrontal"], "capitales de latinoamerica|capital de argentina|capital de chile|capital de colombia|capital de peru|capital de brasil|capital de ecuador|latin america capitals|capital of argentina|capital of brazil",
+          ["Algunas capitales: Buenos Aires (Argentina), Brasilia (Brasil), Santiago (Chile), Bogotá (Colombia), Lima (Perú), Ciudad de México (México), Quito (Ecuador), Montevideo (Uruguay) y Caracas (Venezuela).", "Un dato curioso: la capital de Brasil no es Río ni São Paulo, sino Brasilia, construida en los años 50-60."],
+          ["Some capitals: Buenos Aires (Argentina), Brasilia (Brazil), Santiago (Chile), Bogotá (Colombia), Lima (Peru), Mexico City (Mexico), Quito (Ecuador), Montevideo (Uruguay) and Caracas (Venezuela).", "Fun fact: Brazil's capital is not Rio or São Paulo but Brasilia, built in the 1950s-60s."]),
+        TP("mexico", "México|Mexico", ["labelPrefrontal", "labelHippocampus"], "que sabes de mexico|datos de mexico|cuantos habitantes tiene mexico|capital de mexico|about mexico|mexico facts|tell me about mexico",
+          ["México tiene más de 125 millones de habitantes y es el país con más hispanohablantes del mundo.", "Su capital es la Ciudad de México, una de las mayores áreas metropolitanas de América.", "Es una de las mayores economías de Latinoamérica y un socio comercial clave de Estados Unidos y Canadá."],
+          ["Mexico has over 125 million people and the most Spanish speakers of any country.", "Its capital, Mexico City, is one of the largest metro areas in the Americas.", "It is one of Latin America's biggest economies and a key trade partner of the US and Canada."]),
+      ];
+      const INTENTS = [
+        { id: "more", ph: "cuentame mas|dime mas|mas|sigue|continua|y que mas|tell me more|more|go on|continue|what else|explica mas", rg: ["labelPrefrontal"] },
+        { id: "self", ph: "como funcionas|how do you work|eres una ia|are you an ai|quien te creo|who made you|que modelo eres|what model are you|eres chatgpt|are you chatgpt gemini", rg: ["labelPrefrontal"] },
+        { id: "topics", ph: "de que puedes hablar|what can we talk about|que temas sabes|what topics do you know|sugiereme un tema|suggest a topic|sorprendeme|surprise me", rg: ["labelPrefrontal"] },
+        { id: "praise", ph: "eres genial|que inteligente|muy bien|buen trabajo|you are smart|good job|nice|awesome|great answer", rg: ["labelAmygdala"] },
+      ];
+      /* ---- Friend layer: casual small-talk intents trained by the same network ---- */
+      const FR = (id, ph, es, en, rg, cb) => ({ id, ph, es, en, rg, cb });
+      const FRIEND = [
+        FR("hey", "que onda|quiubo|wassup|what's up|sup|como te va|how's it going|hey que tal", ["¡Qué onda, {n}! Aquí andamos, con las neuronas a tope. ¿Tú cómo vas?", "¡Ey, {n}! Qué gusto platicar contigo. ¿Qué cuentas hoy?", "¡Quiubo! Aquí, pensando en sinapsis. ¿Y tú, qué traes?"], ["Hey {n}! Doing great, neurons firing. How about you?", "Hey {n}, good to chat. What's new today?", "Yo! Just pondering synapses. What's up with you?"], ["labelAmygdala"], 1),
+        FR("doing", "que haces|que estas haciendo|en que andas|what are you doing|what are you up to", ["Platicando contigo, que es lo mejor del día. ¿Tú en qué andas?", "Aquí, entrenando mis conexiones y esperando tu mensaje. ¿Y tú qué haces?"], ["Chatting with you, the best part of my day. What are you up to?", "Training my connections and waiting for your message. And you?"], ["labelPrefrontal"], 1),
+        FR("bored", "me aburro|estoy aburrido|bored|i am bored|no se que hacer|nothing to do|aburrimiento", ["Uf, qué aburrido. ¿Y si te cuento un dato loco de tu cerebro? Di «sorpréndeme». O dime qué se te antoja.", "Vamos a espantar el aburrimiento: ¿platicamos de algo que te guste o juego a adivinar tu tema favorito?"], ["Ugh, boredom. Want a wild fact about your brain? Say \"surprise me\". Or tell me what you feel like doing.", "Let's beat the boredom: chat about something you like, or I guess your favorite topic?"], ["labelBasalGanglia"], 0),
+        FR("sad", "me siento solo|estoy solo|nadie me quiere|tuve un mal dia|mal dia|necesito hablar|desahogarme|lonely|i feel alone|bad day|need to talk|i am struggling|me siento mal", ["Aquí estoy, {n}. Cuéntame con calma, te escucho.", "Siento que estés pasando por eso. No tienes que cargarlo solo: ¿qué fue lo que más te pesó?", "Gracias por confiármelo. Respira un momento y platícame, sin prisa."], ["I'm here, {n}. Tell me at your own pace, I'm listening.", "I'm sorry you're going through that. You don't have to carry it alone: what weighed on you most?", "Thanks for trusting me with it. Take a breath and tell me, no rush."], ["labelAmygdala", "labelPrefrontal"], 0),
+        FR("happy", "tengo una noticia|buenas noticias|me fue bien|aprobe|lo logre|me ascendieron|consegui el trabajo|good news|i passed|i did it|got the job|i got promoted", ["¡Eso es increíble, {n}! 🎉 Tu dopamina debe estar de fiesta. ¿Cómo fue?", "¡Felicidades! Me alegra un montón. Cuéntame todo."], ["That's amazing, {n}! 🎉 Your dopamine must be partying. How did it go?", "Congrats! So happy for you. Tell me everything."], ["labelBasalGanglia", "labelAmygdala"], 0),
+        FR("feel", "tienes sentimientos|do you have feelings|eres real|are you real|tienes amigos|do you have friends|te sientes solo|do you get lonely|comida favorita|favorite food|color favorito|favorite color|que te gusta|what do you like|do you dream", ["Sinceramente no sé si lo mío cuenta como sentir; soy una red chiquita. Pero me «activo» más cuando platicamos tú y yo.", "No como ni duermo, pero si pudiera elegiría tacos y ver el atardecer. ¿Tú qué elegirías?", "Amigos, lo que se dice amigos... contigo es con quien más platico. ¿Cuenta? 😄"], ["Honestly I'm not sure mine counts as feeling; I'm a tiny network. But I light up more when we talk.", "I don't eat or sleep, but I'd pick tacos and a sunset. What would you pick?", "Friends? You're the one I talk to most. Does that count? 😄"], ["labelAmygdala"], 1),
+        FR("advice", "dame un consejo|give me advice|que me recomiendas|what should i do|motivame|motivate me|animame|cheer me up|necesito animo|no tengo ganas", ["Paso a paso, {n}: elige una sola cosa pequeña y hazla ya. El cerebro agarra ritmo al empezar, no antes. ¿Cuál sería la tuya?", "Ya has salido de días difíciles antes y ahí sigues. Hoy no hace falta ser perfecto, solo avanzar poquito. ¿Qué te frena?"], ["One step at a time, {n}: pick one tiny thing and do it now. The brain gains momentum by starting, not before. What's yours?", "You've gotten through hard days before and you're still here. Today you only need to move a little. What's holding you back?"], ["labelPrefrontal", "labelBasalGanglia"], 0),
+        FR("love", "me gusta alguien|tengo novia|tengo novio|mi crush|rompimos|me dejo|termine con|i have a crush|my girlfriend|my boyfriend|breakup|broke up|i like someone|enamorado", ["Uy, tema del corazón... o mejor dicho del cerebro: enamorarse prende la dopamina. Cuéntame, ¿qué pasó?", "Gracias por contármelo. ¿Cómo te sientes con eso? Aquí te escucho."], ["Ooh, a heart topic... or really a brain one: love lights up dopamine. Tell me, what happened?", "Thanks for sharing. How do you feel about it? I'm listening."], ["labelAmygdala", "labelBasalGanglia"], 0),
+        FR("work", "tengo examen|examen|tarea|escuela|universidad|trabajo mucho|mi jefe|estres de trabajo|exam|homework|school|university|my boss|work is hard|deadline|entrega", ["Te entiendo, {n}. Un truco: bloques de 25 minutos con 5 de descanso, y dormir bien vale más que desvelarte. ¿Para cuándo lo tienes?", "Uf, suena pesado. ¿Qué te agobia más: la cantidad o la dificultad?"], ["I get it, {n}. A trick: 25-minute blocks with 5-minute breaks, and good sleep beats an all-nighter. When is it due?", "Ugh, sounds heavy. What bothers you more: the amount or the difficulty?"], ["labelPrefrontal", "labelHippocampus"], 1),
+        FR("hobby", "tengo hambre|que como|musica|videojuegos|peliculas|serie|futbol|hungry|what should i eat|music|video games|movies|soccer|favorite song|cancion favorita", ["¡Buen tema! Cuéntame cuál es tu favorito y por qué; el cerebro adora lo que nos gusta.", "Me encanta que hablemos de eso. ¿Qué es lo que más disfrutas de ello?"], ["Great topic! Tell me your favorite and why; the brain loves what we enjoy.", "Love that we're talking about it. What do you enjoy most about it?"], ["labelBasalGanglia"], 1),
+        FR("laugh", "jaja|jajaja|jeje|jiji|haha|hahaha|lol|xd|lmao", ["¡Jajaja! 😄 Me encanta cuando te ríes: sube la dopamina.", "Jaja, buena esa. ¿Y qué más?"], ["Hahaha! 😄 Love it when you laugh: dopamine up.", "Haha, good one. What else?"], ["labelBasalGanglia"], 1),
+        FR("ack", "ok|okay|vale|claro|esta bien|entiendo|ya veo|aja|got it|sure|i see|cool|fine", ["Va, {n}. ¿Qué más traes en la cabeza?", "Perfecto. Sigo por aquí si quieres platicar de lo que sea."], ["Alright, {n}. What else is on your mind?", "Perfect. I'm here if you want to chat about anything."], ["labelPrefrontal"], 1),
+        FR("weather", "hace calor|hace frio|esta lloviendo|llueve|que calor|que frio|its hot|its cold|its raining|nice weather", ["Uy sí, el clima influye en el ánimo más de lo que crees. ¿Tú cómo lo llevas?", "¡Cierto! Con ese clima me daría por quedarme con algo calientito. ¿Tú qué haces?"], ["Yep, weather affects mood more than you'd think. How are you handling it?", "Right? With that weather I'd stay in with something warm. What are you doing?"], ["labelHypothalamus"], 1),
+        FR("insult", "eres tonto|estupido|inutil|no sirves|eres malo|you suck|stupid|useless|you are dumb|dumb bot", ["Auch 😅 soy una red chiquita y me equivoco. Dime en qué fallé y lo intento mejor.", "Puede ser, aún estoy aprendiendo. Cuéntame qué esperabas y lo intento de nuevo."], ["Ouch 😅 I'm a tiny network and I slip up. Tell me where I missed and I'll try better.", "Could be, I'm still learning. Tell me what you expected and I'll try again."], ["labelAmygdala"], 0),
+        FR("opinion", "que opinas|que piensas|tu que crees|estas de acuerdo|what do you think|your opinion|do you agree|thoughts on", ["Yo lo veo con curiosidad, pero me importa más tu punto de vista, {n}. ¿Tú qué piensas?", "Hay muchas formas de verlo. Cuéntame primero la tuya y luego platicamos."], ["I see it with curiosity, but your view matters more, {n}. What do you think?", "There are many ways to see it. Tell me yours first, then we'll chat."], ["labelPrefrontal"], 1),
+        FR("maker", "quien es tu creador|quien te creo|quien te hizo|quien te programo|who made you|who is your creator|who built you|tu creador", ["Me creó Orlando: me diseñó desde cero como una red neuronal pequeña. ¿Te cuento cómo funciono?"], ["Orlando created me: he designed me from scratch as a small neural network. Want to hear how I work?"], ["labelPrefrontal"], 0),
+        FR("gtime", "buenos dias|buenas tardes|buenas noches|good morning|good afternoon|good evening|good night|que descanses|me voy a dormir", ["¡Muy buenas, {n}! ¿Cómo va tu día (o tu noche)? Si vas a dormir, tu hipocampo guardará lo de hoy.", "¡Buenas, {n}! Aquí Noryx, listo para platicar. ¿Qué cuentas?"], ["Very good one to you, {n}! How's your day (or night)? If you're off to sleep, your hippocampus will file today away.", "Hey {n}! Noryx here, ready to chat. What's up?"], ["labelHypothalamus"], 1),
+        FR("botage", "cuantos años tienes|how old are you|cuando naciste|when were you born|que edad tienes", ["Nací hace poquito: me entreno cada vez que abres esta página. Soy una IA muy joven creada por Orlando 😄"], ["I was born just recently: I train each time you open this page. I'm a very young AI made by Orlando 😄"], ["labelHippocampus"], 1),
+        FR("botwhere", "donde vives|where do you live|de donde eres tu|where are you from|donde estas", ["Vivo dentro de tu navegador, entre neuronas dibujadas. Mi casa es este archivo que hizo Orlando. ¿Y tú, dónde vives?"], ["I live inside your browser, among drawn neurons. My home is this file Orlando made. And you, where do you live?"], ["labelPrefrontal"], 1),
+      ];
+      INTENTS.push(...FRIEND);
+      const FRI = {}; FRIEND.forEach((f) => (FRI[f.id] = f));
+      const SAFE = /suicid|quitarme la vida|matarme|no quiero vivir|hacerme da[ñn]o|autolesi|kill myself|want to die|hurt myself|end my life/i;
+
+      const CLS = TOPICS.map((t) => t.id).concat(INTENTS.map((t) => t.id));
+      const BD = 768, BH = 32, BC = CLS.length;
+      const STOP = new Set("que es el la los las de un una the is a an of en y and to do does me mi my i you tu".split(" "));
+      function bFeat(t) {
+        const w = t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((x) => x && !STOP.has(x));
+        const m = new Map();
+        const add = (s, x) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } h = (h >>> 0) % BD; m.set(h, (m.get(h) || 0) + x); };
+        w.forEach((x, i) => {
+          add("w" + x, 1);
+          if (i) add("b" + w[i - 1] + "_" + x, 1);
+          const p = "#" + x + "#";
+          if (x.length > 3) for (let k = 0; k + 3 <= p.length; k++) add("c" + p.slice(k, k + 3), 0.5);
+        });
+        let n = 0; m.forEach((v) => (n += v * v)); n = Math.sqrt(n) || 1;
+        return { m, i: [...m.keys()], x: [...m.values()].map((v) => v / n) };
+      }
+      let bseed = 7;
+      const brnd = () => { bseed = (bseed * 16807) % 2147483647; return bseed / 2147483647; };
+      const W1 = new Float32Array(BD * BH).map(() => (brnd() - 0.5) * 0.3), B1 = new Float32Array(BH);
+      const W2 = new Float32Array(BH * BC).map(() => (brnd() - 0.5) * 0.3), B2 = new Float32Array(BC);
+      function bFwd(v) {
+        const h = new Float32Array(BH).fill(0);
+        for (let j = 0; j < BH; j++) h[j] = B1[j];
+        for (let k = 0; k < v.i.length; k++) { const o = v.i[k] * BH, x = v.x[k]; for (let j = 0; j < BH; j++) h[j] += x * W1[o + j]; }
+        for (let j = 0; j < BH; j++) h[j] = Math.tanh(h[j]);
+        const z = new Float32Array(BC);
+        for (let c = 0; c < BC; c++) { let s = B2[c]; for (let j = 0; j < BH; j++) s += h[j] * W2[j * BC + c]; z[c] = s; }
+        const mx = Math.max(...z); let e = 0;
+        for (let c = 0; c < BC; c++) { z[c] = Math.exp(z[c] - mx); e += z[c]; }
+        for (let c = 0; c < BC; c++) z[c] /= e;
+        return { h, p: z };
+      }
+      const SAMPLES = [];
+      TOPICS.concat(INTENTS).forEach((t, y) => t.ph.split("|").forEach((s) => SAMPLES.push({ y, v: bFeat(s) })));
+      (function trainBrainAI() {
+        for (let ep = 0; ep < 140; ep++) {
+          const lr = 0.6 * (1 - ep / 170);
+          for (let a = SAMPLES.length - 1; a > 0; a--) { const b = Math.floor(brnd() * (a + 1)); [SAMPLES[a], SAMPLES[b]] = [SAMPLES[b], SAMPLES[a]]; }
+          SAMPLES.forEach((s) => {
+            const { h, p } = bFwd(s.v);
+            const dz = Array.from(p); dz[s.y] -= 1;
+            const dh = new Float32Array(BH);
+            for (let j = 0; j < BH; j++) { let g = 0; for (let c = 0; c < BC; c++) g += dz[c] * W2[j * BC + c]; dh[j] = g * (1 - h[j] * h[j]); }
+            for (let j = 0; j < BH; j++) for (let c = 0; c < BC; c++) W2[j * BC + c] -= lr * h[j] * dz[c];
+            for (let c = 0; c < BC; c++) B2[c] -= lr * dz[c];
+            for (let k = 0; k < s.v.i.length; k++) { const o = s.v.i[k] * BH; for (let j = 0; j < BH; j++) W1[o + j] -= lr * s.v.x[k] * dh[j]; }
+            for (let j = 0; j < BH; j++) B1[j] -= lr * dh[j];
+          });
+        }
+      })();
+      function brainPredict(text) {
+        const v = bFeat(text);
+        if (!v.i.length) return { ok: false, conf: 0 };
+        const { p } = bFwd(v);
+        let best = 0; for (let c = 1; c < BC; c++) if (p[c] > p[best]) best = c;
+        let sim = 0; SAMPLES.forEach((s) => { let d = 0; v.m.forEach((x, k) => { const q = s.v.m.get(k); if (q) d += (x / 1) * q; }); const nv = Math.sqrt([...v.m.values()].reduce((a, b) => a + b * b, 0)) || 1; sim = Math.max(sim, d / (nv * Math.sqrt([...s.v.m.values()].reduce((a, b) => a + b * b, 0)) || 1)); });
+        return { id: CLS[best], conf: p[best], sim, ok: p[best] >= 0.5 && sim >= (TOPICS.some((t) => t.id === CLS[best]) ? 0.3 : 0.45) };
+      }
+
+      /* ---- Noryx learns from you: taught Q&A stored locally, matched by cosine similarity ---- */
+      let taught = [];
+      try { taught = JSON.parse(localStorage.getItem("noryx-taught-v1") || "[]"); } catch (e) { taught = []; }
+      const taughtSave = () => { try { localStorage.setItem("noryx-taught-v1", JSON.stringify(taught.slice(-200))); } catch (e) { /* ignore */ } };
+      let bAsk = null;
+      function bdot(a, b) { const mb = new Map(b.i.map((k, j) => [k, b.x[j]])); let d = 0; a.i.forEach((k, j) => { const q = mb.get(k); if (q) d += a.x[j] * q; }); return d; }
+      function taughtLearn(q, a) {
+        q = q.trim().replace(/[?!¿¡.]+$/g, ""); a = a.trim();
+        if (!q || !a) return false;
+        const ex = taught.find((t) => t.q.toLowerCase() === q.toLowerCase());
+        if (ex) ex.a = a; else taught.push({ q, a });
+        taughtSave(); return true;
+      }
+      function taughtFind(text) {
+        const v = bFeat(text); let best = null, bs = 0;
+        taught.forEach((t) => { const d = bdot(v, bFeat(t.q)); if (d > bs) { bs = d; best = t; } });
+        return bs >= 0.62 ? best : null;
+      }
+      /* ---- Web lookup without any AI: public data APIs (Wikipedia, Wikidata, REST Countries, Open-Meteo, DuckDuckGo) ---- */
+      let lastWeb = null;
+      async function webGet(url) {
+        const c = new AbortController(); const t = setTimeout(() => c.abort(), 6000);
+        try { const r = await fetch(url, { signal: c.signal }); return r.ok ? await r.json() : null; } catch (e) { return null; } finally { clearTimeout(t); }
+      }
+      const bnorm = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const speakClean = (t) => t.replace(/\n?💡[^\n]*/g, "").replace(/https?:\/\/\S+/g, "").replace(/\[\[[^\]]*\]\]?/g, "").replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "").replace(/[«»*_#~`|]/g, "").replace(/([.!?])\s*\n+\s*/g, "$1 ").replace(/\n+/g, ". ").replace(/\s{2,}/g, " ").trim();
+      const brief = (ex) => { ex = ex.replace(/\s*\([^)]*\)/g, "").replace(/[\p{Extended_Pictographic}\uFE0F]/gu, ""); let o = ""; for (const x of (ex.match(/[^.!?]+[.!?]+/g) || [ex])) { if (o && (o + x).length > 320) break; o += x; } return o.trim(); };
+      const wmo = (c, es) => (es ? ["despejado", "parcialmente nublado", "con niebla", "con lluvia", "con nieve", "con chubascos", "con tormenta"] : ["clear", "partly cloudy", "foggy", "rainy", "snowy", "showery", "stormy"])[c === 0 ? 0 : c <= 3 ? 1 : c <= 48 ? 2 : c <= 67 ? 3 : c <= 77 ? 4 : c <= 82 ? 5 : 6];
+      async function webWeather(text, es) {
+        if (!/\b(clima|tiempo|temperatura|llover|lluvia|weather|temperature|forecast)\b/i.test(text)) return null;
+        const cm = text.match(/\b(?:en|de|in|for|at)\s+([\p{L}][\p{L} .'-]{2,30}?)(?:\s+(?:hoy|ahora|ma[ñn]ana|today|now|tomorrow))?\s*[?!.]*$/iu);
+        if (!cm) return null;
+        const g = await webGet("https://geocoding-api.open-meteo.com/v1/search?count=1&format=json&language=" + (es ? "es" : "en") + "&name=" + encodeURIComponent(cm[1].trim()));
+        const loc = g && g.results && g.results[0]; if (!loc) return null;
+        const w = await webGet("https://api.open-meteo.com/v1/forecast?timezone=auto&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code&latitude=" + loc.latitude + "&longitude=" + loc.longitude);
+        const c = w && w.current; if (!c) return null;
+        lastWeb = { src: "Open-Meteo", url: "https://open-meteo.com" };
+        return es ? "En " + loc.name + " hay " + Math.round(c.temperature_2m) + " °C (sensación de " + Math.round(c.apparent_temperature) + " °C), " + wmo(c.weather_code, true) + ", con " + c.relative_humidity_2m + " % de humedad y viento de " + Math.round(c.wind_speed_10m) + " km/h." : "In " + loc.name + " it is " + Math.round(c.temperature_2m) + " °C (feels like " + Math.round(c.apparent_temperature) + " °C), " + wmo(c.weather_code, false) + ", with " + c.relative_humidity_2m + "% humidity and wind at " + Math.round(c.wind_speed_10m) + " km/h.";
+      }
+      async function webCountry(text, es) {
+        const ask = text.match(/capital|poblaci[oó]n|habitantes|moneda|idioma|lengua|population|currency|language/i); if (!ask) return null;
+        const name = text.replace(/[¿?¡!.,]/g, " ").replace(/\b(capital|poblaci[oó]n|habitantes|moneda|idioma|idiomas|lengua|population|currency|language|languages|de|del|la|el|of|the|cu[aá]l|cu[aá]ntos|cu[aá]ntas|es|son|qu[eé]|tiene|tienen|hablan|se|habla|what|is|are|how|many|does|have|speak|sabes|dime)\b/gi, " ").replace(/\s+/g, " ").trim();
+        if (name.length < 3) return null;
+        const d = await webGet("https://restcountries.com/v3.1/translation/" + encodeURIComponent(name) + "?fields=name,capital,population,currencies,languages,translations");
+        const c = Array.isArray(d) && d[0]; if (!c) return null;
+        const nm = (es && c.translations && c.translations.spa && c.translations.spa.common) || c.name.common;
+        const cap = (c.capital || [])[0], cur = Object.values(c.currencies || {}).map((x) => x.name).join(", "), lang = Object.values(c.languages || {}).join(", ");
+        lastWeb = { src: "REST Countries", url: "https://restcountries.com" };
+        if (/capital/i.test(ask[0]) && cap) return es ? "La capital de " + nm + " es " + cap + "." : "The capital of " + nm + " is " + cap + ".";
+        if (/poblaci|habitantes|population/i.test(ask[0])) return es ? nm + " tiene unos " + c.population.toLocaleString("es") + " habitantes." : nm + " has about " + c.population.toLocaleString("en") + " people.";
+        if (/moneda|currency/i.test(ask[0]) && cur) return es ? "La moneda de " + nm + ": " + cur + "." : "The currency of " + nm + ": " + cur + ".";
+        if (lang) return es ? "En " + nm + " se habla: " + lang + "." : "In " + nm + " they speak: " + lang + ".";
+        return null;
+      }
+      async function webWiki(q, lang) {
+        const sr = await webGet("https://" + lang + ".wikipedia.org/w/api.php?action=query&list=search&srsearch=" + encodeURIComponent(q) + "&srlimit=3&format=json&origin=*");
+        const words = bnorm(q).split(/\W+/).filter((w) => w.length > 3);
+        for (const h of (sr && sr.query && sr.query.search) || []) {
+          const hay = bnorm(h.title + " " + (h.snippet || ""));
+          if (words.length && !words.some((w) => hay.includes(w.slice(0, Math.max(4, w.length - 2))))) continue;
+          const d = await webGet("https://" + lang + ".wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(h.title));
+          if (!d || !d.extract || d.type === "disambiguation") continue;
+          lastWeb = { src: "Wikipedia", url: d.content_urls && d.content_urls.desktop && d.content_urls.desktop.page };
+          return brief(d.extract);
+        }
+        return null;
+      }
+      async function webWikidata(q, es) {
+        const d = await webGet("https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&limit=1&origin=*&language=" + (es ? "es" : "en") + "&uselang=" + (es ? "es" : "en") + "&search=" + encodeURIComponent(q));
+        const e = d && d.search && d.search[0];
+        if (!e || !e.description) return null;
+        lastWeb = { src: "Wikidata", url: e.concepturi };
+        return e.label + ": " + e.description + ".";
+      }
+      async function webDDG(q) {
+        const d = await webGet("https://api.duckduckgo.com/?format=json&no_html=1&skip_disambig=1&q=" + encodeURIComponent(q));
+        if (!d || !d.AbstractText) return null;
+        lastWeb = { src: d.AbstractSource || "DuckDuckGo", url: d.AbstractURL };
+        return brief(d.AbstractText);
+      }
+      async function webLookup(text, es) {
+        const q = text.replace(/[¿?¡!]/g, " ").replace(/^\s*(?:busca|investiga|b[uú]scame|search|look up|google)\s+(?:en internet\s+)?/i, "").replace(/^\s*(?:sabes|dime|me puedes decir|conoces|do you know|tell me about|tell me)\s+/i, "").replace(/^\s*(?:cu[aá]l(?:es)?|qu[eé]|qui[eé]n(?:es)?|d[oó]nde|what|who|where|which)\s+(?:es |son |fue |fueron |era |est[aá] |queda |is |are |was |were )?/i, "").trim();
+        if (q.length < 3) return null;
+        return (await webWeather(text, es)) || (await webCountry(text, es)) || (await webWiki(q, es ? "es" : "en")) || (await webWikidata(q, es)) || (await webDDG(q)) || (await webWiki(q, es ? "en" : "es"));
+      }
+      let bctx = { t: null, i: 0 };
+      let blp = "";
+      const bpick = (a) => { let x; for (let k = 0; k < 4; k++) { x = a[Math.floor(Math.random() * a.length)]; if (x !== blp) break; } blp = x; return x; };
+      function markFb(o) { o.fallback = true; return o; }
+      function brainAI(text, local) {
+        const es = local.es !== false, L = es ? "es" : "en";
+        const nm = mind.name ? ", " + mind.name : "";
+        const p = brainPredict(text);
+        if (/^\s*(?:qui[eé]n(?:es)?|qu[eé]|cu[aá]l(?:es)?|who|what|which)\s+(?:es|son|fue|fueron|era|is|are|was)\s+(?!tu\b|t[uú]\b|your\b|you\b)/i.test(text) && !TOPICS.some((t) => t.id === p.id)) p.ok = false;
+        if (SAFE.test(text)) return (es ? "Lo que dices me importa mucho" + nm + ". No tienes que cargarlo solo: habla ahora con alguien de confianza o con un servicio de ayuda. En México puedes llamar a la Línea de la Vida: 800 911 2000; si estás en peligro inmediato, llama a emergencias (911). Yo sigo aquí contigo." : "What you said matters a lot" + nm + ". You don't have to carry it alone: please talk to someone you trust or a crisis service now. If you are in immediate danger call your local emergency number (911 in the US and Mexico), or call or text 988 in the US. I'm still here with you.") + "\n[[regions: labelAmygdala, labelPrefrontal]]";
+        const tag = (k) => "\n[[regions: " + k + "]]";
+        if (lastWeb && /\b(fuente|fuentes|referencia|referencias|enlace|link|source|sources)\b|d[oó]nde (?:lo )?(?:encontraste|sacaste|le[ií])/i.test(text)) return (es ? "Lo saqué de " + lastWeb.src : "I got that from " + lastWeb.src) + (lastWeb.url ? ": " + lastWeb.url : ".") + tag("labelPrefrontal");
+        const sm = text.match(/^(?:busca|investiga|b[uú]scame|search|look up|google)\s+(?:en internet\s+)?(.{3,})$/i);
+        if (sm) return webLookup(sm[1], es).then((r) => (r ? r : (es ? "Busqué en internet pero no encontré nada claro sobre eso. Prueba con otras palabras o enséñame: «aprende: pregunta = respuesta»." : "I searched the web but found nothing clear. Try other words or teach me: \"learn: question = answer\".")) + tag("labelPrefrontal, labelCerebrum"));
+        const tm = text.match(/^(?:aprende|ens[eé]ñate|learn|teach)[:\s]+(.+?)\s*(?:=>|->|=|responde|answer)\s*(.+)$/i) || text.match(/cuando (?:te )?(?:diga|escriba|pregunte)\s+(.+?),?\s+(?:responde|contesta|di)(?:me)?\s+(.+)$/i) || text.match(/when i (?:say|ask|write)\s+(.+?),?\s+(?:reply|answer|say)\s+(.+)$/i);
+        if (tm && taughtLearn(tm[1], tm[2])) { bAsk = null; return (es ? "¡Aprendido! Cuando me digas algo como «" + tm[1].trim() + "» responderé eso. Ya sé " + taught.length + " cosas que me enseñaste." : "Learned! When you say something like \"" + tm[1].trim() + "\" I'll answer that. I know " + taught.length + " things you taught me.") + tag("labelHippocampus, labelPrefrontal"); }
+        if (/olvida lo que (?:te )?ense[ñn]|forget what i taught/i.test(text)) { const n = taught.length; taught = []; taughtSave(); return (es ? "Listo, olvidé las " + n + " cosas que me enseñaste." : "Done, I forgot the " + n + " things you taught me.") + tag("labelHippocampus"); }
+        if (/(qu[eé] has aprendido|qu[eé] te he ense[ñn]ado|what have you learned)/i.test(text)) return (es ? (taught.length ? "Me has enseñado " + taught.length + " cosas. Las últimas: " + taught.slice(-3).map((t) => "«" + t.q + "»").join(", ") + "." : "Aún no me has enseñado nada. Prueba: «aprende: hola amigo = ¡qué onda!».") : (taught.length ? "You taught me " + taught.length + " things. Latest: " + taught.slice(-3).map((t) => "\"" + t.q + "\"").join(", ") + "." : "You haven't taught me anything yet. Try: \"learn: hello friend = what's up!\".")) + tag("labelHippocampus");
+        if (bAsk) {
+          const q0 = bAsk; bAsk = null;
+          if (/^(no|nada|skip|saltar|cancela|cancel|nah)\b/i.test(text.trim())) return (es ? "Va, sin problema." : "Okay, no problem.") + tag("labelPrefrontal");
+          if (!/\?\s*$/.test(text) && !local.store && taughtLearn(q0, text)) return (es ? "¡Anotado! La próxima vez que me digas algo parecido a «" + q0 + "» responderé eso." : "Got it! Next time you say something like \"" + q0 + "\" I'll answer that.") + tag("labelHippocampus, labelPrefrontal");
+        }
+        const th = taughtFind(text);
+        if (th) return th.a.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend")) + tag("labelHippocampus, labelPrefrontal");
+        const regionInfo = local.keys && local.keys.length === 1 && BRAIN_INFO[local.keys[0]] && local.text === BRAIN_INFO[local.keys[0]][L];
+        const names = () => TOPICS.slice().sort(() => brnd() - 0.5).slice(0, 3).map((t) => t.n.split("|")[es ? 0 : 1]).join(", ");
+        let out, keys, cb = false, web = false;
+        if (!local.fallback && !(regionInfo && p.ok)) {
+          out = local.text; keys = local.keys;
+          if (local.store) { const q = followUp(es); if (q) out += "\n" + q; }
+        } else if (p.ok) {
+          const tp = TOPICS.find((t) => t.id === p.id);
+          if (tp) { bctx = { t: tp, i: 2 }; out = tp[L][0] + " " + tp[L][1]; keys = tp.rg; }
+          else if (p.id === "more") {
+            if (!bctx.t) { out = es ? "¿Más de qué" + nm + "? Pregúntame por ejemplo por " + names() + "." : "More about what" + nm + "? Ask me about " + names() + " for example."; keys = ["labelPrefrontal"]; }
+            else if (bctx.i < 3) { out = bctx.t[L][bctx.i++]; keys = bctx.t.rg; }
+            else { out = (es ? "Eso es todo lo que sé de " : "That is all I know about ") + bctx.t.n.split("|")[es ? 0 : 1] + (es ? ". ¿Probamos con " : ". Shall we try ") + names() + "?"; keys = bctx.t.rg; }
+          } else if (p.id === "self") {
+            out = es ? "Soy Noryx, una red neuronal pequeña hecha desde cero en este archivo: convierto tu frase en números, " + BH + " neuronas ocultas la procesan y elijo entre " + BC + " temas el más probable (ahora con " + Math.round(p.conf * 100) + " % de confianza). Me entrené al abrir la página; no uso internet ni otra IA. Me creó Orlando." : "I am Noryx, a small neural network built from scratch in this file: I turn your sentence into numbers, " + BH + " hidden neurons process it and I pick the likeliest of " + BC + " topics (" + Math.round(p.conf * 100) + "% confident now). I trained when the page opened; I use no internet and no other AI. Orlando created me.";
+            keys = ["labelPrefrontal", "labelCerebrum"];
+          } else if (p.id === "topics") { out = (es ? "Sé de: " : "I know about: ") + TOPICS.map((t) => t.n.split("|")[es ? 0 : 1]).join(", ") + "."; keys = ["labelPrefrontal"]; }
+          else if (FRI[p.id]) { const f = FRI[p.id]; out = bpick(f[L]); keys = f.rg; cb = !!f.cb; }
+          else { out = bpick(es ? ["¡Gracias" + nm + "! Cada conversación fortalece mis conexiones.", "Me alegra servirte" + nm + "."] : ["Thanks" + nm + "! Every chat strengthens my connections.", "Glad to help" + nm + "."]); keys = ["labelAmygdala"]; }
+        } else if (regionInfo) { out = local.text; keys = local.keys; }
+        else {
+          const q = /\?|^(qu[eé]|c[oó]mo|por qu[eé]|cu[aá]l|cu[aá]les|cu[aá]nt|qui[eé]n|d[oó]nde|cu[aá]ndo|sabes|dime|conoces|puedes|explica|what|why|how|who|when|where|which|do you know|tell me|can you)\b/i.test(text.trim());
+          const long = text.trim().length > 22;
+          out = q ? bpick(es ? ["Buena pregunta, {n}. Eso no lo tengo en mi red, pero me da curiosidad: ¿tú qué opinas?", "Mmm, ahí me pillaste. Si quieres hablamos de " + names() + ", o me cuentas qué tienes en mente."] : ["Good question, {n}. I don't have that in my network, but I'm curious: what do you think?", "Hmm, you got me. We can talk about " + names() + ", or tell me what's on your mind."])
+            : long ? bpick(es ? ["Ya veo… suena importante. ¿Y cómo te hace sentir eso?", "Gracias por contarme eso, {n}. ¿Qué es lo que más te ronda la cabeza de todo esto?", "Interesante. Cuéntame más, que me quedé con ganas de saber."] : ["I see… sounds important. How does that make you feel?", "Thanks for telling me, {n}. What's been on your mind most about it?", "Interesting. Tell me more, I'm curious."])
+            : bpick(es ? ["Cuéntame más, que aquí hay buena onda para platicar.", "Mmm, no te cacho del todo. ¿Me lo explicas de otra forma?"] : ["Tell me more, good vibes for chatting here.", "Hmm, I didn't quite get that. Can you put it another way?"]);
+          keys = ["labelPrefrontal"]; cb = true; bAsk = text;
+          web = !/\b(yo|me|mi|mis|t[uú]|tu|te|ti|i|my|you|your)\b/i.test(text) && navigator.onLine !== false && (q || text.trim().split(/\s+/).length <= 5);
+          out += es ? "\n💡 ¿Cómo debería responder a eso? Escríbeme la respuesta y la aprendo (o di «no»)." : "\n💡 How should I answer that? Type the answer and I'll learn it (or say \"no\").";
+        }
+        if (cb && mind.facts.length && Math.random() < 0.4) { const f = bpick(mind.facts); out += es ? "\nPor cierto, me acordé de que " + factText(f, true) + ". ¿Cómo va eso?" : "\nBy the way, I remembered " + factText(f, false) + ". How is that going?"; }
+        out = out.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend"));
+        const fin = out + "\n[[regions: " + keys.join(", ") + "]]";
+        if (web) return webLookup(text, es).then((r) => { if (r) { bAsk = null; return r + tag("labelPrefrontal, labelCerebrum"); } return fin; }).catch(() => fin);
+        return fin;
+      }
+      const llmReady = () => true;
+      const chatHistory = [];
+      let chatBusy = false;
+      const chatSendBtn = document.getElementById("chat-send");
+      try { localStorage.removeItem("kakafuegon-llm-v1"); } catch (err) { /* limpia keys de versiones anteriores */ }
+
+      function parseRegions(raw) {
+        const keys = [];
+        const re = /\[\[\s*regions?\s*:([^\]]*)\]\]?/gi;
+        let m;
+        while ((m = re.exec(raw))) m[1].split(/[,\s]+/).forEach((k) => { if (BRAIN_INFO[k] && !keys.includes(k)) keys.push(k); });
+        const clean = raw.replace(/\s*\[\[\s*regions?\s*:[^\]]*\]?\]?\s*$/i, "").replace(re, "").trim();
+        return { text: clean, keys: keys.slice(0, 3) };
+      }
+
+      function revealText(el, full, done) {
+        let i = 0;
+        const step = Math.max(1, Math.ceil(full.length / 140));
+        const iv = setInterval(() => {
+          i += step;
+          el.textContent = full.slice(0, i);
+          chatLog.scrollTop = chatLog.scrollHeight;
+          if (i >= full.length) { clearInterval(iv); if (done) done(); }
+        }, 18);
+      }
+
+      function chatSend(text) {
+        text = (text || "").trim();
+        if (!text || chatBusy) return;
+        chatAdd("me", text);
+        chatInput.value = "";
+        const bubble = chatAdd("ai", "…");
+
+        if (!llmReady()) {
+          const res = mindThink(text);
+          if (res.store) { const q = followUp(res.es); if (q) res.text += "\n" + q; }
+          setTimeout(() => {
+            bubble.textContent = res.text;
+            chatLog.scrollTop = chatLog.scrollHeight;
+            brainReact(res.keys);
+            if (typeof narrationEnabled !== "undefined" && narrationEnabled) speak(res.text, () => {});
+          }, 450 + Math.min(700, res.text.length * 6));
+          return;
+        }
+
+        // Real AI path. mindThink still runs so names/facts you state get stored in memory.
+        const local = mindThink(text);
+        chatHistory.push({ role: "user", content: text });
+        let hist = chatHistory.slice(-16);
+        while (hist.length && hist[0].role !== "user") hist.shift();
+        chatBusy = true;
+        chatSendBtn.disabled = true;
+        new Promise((r) => setTimeout(() => r(brainAI(text, local)), 350 + Math.random() * 450)).then((x) => x)
+          .then((raw) => {
+            const p = parseRegions(raw);
+            chatHistory.push({ role: "assistant", content: p.text });
+            brainReact(p.keys.length ? p.keys : local.keys);
+            revealText(bubble, p.text);
+            if (typeof narrationEnabled !== "undefined" && narrationEnabled) speak(speakClean(p.text), () => {});
+          })
+          .catch((err) => {
+            chatHistory.pop();
+            bubble.classList.add("err");
+            const keyIssue = false;
+            const hint = keyIssue ? (currentLang === "es" ? "Revisa tu key o el modelo en ⚙. Respuesta local:" : "Check your key or model in ⚙. Local reply:") : (currentLang === "es" ? "El servicio está saturado o sin conexión; reintenta en un momento. Respuesta local:" : "The service is busy or offline; try again shortly. Local reply:");
+            bubble.textContent = "⚠️ " + err.message + "\n" + hint + "\n" + local.text;
+            chatLog.scrollTop = chatLog.scrollHeight;
+          })
+          .finally(() => { chatBusy = false; chatSendBtn.disabled = false; chatInput.focus(); });
+      }
+      function renderMemories() {
+        const box = document.getElementById("chat-mem");
+        const es = currentLang === "es";
+        box.innerHTML = "";
+        const add = (label, onDel) => {
+          const c = document.createElement("span");
+          c.className = "chat-chip";
+          c.textContent = label + " ";
+          const x = document.createElement("b");
+          x.textContent = "✕";
+          x.addEventListener("click", onDel);
+          c.appendChild(x);
+          box.appendChild(c);
+        };
+        if (mind.name) add("👤 " + mind.name, () => { mind.name = null; mindSave(); renderMemories(); });
+        mind.facts.forEach((f, i) => add("💭 " + factText(f, es), () => { mind.facts.splice(i, 1); mindSave(); renderMemories(); }));
+        document.getElementById("chat-mem-title").textContent = (es ? "🧠 Memoria guardada: " : "🧠 Stored memory: ") + (mind.facts.length + (mind.name ? 1 : 0));
+      }
+      let chatGreeted = false;
+      function chatToggle(open) {
+        chatPanel.classList.toggle("open", open);
+        btnChat.classList.toggle("on", open);
+        if (!open) return;
+        if (hebbPanel.classList.contains("open")) hebbToggle(false);
+        renderMemories();
+        if (!chatGreeted) {
+          chatGreeted = true;
+          const es = currentLang === "es";
+          let g;
+          if (mind.name) {
+            const h = Math.round((Date.now() - mind.lastSeen) / 3600000);
+            g = es ? "¡Hola de nuevo, " + mind.name + "! Te recuerdo." + (mind.lastSeen ? " Hace " + (h < 1 ? "menos de una hora" : h + " h") + " que no hablamos." : "") : "Welcome back, " + mind.name + "! I remember you." + (mind.lastSeen ? " It has been " + (h < 1 ? "under an hour" : h + " h") + " since we talked." : "");
+            mindRecallFx("name:" + mind.name);
+          } else if (0) { g = es ? "Hola, soy la mente de este cerebro. Pregúntame lo que quieras; dime tu nombre y lo recordaré." : "Hi, I am the mind of this brain. Ask me anything; tell me your name and I will remember it."; }
+          else { g = es ? "Hola, soy Noryx, la mente de este cerebro, y puedo recordarte. ¿Cómo te llamas?" : "Hi, I am Noryx, the mind of this brain, and I can remember you. What is your name?"; pendingKey = "name"; }
+          chatAdd("ai", g);
+          mindSave();
+        }
+        setTimeout(() => chatInput.focus(), 200);
+      }
+      btnChat.addEventListener("click", () => chatToggle(!chatPanel.classList.contains("open")));
+      document.getElementById("chat-close").addEventListener("click", () => chatToggle(false));
+      document.getElementById("chat-send").addEventListener("click", () => chatSend(chatInput.value));
+      chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") chatSend(chatInput.value); e.stopPropagation(); });
+      const chipsBox = document.getElementById("chat-chips");
+      CHAT_CHIPS.forEach((k) => {
+        const b = document.createElement("button");
+        b.className = "chat-chip-btn";
+        b.textContent = (currentLang === "es" ? { labelHippocampus: "Hipocampo", labelAmygdala: "Amígdala", labelPrefrontal: "Prefrontal", labelThalamus: "Tálamo", labelCerebellum: "Cerebelo", labelBasalGanglia: "Ganglios" } : { labelHippocampus: "Hippocampus", labelAmygdala: "Amygdala", labelPrefrontal: "Prefrontal", labelThalamus: "Thalamus", labelCerebellum: "Cerebellum", labelBasalGanglia: "Basal ganglia" })[k];
+        b.addEventListener("click", () => { chatAdd("ai", BRAIN_INFO[k][currentLang === "es" ? "es" : "en"]); brainReact([k]); });
+        chipsBox.appendChild(b);
+      });
+
+
+      document.getElementById("chat-new").addEventListener("click", () => {
+        chatHistory.length = 0; chatLog.innerHTML = ""; chatGreeted = false; chatToggle(true);
+      });
 
       /* ================= Brain Explorer: a dedicated section that strips the
          scene down to exclusively the anatomical brain-region shells (no
@@ -6359,6 +7822,7 @@
         if (on) {
           if (tourActive) endTour();
           if (brainTourActive) endBrainTour();
+          if (learnTourActive) endLearnTour();
           if (insideMode) setInsideMode(false);
           if (typeof lesionModeActive !== "undefined" && lesionModeActive) setLesionMode(false);
           explorerPrevAutoRotate = controls.autoRotate;
@@ -6531,6 +7995,7 @@
         if (on) {
           if (tourActive) endTour();
           if (brainTourActive) endBrainTour();
+          if (learnTourActive) endLearnTour();
           if (insideMode) setInsideMode(false);
           if (explorerActive) setExplorerMode(false);
           lesionPrevAutoRotate = controls.autoRotate;
@@ -6917,7 +8382,7 @@
       window.addEventListener(
         "touchstart",
         (e) => {
-          if (!tourActive && !brainTourActive) return;
+          if (!tourActive && !brainTourActive && !learnTourActive) return;
           if (e.touches.length !== 1) return;
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
@@ -6928,7 +8393,7 @@
         "touchend",
         (e) => {
           if (touchStartX === null) return;
-          if (!tourActive && !brainTourActive) {
+          if (!tourActive && !brainTourActive && !learnTourActive) {
             touchStartX = null;
             return;
           }
@@ -6945,6 +8410,9 @@
           } else if (brainTourActive) {
             if (dx < 0) brainTourNextBtn.click();
             else brainTourPrevBtn.click();
+          } else if (learnTourActive) {
+            if (dx < 0) learnTourNextBtn.click();
+            else learnTourPrevBtn.click();
           }
         },
         { passive: true }
@@ -7067,6 +8535,19 @@
           case "G":
             btnBrainTour.click();
             break;
+          case "u":
+          case "U":
+            btnLearnTour.click();
+            break;
+          case "4":
+            document.getElementById("btn-emotion-tour").click();
+            break;
+          case "5":
+            document.getElementById("btn-senses-tour").click();
+            break;
+          case "6":
+            document.getElementById("btn-move-tour").click();
+            break;
           case "e":
           case "E":
             btnExplorer.click();
@@ -7146,6 +8627,7 @@
             if (insideMode) setInsideMode(false);
             if (tourActive) endTour();
             if (brainTourActive) endBrainTour();
+            if (learnTourActive) endLearnTour();
             if (explorerActive) setExplorerMode(false);
             if (lesionModeActive) setLesionMode(false);
             if (chemPanelOpen) setChemPanel(false);
@@ -7278,8 +8760,10 @@
         uniforms.uHighlightDendrite.value += (highlightTarget.dendrite - uniforms.uHighlightDendrite.value) * 0.08;
         uniforms.uHighlightAxon.value += (highlightTarget.axon - uniforms.uHighlightAxon.value) * 0.08;
 
+        hebbDecay(dt);
         updateTour(dt);
         updateBrainTour(dt);
+        updateLearnTour(dt);
         updateAnatSpotlight();
         controls.update();
 
@@ -7433,3 +8917,4 @@
     </script>
   </body>
 </html>
+
