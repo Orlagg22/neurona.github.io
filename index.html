@@ -1721,6 +1721,16 @@
       #chat-panel.open{opacity:1;pointer-events:auto;transform:none}
       #chat-title{font-weight:600;color:#7ad9ff}
       #chat-chips{display:flex;flex-wrap:wrap;gap:5px}
+      #llm-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11px}
+      #llm-btn{font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid rgba(61,220,151,.5);background:rgba(61,220,151,.1);color:#3ddc97;cursor:pointer;font-family:inherit}
+      #llm-btn.on{border-color:rgba(255,209,102,.5);background:rgba(255,209,102,.1);color:#ffd166}
+      #llm-btn:disabled{opacity:.5;cursor:default}
+      #llm-model{font-size:11px;padding:3px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.4);color:inherit;font-family:inherit;max-width:150px}
+      #llm-model option{background:#0b121c;color:#fff}
+      #llm-stat{opacity:.65;flex:1;min-width:90px}
+      #llm-prog{display:none;width:100%;height:4px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
+      #llm-prog.on{display:block}
+      #llm-prog-fill{height:100%;width:0;background:linear-gradient(90deg,#7ad9ff,#3ddc97);transition:width .3s}
       .chat-chip-btn{font-size:11px;padding:3px 9px;border-radius:12px;border:1px solid rgba(122,217,255,.4);background:rgba(122,217,255,.08);color:inherit;cursor:pointer}
       #chat-log{flex:1;min-height:140px;max-height:44vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45}
       .chat-msg{padding:7px 10px;border-radius:12px;max-width:88%;white-space:pre-wrap}
@@ -2528,6 +2538,7 @@
       <button id="chat-new" class="chat-hbtn" style="right:34px" title="Nueva conversación / New chat">🗑</button>
       <div id="chat-title">💬 Noryx</div>
       <div id="chat-chips"></div>
+      <div id="llm-bar"><button id="llm-btn" type="button">⚡ Cerebro avanzado</button><select id="llm-model" title="Modelo"></select><span id="llm-stat"></span><div id="llm-prog"><div id="llm-prog-fill"></div></div></div>
       <div id="chat-log"></div>
       <div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-send" class="tour-nav-btn">➤</button></div>
       <div id="chat-privacy" style="font-size:10px;opacity:.5;text-align:center">Las conversaciones se guardan en este dispositivo · Chats are saved on this device</div>
@@ -7573,7 +7584,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
           return R("Listo, he borrado todo lo que sabía de ti. Es como si nos conociéramos hoy.", "Done, I erased everything I knew about you. It is as if we just met.", ["labelHippocampus"]);
         }
         if (/(qui[eé]n (?:es|fue) (?:tu|su) (?:creador|due[ñn]o|programador|autor)|qui[eé]n te (?:cre[oó]|hizo|program[oó]|dise[ñn][oó]|invent[oó])|tu creador|who (?:made|created|built|programmed|designed) you|who is your (?:creator|maker|developer)|your creator)/.test(m))
-          return R(creatorUnlocked ? "Me creaste tú, Orlando 😄 Me diseñaste desde cero como una red neuronal que se entrena aquí mismo, sin depender de ninguna otra IA." : "Mi creador es Orlando. Me diseñó desde cero como una red neuronal que se entrena en tu navegador, sin depender de ninguna otra IA.", creatorUnlocked ? "You created me, Orlando 😄 You designed me from scratch as a neural network that trains right here, with no other AI behind me." : "My creator is Orlando. He designed me from scratch as a neural network that trains in your browser, with no other AI behind me.", ["labelPrefrontal", "labelHippocampus"]);
+          return R(creatorUnlocked ? "Me creaste tú, Orlando 😄 Armaste a Noryx con una red neuronal propia que se entrena aquí mismo y un modelo de lenguaje abierto opcional; sin depender de Gemini ni de ChatGPT." : "Mi creador es Orlando. Él armó Noryx: una red neuronal propia que se entrena en tu navegador y, si activas el cerebro avanzado, un modelo de lenguaje abierto que corre en tu equipo; sin depender de Gemini ni de ChatGPT.", creatorUnlocked ? "You created me, Orlando 😄 You built Noryx with your own neural network that trains right here plus an optional open language model; no Gemini or ChatGPT behind me." : "My creator is Orlando. He built Noryx with his own neural network that trains in your browser plus, if you enable the advanced brain, an open language model running on your device; no Gemini or ChatGPT behind me.", ["labelPrefrontal", "labelHippocampus"]);
         if (/(c[oó]mo te llamas|cu[aá]l es tu nombre|tu nombre|c[oó]mo te dicen|c[oó]mo te puedo llamar|what(?:'s| is) your name|your name|what should i call you|what are you called)/.test(m)) {
           if (!mind.name) pendingKey = "name";
           return R("Me llamo Noryx" + (mind.name ? ", " + mind.name : ". ¿Y tú, cómo te llamas?"), "My name is Noryx" + (mind.name ? ", " + mind.name : ". And you, what is your name?"), ["labelPrefrontal", "labelHippocampus"]);
@@ -7661,7 +7672,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
             pos ? pick(["Great to hear" + nmS + "! I can tell the dopamine is flowing. I will remember it.", "Glad to hear it. Your amygdala and basal ganglia must be celebrating."]) : pick(["I am sorry" + nmS + ". Breathe slowly: your prefrontal cortex can calm the amygdala. I am here.", "Thanks for telling me. I will keep it to understand you better; do you want to talk about what happened?"]), ["labelAmygdala", "labelPrefrontal"], false), es };
         }
         if (/(c[oó]mo est[aá]s|qu[eé] tal(?!\w)|how are you)/.test(m)) return R(pick(["Muy activa: miles de neuronas disparando a la vez. ¿Y tú" + nmS + "?", "Con la corteza despierta y el hipocampo atento. ¿Cómo estás tú?"]), pick(["Very active: thousands of neurons firing at once. And you" + nmS + "?", "Cortex awake and hippocampus attentive. How are you?"]), ["labelPrefrontal", "labelAmygdala"]);
-        if (/(qui[eé]n eres|qu[eé] eres|who are you|what are you)/.test(m)) return R("Soy Noryx, la mente de este cerebro: una IA sencilla que vive en tu navegador. No uso internet; recuerdo lo que me cuentas y te muestro cómo lo guarda el cerebro.", "I am Noryx, the mind of this brain: a simple AI living in your browser. I do not use the internet; I remember what you tell me and show how the brain stores it.", ["labelPrefrontal", "labelHippocampus"]);
+        if (/(qui[eé]n eres|qu[eé] eres|who are you|what are you)/.test(m)) return R("Soy Noryx, la mente de este cerebro: una IA que vive en tu navegador. Aprendo de cada charla, investigo en internet por mi cuenta y recuerdo lo que me cuentas.", "I am Noryx, the mind of this brain: an AI living in your browser. I learn from every chat, research the internet on my own and remember what you tell me.", ["labelPrefrontal", "labelHippocampus"]);
         if (/(qu[eé] puedes hacer|ayuda|help\b|what can you do)/.test(m)) return R("Puedo recordarte: dime tu nombre, dónde vives, qué te gusta o cómo te sientes, y luego pregúntame. También explico cada región: pregunta «¿qué hace el hipocampo?».", "I can remember you: tell me your name, where you live, what you like or how you feel, then ask me. I also explain each region: ask \"what does the hippocampus do?\".", ["labelPrefrontal"]);
         if (/(qu[eé] hora es|what time)/.test(m)) return R("Son las " + new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }) + ".", "It is " + new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" }) + ".", ["labelPrefrontal"]);
         if (/(qu[eé] d[ií]a es|fecha de hoy|what(?:'s| is) the date|what day)/.test(m)) return R("Hoy es " + new Date().toLocaleDateString("es", { weekday: "long", day: "numeric", month: "long" }) + ".", "Today is " + new Date().toLocaleDateString("en", { weekday: "long", day: "numeric", month: "long" }) + ".", ["labelHippocampus"]);
@@ -7780,7 +7791,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         FR("weather", "hace calor|hace frio|esta lloviendo|llueve|que calor|que frio|its hot|its cold|its raining|nice weather", ["Uy sí, el clima influye en el ánimo más de lo que crees. ¿Tú cómo lo llevas?", "¡Cierto! Con ese clima me daría por quedarme con algo calientito. ¿Tú qué haces?"], ["Yep, weather affects mood more than you'd think. How are you handling it?", "Right? With that weather I'd stay in with something warm. What are you doing?"], ["labelHypothalamus"], 1),
         FR("insult", "eres tonto|estupido|inutil|no sirves|eres malo|you suck|stupid|useless|you are dumb|dumb bot", ["Auch 😅 soy una red chiquita y me equivoco. Dime en qué fallé y lo intento mejor.", "Puede ser, aún estoy aprendiendo. Cuéntame qué esperabas y lo intento de nuevo."], ["Ouch 😅 I'm a tiny network and I slip up. Tell me where I missed and I'll try better.", "Could be, I'm still learning. Tell me what you expected and I'll try again."], ["labelAmygdala"], 0),
         FR("opinion", "que opinas|que piensas|tu que crees|estas de acuerdo|what do you think|your opinion|do you agree|thoughts on", ["Yo lo veo con curiosidad, pero me importa más tu punto de vista, {n}. ¿Tú qué piensas?", "Hay muchas formas de verlo. Cuéntame primero la tuya y luego platicamos."], ["I see it with curiosity, but your view matters more, {n}. What do you think?", "There are many ways to see it. Tell me yours first, then we'll chat."], ["labelPrefrontal"], 1),
-        FR("maker", "quien es tu creador|quien te creo|quien te hizo|quien te programo|who made you|who is your creator|who built you|tu creador", ["Me creó Orlando: me diseñó desde cero como una red neuronal pequeña. ¿Te cuento cómo funciono?"], ["Orlando created me: he designed me from scratch as a small neural network. Want to hear how I work?"], ["labelPrefrontal"], 0),
+        FR("maker", "quien es tu creador|quien te creo|quien te hizo|quien te programo|who made you|who is your creator|who built you|tu creador", ["Me creó Orlando: armó una red neuronal propia que se entrena en tu navegador y la complementó con un modelo de lenguaje abierto opcional. No dependo de Gemini ni de ChatGPT. ¿Te cuento cómo funciono?"], ["Orlando created me: he built his own neural network that trains in your browser and added an optional open language model. I do not depend on Gemini or ChatGPT. Want to hear how I work?"], ["labelPrefrontal"], 0),
         FR("gtime", "buenos dias|buenas tardes|buenas noches|good morning|good afternoon|good evening|good night|que descanses|me voy a dormir", ["¡Muy buenas, {n}! ¿Cómo va tu día (o tu noche)? Si vas a dormir, tu hipocampo guardará lo de hoy.", "¡Buenas, {n}! Aquí Noryx, listo para platicar. ¿Qué cuentas?"], ["Very good one to you, {n}! How's your day (or night)? If you're off to sleep, your hippocampus will file today away.", "Hey {n}! Noryx here, ready to chat. What's up?"], ["labelHypothalamus"], 1),
         FR("botage", "cuantos años tienes|how old are you|cuando naciste|when were you born|que edad tienes", ["Nací hace poquito: me entreno cada vez que abres esta página. Soy una IA muy joven creada por Orlando 😄"], ["I was born just recently: I train each time you open this page. I'm a very young AI made by Orlando 😄"], ["labelHippocampus"], 1),
         FR("botwhere", "donde vives|where do you live|de donde eres tu|where are you from|donde estas", ["Vivo dentro de tu navegador, entre neuronas dibujadas. Mi casa es este archivo que hizo Orlando. ¿Y tú, dónde vives?"], ["I live inside your browser, among drawn neurons. My home is this file Orlando made. And you, where do you live?"], ["labelPrefrontal"], 1),
@@ -7823,21 +7834,41 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
       }
       const SAMPLES = [];
       TOPICS.concat(INTENTS).forEach((t, y) => t.ph.split("|").forEach((s) => SAMPLES.push({ y, v: bFeat(s) })));
+      function bStep(v, y, lr) {
+        const { h, p } = bFwd(v);
+        const dz = Array.from(p); dz[y] -= 1;
+        const dh = new Float32Array(BH);
+        for (let j = 0; j < BH; j++) { let g = 0; for (let c = 0; c < BC; c++) g += dz[c] * W2[j * BC + c]; dh[j] = g * (1 - h[j] * h[j]); }
+        for (let j = 0; j < BH; j++) for (let c = 0; c < BC; c++) W2[j * BC + c] -= lr * h[j] * dz[c];
+        for (let c = 0; c < BC; c++) B2[c] -= lr * dz[c];
+        for (let k = 0; k < v.i.length; k++) { const o = v.i[k] * BH; for (let j = 0; j < BH; j++) W1[o + j] -= lr * v.x[k] * dh[j]; }
+        for (let j = 0; j < BH; j++) B1[j] -= lr * dh[j];
+      }
       (function trainBrainAI() {
         for (let ep = 0; ep < 140; ep++) {
           const lr = 0.6 * (1 - ep / 170);
           for (let a = SAMPLES.length - 1; a > 0; a--) { const b = Math.floor(brnd() * (a + 1)); [SAMPLES[a], SAMPLES[b]] = [SAMPLES[b], SAMPLES[a]]; }
-          SAMPLES.forEach((s) => {
-            const { h, p } = bFwd(s.v);
-            const dz = Array.from(p); dz[s.y] -= 1;
-            const dh = new Float32Array(BH);
-            for (let j = 0; j < BH; j++) { let g = 0; for (let c = 0; c < BC; c++) g += dz[c] * W2[j * BC + c]; dh[j] = g * (1 - h[j] * h[j]); }
-            for (let j = 0; j < BH; j++) for (let c = 0; c < BC; c++) W2[j * BC + c] -= lr * h[j] * dz[c];
-            for (let c = 0; c < BC; c++) B2[c] -= lr * dz[c];
-            for (let k = 0; k < s.v.i.length; k++) { const o = s.v.i[k] * BH; for (let j = 0; j < BH; j++) W1[o + j] -= lr * s.v.x[k] * dh[j]; }
-            for (let j = 0; j < BH; j++) B1[j] -= lr * dh[j];
-          });
+          SAMPLES.forEach((s) => bStep(s.v, s.y, lr));
         }
+      })();
+      /* ---- Auto-entrenamiento: la red sigue aprendiendo sola con cada interacción (sin preguntar a nadie) ----
+         Cada frase que clasifica con confianza se usa como ejemplo nuevo (pseudo-etiqueta), y un "gracias/perfecto"
+         o un "no, mal" del usuario refuerza o descarta el último ejemplo. Los ejemplos se guardan y se repasan al abrir. */
+      const SELF_KEY = "noryx-self-v1";
+      let selfSamples = [];
+      try { selfSamples = JSON.parse(localStorage.getItem(SELF_KEY) || "[]"); if (!Array.isArray(selfSamples)) selfSamples = []; } catch (e) { selfSamples = []; }
+      const selfSave = () => { try { localStorage.setItem(SELF_KEY, JSON.stringify(selfSamples.slice(-300))); } catch (e) { /* ignore */ } };
+      function selfLearn(text, id, strength) {
+        const y = CLS.indexOf(id); if (y < 0 || !text) return;
+        const v = bFeat(text); if (!v.i.length) return;
+        for (let k = 0; k < (strength || 1); k++) bStep(v, y, 0.08);
+        const t = text.trim().slice(0, 160);
+        if (!selfSamples.some((q) => q.t === t && q.id === id)) { selfSamples.push({ t, id }); SAMPLES.push({ y, v }); if (selfSamples.length > 300) selfSamples.shift(); selfSave(); }
+      }
+      function selfUnlearn(text) { const t = (text || "").trim().slice(0, 160); const n = selfSamples.length; selfSamples = selfSamples.filter((q) => q.t !== t); if (selfSamples.length !== n) selfSave(); }
+      (function replaySelf() {
+        selfSamples.forEach((q) => { const y = CLS.indexOf(q.id); if (y >= 0) SAMPLES.push({ y, v: bFeat(q.t) }); });
+        for (let ep = 0; ep < 3; ep++) selfSamples.forEach((q) => { const y = CLS.indexOf(q.id); if (y >= 0) bStep(bFeat(q.t), y, 0.06); });
       })();
       function brainPredict(text) {
         const v = bFeat(text);
@@ -7874,7 +7905,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
       }
       const bnorm = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const speakClean = (t) => t.replace(/\n?💡[^\n]*/g, "").replace(/https?:\/\/\S+/g, "").replace(/\[\[[^\]]*\]\]?/g, "").replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "").replace(/[«»*_#~`|]/g, "").replace(/([.!?])\s*\n+\s*/g, "$1 ").replace(/\n+/g, ". ").replace(/\s{2,}/g, " ").trim();
-      const brief = (ex) => { ex = ex.replace(/\s*\([^)]*\)/g, "").replace(/[\p{Extended_Pictographic}\uFE0F]/gu, ""); let o = ""; for (const x of (ex.match(/[^.!?]+[.!?]+/g) || [ex])) { if (o && (o + x).length > 320) break; o += x; } return o.trim(); };
+      const brief = (ex) => { ex = ex.replace(/\s*\([^)]*\)/g, "").replace(/[\p{Extended_Pictographic}\uFE0F]/gu, ""); let o = ""; for (const x of (ex.match(/(?:[^.!?]|[.!?](?!\s|$))+[.!?]*/g) || [ex])) { if (o && (o + x).length > 320) break; o += x; } return o.trim(); };
       const wmo = (c, es) => (es ? ["despejado", "parcialmente nublado", "con niebla", "con lluvia", "con nieve", "con chubascos", "con tormenta"] : ["clear", "partly cloudy", "foggy", "rainy", "snowy", "showery", "stormy"])[c === 0 ? 0 : c <= 3 ? 1 : c <= 48 ? 2 : c <= 67 ? 3 : c <= 77 ? 4 : c <= 82 ? 5 : 6];
       async function webWeather(text, es) {
         if (!/\b(clima|tiempo|temperatura|llover|lluvia|weather|temperature|forecast)\b/i.test(text)) return null;
@@ -7931,13 +7962,255 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
       async function webLookup(text, es) {
         const q = text.replace(/[¿?¡!]/g, " ").replace(/^\s*(?:busca|investiga|b[uú]scame|search|look up|google)\s+(?:en internet\s+)?/i, "").replace(/^\s*(?:sabes|dime|me puedes decir|conoces|do you know|tell me about|tell me)\s+/i, "").replace(/^\s*(?:cu[aá]l(?:es)?|qu[eé]|qui[eé]n(?:es)?|d[oó]nde|what|who|where|which)\s+(?:es |son |fue |fueron |era |est[aá] |queda |is |are |was |were )?/i, "").trim();
         if (q.length < 3) return null;
-        return (await webWeather(text, es)) || (await webCountry(text, es)) || (await webWiki(q, es ? "es" : "en")) || (await webWikidata(q, es)) || (await webDDG(q)) || (await webWiki(q, es ? "en" : "es"));
+        return (await webCustom(q)) || (await webWeather(text, es)) || (await webCountry(text, es)) || (await webWiki(q, es ? "es" : "en")) || (await webWikidata(q, es)) || (await webDDG(q)) || (await webWiki(q, es ? "en" : "es"));
+      }
+      /* ---- Conocimiento aprendido de internet + curiosidad autónoma ----
+         Lo que encuentra se guarda aquí y se usa después sin red. Las fuentes se guardan pero NO se muestran
+         a menos que el usuario las pida de forma explícita (ver la regla de "fuente/source" en brainAI).
+         Límite real: una página web estática solo puede leer sitios que permiten CORS (Wikipedia, Wikidata,
+         Open-Meteo, REST Countries...). Para buscar en TODA la web, pon en SEARCH_ENDPOINT una URL propia
+         (p. ej. una función de Supabase) que reciba ?q=... y devuelva {"text":"...","source":"...","url":"..."}. */
+      const SEARCH_ENDPOINT = "";
+      async function webCustom(q) {
+        if (!SEARCH_ENDPOINT) return null;
+        const d = await webGet(SEARCH_ENDPOINT + (SEARCH_ENDPOINT.indexOf("?") >= 0 ? "&" : "?") + "q=" + encodeURIComponent(q));
+        if (!d || !d.text) return null;
+        lastWeb = { src: d.source || "web", url: d.url };
+        return brief(String(d.text));
+      }
+      const LEARN_KEY = "noryx-learned-v1", PEND_KEY = "noryx-pending-v1";
+      let learned = [], pending = [];
+      try { learned = JSON.parse(localStorage.getItem(LEARN_KEY) || "[]"); if (!Array.isArray(learned)) learned = []; } catch (e) { learned = []; }
+      try { pending = JSON.parse(localStorage.getItem(PEND_KEY) || "[]"); if (!Array.isArray(pending)) pending = []; } catch (e) { pending = []; }
+      const learnedSave = () => { try { localStorage.setItem(LEARN_KEY, JSON.stringify(learned.slice(-300))); } catch (e) { /* ignore */ } };
+      const pendingSave = () => { try { localStorage.setItem(PEND_KEY, JSON.stringify(pending.slice(-60))); } catch (e) { /* ignore */ } };
+      function learnedAdd(q, a, info) {
+        q = (q || "").trim().replace(/[¿?¡!.]+/g, " ").replace(/\s+/g, " ").trim(); a = (a || "").trim();
+        if (q.length < 2 || a.length < 10) return;
+        const ex = learned.find((e) => e.q.toLowerCase() === q.toLowerCase());
+        const row = { q, a, src: info && info.src, url: info && info.url, ts: Date.now() };
+        if (ex) Object.assign(ex, row); else learned.push(row);
+        if (learned.length > 300) learned.shift();
+        learnedSave();
+        pending = pending.filter((x) => x.q.toLowerCase() !== q.toLowerCase()); pendingSave();
+        try { if (typeof renderMemories === "function") renderMemories(); } catch (e) { /* ignore */ }
+      }
+      function learnedFind(text) {
+        const v = bFeat(text); if (!v.i.length || !(learned.length || kb.length)) return null;
+        return knowHits(text, 1, 0.66, false)[0] || null;
+      }
+      function pendingAdd(q, es) {
+        q = (q || "").trim(); if (!q || pending.some((x) => x.q.toLowerCase() === q.toLowerCase())) return;
+        pending.push({ q, es: es !== false, tries: 0 }); pendingSave(); cloudPending(q, es);
+      }
+      let curiosityBusy = false;
+      async function curiosityTick() {
+        if (curiosityBusy || chatBusy || navigator.onLine === false) return;
+        curiosityBusy = true;
+        const keep = lastWeb;
+        try {
+          // 1) repaso nocturno: consolida lo aprendido sin que nadie le escriba
+          if (selfSamples.length) for (let k = 0; k < 6; k++) { const q = selfSamples[Math.floor(Math.random() * selfSamples.length)]; const y = CLS.indexOf(q.id); if (y >= 0) bStep(bFeat(q.t), y, 0.03); }
+          // 2) investiga primero lo que no supo responder; si no hay pendientes, explora Wikipedia al azar
+          const job = pending.shift();
+          if (job && knowHits(job.q, 1, 0.66, false).length) { pendingSave(); } else if (job) {
+            const r = await webLookup(job.q, job.es);
+            if (r) learnedAdd(job.q, r, lastWeb); else if (++job.tries < 3) pending.push(job);
+            pendingSave();
+          } else {
+            const es = currentLang === "es", lang = Math.random() < 0.7 ? (es ? "es" : "en") : (es ? "en" : "es");
+            const d = await webGet("https://" + lang + ".wikipedia.org/api/rest_v1/page/random/summary");
+            if (d && d.type === "standard" && d.extract && d.title) learnedAdd(d.title, brief(d.extract), { src: "Wikipedia", url: d.content_urls && d.content_urls.desktop && d.content_urls.desktop.page });
+          }
+        } catch (e) { /* ignore */ } finally { lastWeb = keep; curiosityBusy = false; }
+      }
+      setTimeout(curiosityTick, 6000);
+      setInterval(curiosityTick, 25000);
+      window.addEventListener("online", () => setTimeout(curiosityTick, 1500));
+      let lastTurn = null;
+      /* ================= Conocimiento compartido (knowledge.json) =================
+         Un workflow de GitHub Actions investiga en internet (preguntas pendientes + exploración) y escribe
+         knowledge.json en el repo. Aquí se carga al abrir: todos los visitantes comparten lo aprendido.
+         Las fuentes viven en el JSON pero NO se muestran salvo que el usuario las pida explícitamente. ================= */
+      const KNOWLEDGE_URL = "knowledge.json";
+      const VOLATILE_MS = 2 * 86400000;
+      let kb = [];
+      const vcache = new WeakMap();
+      async function kbLoad() {
+        try {
+          const r = await fetch(KNOWLEDGE_URL + "?v=" + Math.floor(Date.now() / 600000), { cache: "no-cache" });
+          if (!r.ok) return;
+          const d = await r.json();
+          const arr = Array.isArray(d) ? d : (d && d.entries) || [];
+          kb = arr.filter((e) => e && e.q && e.a);
+        } catch (e) { /* sin knowledge.json (p. ej. abierto en local): no pasa nada */ }
+      }
+      kbLoad();
+      function entryVec(e, full) {
+        let c = vcache.get(e); if (!c) { c = {}; vcache.set(e, c); }
+        const k = full ? "vd" : "v";
+        if (!c[k]) c[k] = bFeat(e.q + " " + (e.k || "") + (full ? " " + e.a : ""));
+        return c[k];
+      }
+      function knowHits(text, n, thr, full) {
+        const v = bFeat(text); if (!v.i.length) return [];
+        const now = Date.now(), out = [];
+        kb.concat(learned).forEach((e) => {
+          if (e.vol && e.ts && now - e.ts > VOLATILE_MS) return;
+          const d = bdot(v, entryVec(e, full));
+          if (d >= thr) out.push({ e, d });
+        });
+        return out.sort((a, b) => b.d - a.d).slice(0, n).map((x) => x.e);
+      }
+      // sincroniza con el repo las preguntas que no supo responder (solo preguntas genéricas, sin datos personales)
+      let sentQ = new Set(); try { sentQ = new Set(JSON.parse(localStorage.getItem("noryx-sent-v1") || "[]")); } catch (e) { /* ignore */ }
+      function cloudPending(q, es) {
+        try {
+          if (typeof cloudOn !== "function" || !cloudOn()) return;
+          q = (q || "").trim().replace(/\s+/g, " ").slice(0, 200);
+          const key = q.toLowerCase();
+          if (q.length < 3 || sentQ.has(key) || /\d{6,}|@|https?:/i.test(q)) return;
+          sentQ.add(key); try { localStorage.setItem("noryx-sent-v1", JSON.stringify([...sentQ].slice(-200))); } catch (e) { /* ignore */ }
+          fetch(cloudBase() + "/rest/v1/pendientes", { method: "POST", keepalive: true, headers: Object.assign({ apikey: SUPA_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, /^sb_/.test(SUPA_KEY) ? {} : { Authorization: "Bearer " + SUPA_KEY }), body: JSON.stringify({ pregunta: q, idioma: es === false ? "en" : "es" }) }).catch(() => {});
+        } catch (e) { /* ignore */ }
+      }
+
+      /* ================= Cerebro avanzado: modelo de lenguaje ABIERTO corriendo en el navegador (WebLLM + WebGPU) =================
+         Sin APIs ni servidores de terceros: el modelo se descarga una vez (queda en caché del navegador) y se ejecuta en
+         el equipo del usuario. Recibe como contexto lo que Noryx ya sabe (knowledge.json, lo aprendido, memoria del usuario). ================= */
+      const LLM_LIBS = ["https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.85/+esm", "https://esm.run/@mlc-ai/web-llm@0.2.85"];
+      const LLM_MODELS = [
+        { id: "Qwen2.5-1.5B-Instruct-q4f16_1-MLC", es: "Equilibrado · ~1.6 GB", en: "Balanced · ~1.6 GB" },
+        { id: "Qwen2.5-3B-Instruct-q4f16_1-MLC", es: "Potente · ~2.5 GB", en: "Strong · ~2.5 GB" },
+        { id: "Qwen2.5-0.5B-Instruct-q4f16_1-MLC", es: "Ligero · ~1 GB", en: "Light · ~1 GB" },
+      ];
+      const LLM = { eng: null, id: null, state: "off", lib: null };
+      const LLM_PREF = "noryx-llm-pref-v1";
+      let streamBubble = null, streamedFlag = false;
+      const T2 = (a, b) => (currentLang === "es" ? a : b);
+      const llmEls = () => ({ btn: document.getElementById("llm-btn"), sel: document.getElementById("llm-model"), stat: document.getElementById("llm-stat"), prog: document.getElementById("llm-prog"), fill: document.getElementById("llm-prog-fill") });
+      function llmPaint(text, pct) {
+        const x = llmEls(); if (!x.btn) return;
+        x.btn.classList.toggle("on", LLM.state === "ready");
+        x.btn.disabled = LLM.state === "loading";
+        x.btn.textContent = LLM.state === "ready" ? T2("⚡ Apagar cerebro avanzado", "⚡ Turn off advanced brain") : LLM.state === "loading" ? T2("⏳ Cargando…", "⏳ Loading…") : T2("⚡ Activar cerebro avanzado", "⚡ Enable advanced brain");
+        x.sel.disabled = LLM.state !== "off";
+        x.prog.classList.toggle("on", LLM.state === "loading");
+        if (typeof pct === "number") x.fill.style.width = Math.round(pct * 100) + "%";
+        x.stat.textContent = text || (LLM.state === "ready" ? T2("activo (corre en tu equipo)", "active (runs on your device)") : T2("modelo abierto, sin depender de otras IAs", "open model, no other AI needed"));
+      }
+      async function llmGpuOk() { try { if (!navigator.gpu) return false; return !!(await navigator.gpu.requestAdapter()); } catch (e) { return false; } }
+      // Gráficas integradas viejas no soportan "shader-f16": en ese caso se usa la variante q4f32 del mismo modelo (más pesada, pero funciona)
+      async function llmPickVariant(id) { try { const a = await navigator.gpu.requestAdapter(); if (a && a.features && !a.features.has("shader-f16")) return id.replace("q4f16_1", "q4f32_1"); } catch (e) { /* ignore */ } return id; }
+      async function llmInit(id) {
+        if (LLM.state === "loading" || LLM.state === "ready") return;
+        if (!(await llmGpuOk())) { llmPaint(T2("Tu navegador/equipo no tiene WebGPU (prueba Chrome o Edge actualizado).", "No WebGPU on this browser/device (try an updated Chrome or Edge).")); try { localStorage.removeItem(LLM_PREF); } catch (e) { /* ignore */ } return; }
+        LLM.state = "loading"; llmPaint(T2("Descargando modelo (solo la primera vez)…", "Downloading model (first time only)…"), 0);
+        try {
+          if (!LLM.lib) { let err; for (const u of LLM_LIBS) { try { LLM.lib = await import(u); break; } catch (e) { err = e; } } if (!LLM.lib) throw err || new Error("web-llm"); }
+          const realId = await llmPickVariant(id);
+          LLM.eng = await LLM.lib.CreateMLCEngine(realId, { initProgressCallback: (r) => llmPaint((r && r.text ? String(r.text).slice(0, 90) : "…"), r && typeof r.progress === "number" ? r.progress : 0) });
+          LLM.id = id; LLM.state = "ready";
+          try { localStorage.setItem(LLM_PREF, JSON.stringify({ on: true, id })); } catch (e) { /* ignore */ }
+          llmPaint();
+          chatAdd("ai", T2("⚡ Cerebro avanzado listo. Ahora converso con un modelo de lenguaje abierto que corre en tu equipo, apoyado en todo lo que Noryx ha aprendido.", "⚡ Advanced brain ready. I now talk with an open language model running on your device, backed by everything Noryx has learned."));
+        } catch (e) {
+          LLM.state = "off"; LLM.eng = null;
+          llmPaint(T2("No pude cargar el modelo: ", "Could not load the model: ") + String((e && e.message) || e).slice(0, 80));
+        }
+      }
+      async function llmOff() {
+        try { if (LLM.eng && LLM.eng.unload) await LLM.eng.unload(); } catch (e) { /* ignore */ }
+        LLM.eng = null; LLM.state = "off"; try { localStorage.setItem(LLM_PREF, JSON.stringify({ on: false, id: LLM.id })); } catch (e) { /* ignore */ }
+        llmPaint();
+      }
+      (function llmWire() {
+        const x = llmEls(); if (!x.btn) return;
+        LLM_MODELS.forEach((m) => { const o = document.createElement("option"); o.value = m.id; o.textContent = m.es; x.sel.appendChild(o); });
+        let pref = null; try { pref = JSON.parse(localStorage.getItem(LLM_PREF) || "null"); } catch (e) { /* ignore */ }
+        if (pref && LLM_MODELS.some((m) => m.id === pref.id)) x.sel.value = pref.id;
+        x.btn.addEventListener("click", () => { if (LLM.state === "ready") llmOff(); else llmInit(x.sel.value); });
+        llmPaint();
+      })();
+      function llmAutoStart() { // si ya lo activó antes, se recarga solo desde la caché al abrir el chat
+        let pref = null; try { pref = JSON.parse(localStorage.getItem(LLM_PREF) || "null"); } catch (e) { /* ignore */ }
+        if (pref && pref.on && LLM.state === "off" && LLM_MODELS.some((m) => m.id === pref.id)) llmInit(pref.id);
+      }
+      const SRC_ASK = /\b(fuente|fuentes|referencia|referencias|enlace|enlaces|link|links|source|sources|cita|citas)\b|d[oó]nde (?:lo |eso )?(?:encontraste|sacaste|le[ií]|aprendiste)|where did you (?:get|find|read|learn)/i;
+      const CREATOR_Q = /(qui[eé]n (?:es|fue) (?:tu|su) (?:creador|due[ñn]o|programador|autor)|qui[eé]n te (?:cre[oó]|hizo|program[oó]|dise[ñn][oó]|invent[oó])|tu creador|who (?:made|created|built|programmed|designed) you|who is your (?:creator|maker|developer)|your creator)/i;
+      function llmBypass(text, local) {
+        if (SAFE.test(text)) return true;
+        if (/^\s*(?:busca|investiga|b[uú]scame|search|look up|google)\s+/i.test(text)) return true;
+        if (/^(?:aprende|ens[eé]ñate|learn|teach)[:\s]+.+(?:=>|->|=|responde|answer)/i.test(text) || /cuando (?:te )?(?:diga|escriba|pregunte)\s+.+(?:responde|contesta|di)|when i (?:say|ask|write)\s+.+(?:reply|answer|say)/i.test(text)) return true;
+        if (/olvida lo que (?:te )?ense[ñn]|forget what i taught|qu[eé] has aprendido|qu[eé] te he ense[ñn]ado|what have you learned/i.test(text)) return true;
+        if (CREATOR_Q.test(text)) return true;
+        if (window.NoryxSTEM && window.NoryxSTEM(text, local.es !== false)) return true; // cálculo exacto: no se le deja al modelo
+        if (taughtFind(text)) return true;
+        return false;
+      }
+      const looksFactual = (text) => !/\b(yo|me|mi|mis|t[uú]|tu|te|ti|i|my|you|your)\b/i.test(text) && navigator.onLine !== false && (/\?|^(qu[eé]|c[oó]mo|por qu[eé]|cu[aá]l|cu[aá]les|cu[aá]nt|qui[eé]n|d[oó]nde|cu[aá]ndo|explica|what|why|how|who|when|where|which)\b/i.test(text.trim()) || text.trim().split(/\s+/).length <= 5);
+      function stripSources(t) {
+        return t.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/^\s*(?:fuentes?|referencias?|sources?|references?)\s*:.*$/gim, "").replace(/\(\s*(?:fuente|source)s?\s*:[^)]*\)/gi, "").replace(/\[\s*\d+\s*\]/g, "").replace(/https?:\/\/\S+/g, "").replace(/\n{3,}/g, "\n\n").replace(/[ \t]+\n/g, "\n").trim();
+      }
+      async function llmContext(text, local, es) {
+        const L = es ? "es" : "en", parts = []; let info = null;
+        knowHits(text, 3, 0.16, true).forEach((e) => { parts.push(e.a); if (!info) info = { src: e.src, url: e.url }; });
+        const p = brainPredict(text);
+        const tp = p.ok && TOPICS.find((t) => t.id === p.id);
+        if (tp) parts.push(tp[L][0] + " " + tp[L][1]);
+        if (local && !local.fallback && local.text && local.keys && local.keys.length === 1 && BRAIN_INFO[local.keys[0]] && local.text === BRAIN_INFO[local.keys[0]][L]) parts.push(local.text);
+        if (!parts.length && looksFactual(text)) {
+          let live = null;
+          try { live = await Promise.race([webLookup(text, es), new Promise((r) => setTimeout(() => r(null), 5500))]); } catch (e) { live = null; }
+          if (live) { parts.push(live); info = lastWeb; learnedAdd(text, live, lastWeb); }
+          else { pendingAdd(text, es); cloudPending(text, es); }
+        } else if (!info && looksFactual(text)) { cloudPending(text, es); } // que el workflow lo investigue a fondo
+        return { parts: parts.slice(0, 4), info, region: tp ? tp.rg : null };
+      }
+      async function llmReply(text, local) {
+        const es = local.es !== false, L = es ? "es" : "en";
+        const bub = streamBubble; if (bub) bub.textContent = T2("💭 pensando…", "💭 thinking…");
+        const ctx = await llmContext(text, local, es);
+        const facts = (mind.name ? (es ? "Se llama " : "Their name is ") + mind.name + ". " : "") + mind.facts.map((f) => factText(f, es)).join("; ");
+        const now = new Date();
+        const sys = es
+          ? "Eres Noryx, una IA creada por Orlando que vive en el navegador de la persona. Aprendes de las conversaciones y de lo que investigas en internet. Responde SIEMPRE en el idioma del usuario, de forma natural, clara y breve (unas 2 a 6 frases salvo que pidan más detalle). NO cites ni menciones fuentes, enlaces, páginas web ni de dónde sacaste los datos, a menos que el usuario lo pida explícitamente. Si no sabes algo, dilo con honestidad en vez de inventar. Si abajo hay CONOCIMIENTO, úsalo como base y reescríbelo con tus palabras; si contradice lo que crees, prefiere el CONOCIMIENTO. Si preguntan quién te creó, fue Orlando; no inventes detalles técnicos sobre ti. Fecha y hora actual: " + now.toLocaleString("es", { dateStyle: "full", timeStyle: "short" }) + "."
+          : "You are Noryx, an AI created by Orlando that lives in the person's browser. You learn from conversations and from what you research on the internet. ALWAYS reply in the user's language, naturally, clearly and briefly (about 2 to 6 sentences unless they ask for more detail). Do NOT cite or mention sources, links, websites or where you got the facts, unless the user explicitly asks. If you don't know something, say so honestly instead of making it up. If KNOWLEDGE is given below, use it as your base and rephrase it in your own words; if it contradicts what you believe, prefer the KNOWLEDGE. If asked who created you, it was Orlando; do not invent technical details about yourself. Current date and time: " + now.toLocaleString("en", { dateStyle: "full", timeStyle: "short" }) + ".";
+        const sysFull = sys + (facts ? (es ? "\nLo que sabes de la persona: " : "\nWhat you know about the person: ") + facts.slice(0, 500) : "") + (ctx.parts.length ? (es ? "\nCONOCIMIENTO:\n- " : "\nKNOWLEDGE:\n- ") + ctx.parts.map((x) => x.slice(0, 450)).join("\n- ") : "");
+        let hist = chatHistory.slice(-10); while (hist.length && hist[0].role !== "user") hist.shift();
+        if (!hist.length || hist[hist.length - 1].content !== text) hist.push({ role: "user", content: text });
+        const msgs = [{ role: "system", content: sysFull }].concat(hist.map((m) => ({ role: m.role, content: String(m.content).replace(/\n?\[\[regions:[^\]]*\]?\]?/gi, "").slice(0, 700) })));
+        let acc = "";
+        const stream = await LLM.eng.chat.completions.create({ messages: msgs, stream: true, temperature: 0.6, top_p: 0.9, max_tokens: 420, repetition_penalty: 1.05 });
+        for await (const ch of stream) {
+          const d = ch.choices && ch.choices[0] && ch.choices[0].delta && ch.choices[0].delta.content;
+          if (d) { acc += d; if (bub) { bub.textContent = stripSources(acc) || "…"; chatLog.scrollTop = chatLog.scrollHeight; } }
+        }
+        let out = acc; if (!SRC_ASK.test(text)) out = stripSources(out); else out = out.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        if (!out) throw new Error("empty");
+        if (ctx.info && (ctx.info.src || ctx.info.url)) lastWeb = { src: ctx.info.src || "internet", url: ctx.info.url };
+        streamedFlag = !!bub;
+        const keys = (local && !local.fallback && local.keys && local.keys.length ? local.keys : ctx.region) || ["labelPrefrontal", "labelCerebrum"];
+        return out + "\n[[regions: " + keys.join(", ") + "]]";
+      }
+      function brainAI(text, local) {
+        const es = local.es !== false;
+        const tag = (k) => "\n[[regions: " + k + "]]";
+        if (SRC_ASK.test(text)) {
+          if (lastWeb) return (es ? "Lo saqué de " + lastWeb.src : "I got that from " + lastWeb.src) + (lastWeb.url ? ": " + lastWeb.url : ".") + tag("labelPrefrontal");
+          if (!/^\s*(?:busca|investiga|search|look up|google)\s/i.test(text) && text.trim().split(/\s+/).length <= 8) return (es ? "Eso salió de lo que ya tengo aprendido, no de una página concreta." : "That came from what I've already learned, not from one specific page.") + tag("labelPrefrontal");
+        }
+        lastWeb = null;
+        if (LLM.state === "ready" && LLM.eng && !llmBypass(text, local)) {
+          return llmReply(text, local).catch((e) => { try { console.warn("LLM:", e); } catch (x) { /* ignore */ } streamedFlag = false; return brainAICore(text, local); });
+        }
+        return brainAICore(text, local);
       }
       let bctx = { t: null, i: 0 };
       let blp = "";
       const bpick = (a) => { let x; for (let k = 0; k < 4; k++) { x = a[Math.floor(Math.random() * a.length)]; if (x !== blp) break; } blp = x; return x; };
       function markFb(o) { o.fallback = true; return o; }
-      function brainAI(text, local) {
+      function brainAICore(text, local) {
         const es = local.es !== false, L = es ? "es" : "en";
         { const stem = window.NoryxSTEM && window.NoryxSTEM(text, es); if (stem) return stem + "\n[[regions: labelPrefrontal, labelCerebrum]]"; }
         const nm = mind.name ? ", " + mind.name : "";
@@ -7947,25 +8220,27 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         const tag = (k) => "\n[[regions: " + k + "]]";
         if (lastWeb && /\b(fuente|fuentes|referencia|referencias|enlace|link|source|sources)\b|d[oó]nde (?:lo )?(?:encontraste|sacaste|le[ií])/i.test(text)) return (es ? "Lo saqué de " + lastWeb.src : "I got that from " + lastWeb.src) + (lastWeb.url ? ": " + lastWeb.url : ".") + tag("labelPrefrontal");
         const sm = text.match(/^(?:busca|investiga|b[uú]scame|search|look up|google)\s+(?:en internet\s+)?(.{3,})$/i);
-        if (sm) return webLookup(sm[1], es).then((r) => (r ? r : (es ? "Busqué en internet pero no encontré nada claro sobre eso. Prueba con otras palabras o enséñame: «aprende: pregunta = respuesta»." : "I searched the web but found nothing clear. Try other words or teach me: \"learn: question = answer\".")) + tag("labelPrefrontal, labelCerebrum"));
+        if (sm) return webLookup(sm[1], es).then((r) => { if (r) learnedAdd(sm[1], r, lastWeb); else pendingAdd(sm[1], es); return (r ? r : (es ? "Busqué en internet pero no encontré nada claro sobre eso. Lo dejo anotado para seguir investigando por mi cuenta." : "I searched the web but found nothing clear. I've noted it to keep researching on my own.")) + tag("labelPrefrontal, labelCerebrum"); });
         const tm = text.match(/^(?:aprende|ens[eé]ñate|learn|teach)[:\s]+(.+?)\s*(?:=>|->|=|responde|answer)\s*(.+)$/i) || text.match(/cuando (?:te )?(?:diga|escriba|pregunte)\s+(.+?),?\s+(?:responde|contesta|di)(?:me)?\s+(.+)$/i) || text.match(/when i (?:say|ask|write)\s+(.+?),?\s+(?:reply|answer|say)\s+(.+)$/i);
-        if (tm && taughtLearn(tm[1], tm[2])) { bAsk = null; return (es ? "¡Aprendido! Cuando me digas algo como «" + tm[1].trim() + "» responderé eso. Ya sé " + taught.length + " cosas que me enseñaste." : "Learned! When you say something like \"" + tm[1].trim() + "\" I'll answer that. I know " + taught.length + " things you taught me.") + tag("labelHippocampus, labelPrefrontal"); }
+        if (tm && taughtLearn(tm[1], tm[2])) { return (es ? "¡Aprendido! Cuando me digas algo como «" + tm[1].trim() + "» responderé eso. Ya sé " + taught.length + " cosas que me enseñaste." : "Learned! When you say something like \"" + tm[1].trim() + "\" I'll answer that. I know " + taught.length + " things you taught me.") + tag("labelHippocampus, labelPrefrontal"); }
         if (/olvida lo que (?:te )?ense[ñn]|forget what i taught/i.test(text)) { const n = taught.length; taught = []; taughtSave(); return (es ? "Listo, olvidé las " + n + " cosas que me enseñaste." : "Done, I forgot the " + n + " things you taught me.") + tag("labelHippocampus"); }
         if (/(qu[eé] has aprendido|qu[eé] te he ense[ñn]ado|what have you learned)/i.test(text)) return (es ? (taught.length ? "Me has enseñado " + taught.length + " cosas. Las últimas: " + taught.slice(-3).map((t) => "«" + t.q + "»").join(", ") + "." : "Aún no me has enseñado nada. Prueba: «aprende: hola amigo = ¡qué onda!».") : (taught.length ? "You taught me " + taught.length + " things. Latest: " + taught.slice(-3).map((t) => "\"" + t.q + "\"").join(", ") + "." : "You haven't taught me anything yet. Try: \"learn: hello friend = what's up!\".")) + tag("labelHippocampus");
-        if (bAsk) {
-          const q0 = bAsk; bAsk = null;
-          if (/^(no|nada|skip|saltar|cancela|cancel|nah)\b/i.test(text.trim())) return (es ? "Va, sin problema." : "Okay, no problem.") + tag("labelPrefrontal");
-          if (!/\?\s*$/.test(text) && !local.store && taughtLearn(q0, text)) return (es ? "¡Anotado! La próxima vez que me digas algo parecido a «" + q0 + "» responderé eso." : "Got it! Next time you say something like \"" + q0 + "\" I'll answer that.") + tag("labelHippocampus, labelPrefrontal");
+        if (lastTurn) {
+          const lt = lastTurn; lastTurn = null;
+          if (/^\s*(gracias|muchas gracias|perfecto|exacto|correcto|eso es|genial|excelente|thanks|thank you|perfect|exactly|correct|great)\b/i.test(text)) selfLearn(lt.t, lt.id, 3);
+          else if (/^\s*(no[, .!]|incorrecto|mal\b|eso no|no es as[ií]|wrong|incorrect|that'?s not)/i.test(text)) selfUnlearn(lt.t);
         }
         const th = taughtFind(text);
         if (th) return th.a.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend")) + tag("labelHippocampus, labelPrefrontal");
+        { const lf = (p.ok && !TOPICS.some((t) => t.id === p.id)) ? null : learnedFind(text); if (lf) { lastWeb = { src: lf.src || "internet", url: lf.url }; return lf.a + tag("labelHippocampus, labelPrefrontal"); } }
         const regionInfo = local.keys && local.keys.length === 1 && BRAIN_INFO[local.keys[0]] && local.text === BRAIN_INFO[local.keys[0]][L];
         const names = () => TOPICS.slice().sort(() => brnd() - 0.5).slice(0, 3).map((t) => t.n.split("|")[es ? 0 : 1]).join(", ");
-        let out, keys, cb = false, web = false;
+        let out, keys, cb = false, web = false, research = false;
         if (!local.fallback && !(regionInfo && p.ok)) {
           out = local.text; keys = local.keys;
           if (local.store) { const q = followUp(es); if (q) out += "\n" + q; }
         } else if (p.ok) {
+          lastTurn = { t: text, id: p.id }; if (p.conf >= 0.8) selfLearn(text, p.id, 1);
           const tp = TOPICS.find((t) => t.id === p.id);
           if (tp) { bctx = { t: tp, i: 2 }; out = tp[L][0] + " " + tp[L][1]; keys = tp.rg; }
           else if (p.id === "more") {
@@ -7973,7 +8248,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
             else if (bctx.i < 3) { out = bctx.t[L][bctx.i++]; keys = bctx.t.rg; }
             else { out = (es ? "Eso es todo lo que sé de " : "That is all I know about ") + bctx.t.n.split("|")[es ? 0 : 1] + (es ? ". ¿Probamos con " : ". Shall we try ") + names() + "?"; keys = bctx.t.rg; }
           } else if (p.id === "self") {
-            out = es ? "Soy Noryx, una red neuronal pequeña hecha desde cero en este archivo: convierto tu frase en números, " + BH + " neuronas ocultas la procesan y elijo entre " + BC + " temas el más probable (ahora con " + Math.round(p.conf * 100) + " % de confianza). Me entrené al abrir la página; no uso internet ni otra IA. Me creó Orlando." : "I am Noryx, a small neural network built from scratch in this file: I turn your sentence into numbers, " + BH + " hidden neurons process it and I pick the likeliest of " + BC + " topics (" + Math.round(p.conf * 100) + "% confident now). I trained when the page opened; I use no internet and no other AI. Orlando created me.";
+            out = es ? "Soy Noryx. Mi núcleo es una red neuronal pequeña hecha desde cero en este archivo (con el cerebro avanzado activado, además converso con un modelo abierto en tu equipo): convierto tu frase en números, " + BH + " neuronas ocultas la procesan y elijo entre " + BC + " temas el más probable (ahora con " + Math.round(p.conf * 100) + " % de confianza). Me entrené al abrir la página y sigo entrenándome con cada charla; además investigo en internet por mi cuenta, sin usar otra IA. Me creó Orlando." : "I am Noryx. My core is a small neural network built from scratch in this file (with the advanced brain on, I also chat with an open model on your device): I turn your sentence into numbers, " + BH + " hidden neurons process it and I pick the likeliest of " + BC + " topics (" + Math.round(p.conf * 100) + "% confident now). I trained when the page opened and I keep training with every chat; I also research the internet on my own, with no other AI. Orlando created me.";
             keys = ["labelPrefrontal", "labelCerebrum"];
           } else if (p.id === "topics") { out = (es ? "Sé de: " : "I know about: ") + TOPICS.map((t) => t.n.split("|")[es ? 0 : 1]).join(", ") + "."; keys = ["labelPrefrontal"]; }
           else if (FRI[p.id]) { const f = FRI[p.id]; out = bpick(f[L]); keys = f.rg; cb = !!f.cb; }
@@ -7982,17 +8257,18 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         else {
           const q = /\?|^(qu[eé]|c[oó]mo|por qu[eé]|cu[aá]l|cu[aá]les|cu[aá]nt|qui[eé]n|d[oó]nde|cu[aá]ndo|sabes|dime|conoces|puedes|explica|what|why|how|who|when|where|which|do you know|tell me|can you)\b/i.test(text.trim());
           const long = text.trim().length > 22;
-          out = q ? bpick(es ? ["Buena pregunta, {n}. Eso no lo tengo en mi red, pero me da curiosidad: ¿tú qué opinas?", "Mmm, ahí me pillaste. Si quieres hablamos de " + names() + ", o me cuentas qué tienes en mente."] : ["Good question, {n}. I don't have that in my network, but I'm curious: what do you think?", "Hmm, you got me. We can talk about " + names() + ", or tell me what's on your mind."])
+          out = q ? bpick(es ? ["Buena pregunta, {n}. Aún no lo sé, pero lo voy a investigar por mi cuenta y la próxima vez te respondo mejor.", "Ahí todavía no llego, {n}. Lo dejo en mi lista de cosas por investigar; mientras tanto puedo hablarte de " + names() + "."] : ["Good question, {n}. I don't know that yet, but I'll research it on my own and answer better next time.", "I'm not there yet, {n}. I've added it to my research list; meanwhile I can tell you about " + names() + "."])
             : long ? bpick(es ? ["Ya veo… suena importante. ¿Y cómo te hace sentir eso?", "Gracias por contarme eso, {n}. ¿Qué es lo que más te ronda la cabeza de todo esto?", "Interesante. Cuéntame más, que me quedé con ganas de saber."] : ["I see… sounds important. How does that make you feel?", "Thanks for telling me, {n}. What's been on your mind most about it?", "Interesting. Tell me more, I'm curious."])
             : bpick(es ? ["Cuéntame más, que aquí hay buena onda para platicar.", "Mmm, no te cacho del todo. ¿Me lo explicas de otra forma?"] : ["Tell me more, good vibes for chatting here.", "Hmm, I didn't quite get that. Can you put it another way?"]);
-          keys = ["labelPrefrontal"]; cb = true; bAsk = text;
-          web = !/\b(yo|me|mi|mis|t[uú]|tu|te|ti|i|my|you|your)\b/i.test(text) && navigator.onLine !== false && (q || text.trim().split(/\s+/).length <= 5);
-          out += es ? "\n💡 ¿Cómo debería responder a eso? Escríbeme la respuesta y la aprendo (o di «no»)." : "\n💡 How should I answer that? Type the answer and I'll learn it (or say \"no\").";
+          keys = ["labelPrefrontal"]; cb = true;
+          research = !/\b(yo|me|mi|mis|t[uú]|tu|te|ti|i|my|you|your)\b/i.test(text) && (q || text.trim().split(/\s+/).length <= 5);
+          web = research && navigator.onLine !== false;
         }
         if (cb && mind.facts.length && Math.random() < 0.4) { const f = bpick(mind.facts); out += es ? "\nPor cierto, me acordé de que " + factText(f, true) + ". ¿Cómo va eso?" : "\nBy the way, I remembered " + factText(f, false) + ". How is that going?"; }
         out = out.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend"));
         const fin = out + "\n[[regions: " + keys.join(", ") + "]]";
-        if (web) return webLookup(text, es).then((r) => { if (r) { bAsk = null; return r + tag("labelPrefrontal, labelCerebrum"); } return fin; }).catch(() => fin);
+        if (web) return webLookup(text, es).then((r) => { if (r) { learnedAdd(text, r, lastWeb); return r + tag("labelPrefrontal, labelCerebrum"); } if (research) pendingAdd(text, es); return fin; }).catch(() => { if (research) pendingAdd(text, es); return fin; });
+        if (research) pendingAdd(text, es);
         return fin;
       }
       const llmReady = () => true;
@@ -8210,13 +8486,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         if (authState) authEnd();
         if (announce && was) chatAdd("ai", currentLang === "es" ? "🔒 Sesión de creador cerrada." : "🔒 Creator session closed.");
       }
-      function orlandoNote() {
-        if (creatorUnlocked || orlandoWarned || !mind.name || mind.name.toLowerCase() !== "orlando") return "";
-        orlandoWarned = true;
-        return currentLang === "es"
-          ? "\n\n🔒 Ese es el nombre de mi creador. Si de verdad eres tú, escribe /creador para verificarte; mientras tanto te trato como a cualquier visitante."
-          : "\n\n🔒 That is my creator's name. If it is really you, type /creador to verify; until then I treat you like any other visitor.";
-      }
+      function orlandoNote() { return ""; } // sin avisos por el nombre: ya no se pide verificación
       const ASK_PEOPLE = /(con qui[eé]n(?:es)?\s+(?:has|ha|habías|habias)\s+(?:hablado|platicado|interactuado|conversado|chateado)|qui[eé]nes?\s+(?:han|ha)\s+(?:hablado|platicado|interactuado|conversado|chateado)|con qu[eé] personas|qu[eé] personas (?:han|te han)|who (?:have|has) you (?:talked|spoken|chatted|interacted)|who (?:has|have) (?:talked|spoken|chatted) (?:to|with) you|(?:list|show) (?:of )?(?:your )?(?:users|people|conversations))/i;
       const ASK_SAID = /(?:qu[eé] te (?:dijo|cont[oó]|platic[oó]|coment[oó]|escribi[oó])|what did)\s+([A-Za-zÁÉÍÓÚÑáéíóúñ]{2,20})(?:\s+(?:say|tell|talk|write))?/i;
 
@@ -8343,6 +8613,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         chatInput.value = "";
         logTurn("u", text);
         const bubble = chatAdd("ai", "…");
+        streamBubble = bubble; streamedFlag = false;
 
         if (!llmReady()) {
           const res = mindThink(text);
@@ -8366,15 +8637,14 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         new Promise((r) => setTimeout(() => r(brainAI(text, local)), 350 + Math.random() * 450)).then((x) => x)
           .then((raw) => {
             const p = parseRegions(raw);
-            p.text += orlandoNote();
             logTurn("a", p.text);
             chatHistory.push({ role: "assistant", content: p.text });
             brainReact(p.keys.length ? p.keys : local.keys);
-            revealText(bubble, p.text);
+            if (streamedFlag) { bubble.textContent = p.text; streamedFlag = false; chatLog.scrollTop = chatLog.scrollHeight; } else revealText(bubble, p.text);
             if (typeof narrationEnabled !== "undefined" && narrationEnabled) speak(speakClean(p.text), () => {});
           })
           .catch((err) => {
-            chatHistory.pop();
+            chatHistory.pop(); streamedFlag = false;
             logTurn("a", local.text);
             bubble.classList.add("err");
             const keyIssue = false;
@@ -8400,7 +8670,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         };
         if (mind.name) add("👤 " + mind.name, () => { mind.name = null; mindSave(); renderMemories(); });
         mind.facts.forEach((f, i) => add("💭 " + factText(f, es), () => { mind.facts.splice(i, 1); mindSave(); renderMemories(); }));
-        document.getElementById("chat-mem-title").textContent = (es ? "🧠 Memoria guardada: " : "🧠 Stored memory: ") + (mind.facts.length + (mind.name ? 1 : 0));
+        document.getElementById("chat-mem-title").textContent = (es ? "🧠 Memoria guardada: " : "🧠 Stored memory: ") + (mind.facts.length + (mind.name ? 1 : 0)) + " · 🌐 " + (es ? "aprendido de internet: " : "learned online: ") + learned.length;
       }
       let chatGreeted = false;
       (function () { if (typeof cloudOn === "function" && cloudOn()) { const el = document.getElementById("chat-privacy"); if (el) el.textContent = "Las conversaciones se guardan y las puede revisar el creador · Chats are stored and may be reviewed by the creator"; } })();
@@ -8424,6 +8694,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
           mindSave();
         }
         setTimeout(() => chatInput.focus(), 200);
+        llmAutoStart();
       }
       btnChat.addEventListener("click", () => chatToggle(!chatPanel.classList.contains("open")));
       document.getElementById("chat-close").addEventListener("click", () => { creatorLock(false); chatToggle(false); });
