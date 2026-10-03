@@ -2530,6 +2530,7 @@
       <div id="chat-chips"></div>
       <div id="chat-log"></div>
       <div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-send" class="tour-nav-btn">➤</button></div>
+      <div id="chat-privacy" style="font-size:10px;opacity:.5;text-align:center">Las conversaciones se guardan en este dispositivo · Chats are saved on this device</div>
       <div id="mem-trace-dummy" style="display:none"></div><div id="chat-mem-title"></div>
       <div id="chat-mem"></div>
     </div>
@@ -7243,7 +7244,7 @@
           return R("Listo, he borrado todo lo que sabía de ti. Es como si nos conociéramos hoy.", "Done, I erased everything I knew about you. It is as if we just met.", ["labelHippocampus"]);
         }
         if (/(qui[eé]n (?:es|fue) (?:tu|su) (?:creador|due[ñn]o|programador|autor)|qui[eé]n te (?:cre[oó]|hizo|program[oó]|dise[ñn][oó]|invent[oó])|tu creador|who (?:made|created|built|programmed|designed) you|who is your (?:creator|maker|developer)|your creator)/.test(m))
-          return R(mind.name === "Orlando" ? "Me creaste tú, Orlando 😄 Me diseñaste desde cero como una red neuronal que se entrena aquí mismo, sin depender de ninguna otra IA." : "Mi creador es Orlando. Me diseñó desde cero como una red neuronal que se entrena en tu navegador, sin depender de ninguna otra IA.", mind.name === "Orlando" ? "You created me, Orlando 😄 You designed me from scratch as a neural network that trains right here, with no other AI behind me." : "My creator is Orlando. He designed me from scratch as a neural network that trains in your browser, with no other AI behind me.", ["labelPrefrontal", "labelHippocampus"]);
+          return R(creatorUnlocked ? "Me creaste tú, Orlando 😄 Me diseñaste desde cero como una red neuronal que se entrena aquí mismo, sin depender de ninguna otra IA." : "Mi creador es Orlando. Me diseñó desde cero como una red neuronal que se entrena en tu navegador, sin depender de ninguna otra IA.", creatorUnlocked ? "You created me, Orlando 😄 You designed me from scratch as a neural network that trains right here, with no other AI behind me." : "My creator is Orlando. He designed me from scratch as a neural network that trains in your browser, with no other AI behind me.", ["labelPrefrontal", "labelHippocampus"]);
         if (/(c[oó]mo te llamas|cu[aá]l es tu nombre|tu nombre|c[oó]mo te dicen|c[oó]mo te puedo llamar|what(?:'s| is) your name|your name|what should i call you|what are you called)/.test(m)) {
           if (!mind.name) pendingKey = "name";
           return R("Me llamo Noryx" + (mind.name ? ", " + mind.name : ". ¿Y tú, cómo te llamas?"), "My name is Noryx" + (mind.name ? ", " + mind.name : ". And you, what is your name?"), ["labelPrefrontal", "labelHippocampus"]);
@@ -7690,11 +7691,327 @@
         }, 18);
       }
 
+      /* ================= Acceso de creador + registro de interacciones =================
+         - Cualquiera puede platicar con Noryx. Solo quien escribe /creador y da la
+           contraseña correcta queda "verificado" y puede ver con quién ha hablado
+           Noryx y de qué (/personas, /ver, /exportar...). A los demás Noryx les
+           responde que esa información es privada.
+         - La contraseña NUNCA se guarda en texto plano: solo un hash con sal.
+         - Los registros viven en el localStorage de ESTE navegador/dispositivo. ============= */
+      const CREATOR_HASH = ""; // opcional: pega aquí "sal:hash" (lo da /hash) para fijar la contraseña dentro del archivo
+      const CRED_KEY = "kakafuegon-creator-v1";
+      /* ---------- Nube (Supabase): ver conversaciones de TODOS los dispositivos ----------
+         Rellena las 3 constantes (ver supabase_setup.sql). Si quedan vacías, todo sigue
+         funcionando solo en local. La anon key es pública por diseño: la seguridad real la
+         dan las políticas RLS (cualquiera puede ESCRIBIR mensajes; solo tu cuenta puede LEER). */
+      const SUPA_URL = "https://frdvspuqrbjukbvgfdqw.supabase.co";
+      const SUPA_KEY = "sb_publishable_m-rQ91fGPqdm_5sZieaGbA_F8CZM_tr"; // clave publicable (NUNCA la secret/service_role)
+      const CREATOR_EMAIL = "orlandoggr22@gmail.com"; // el correo de tu cuenta de Supabase Auth
+      const cloudOn = () => !!(SUPA_URL && SUPA_KEY && CREATOR_EMAIL);
+      let cloudToken = null;
+      const cloudBase = () => SUPA_URL.replace(/\/+$/, "");
+      function cloudInsert(row) {
+        if (!cloudOn()) return;
+        try {
+          fetch(cloudBase() + "/rest/v1/mensajes", { method: "POST", keepalive: true, headers: Object.assign({ apikey: SUPA_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, /^sb_/.test(SUPA_KEY) ? {} : { Authorization: "Bearer " + SUPA_KEY }) , body: JSON.stringify(row) }).catch(() => {});
+        } catch (e) { /* ignore */ }
+      }
+      async function cloudLogin(pw) {
+        const r = await fetch(cloudBase() + "/auth/v1/token?grant_type=password", { method: "POST", headers: { apikey: SUPA_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ email: CREATOR_EMAIL, password: pw }) });
+        if (r.status === 400 || r.status === 401) { const e = new Error("bad"); e.bad = true; throw e; }
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        const j = await r.json();
+        if (!j.access_token) throw new Error("sin token");
+        return j.access_token;
+      }
+      async function cloudReq(method, path) {
+        if (!cloudToken) { const e = new Error("expired"); e.expired = true; throw e; }
+        const r = await fetch(cloudBase() + "/rest/v1/" + path, { method, headers: { apikey: SUPA_KEY, Authorization: "Bearer " + cloudToken } });
+        if (r.status === 401 || r.status === 403) { cloudToken = null; const e = new Error("expired"); e.expired = true; throw e; }
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return method === "GET" ? r.json() : null;
+      }
+      async function creatorData() {
+        if (!cloudOn()) return logLoad();
+        const rows = (await cloudReq("GET", "mensajes?select=session_id,nombre,rol,texto,ts&order=ts.desc&limit=5000")).reverse();
+        const by = new Map();
+        rows.forEach((r) => {
+          let x = by.get(r.session_id);
+          const ts = Date.parse(r.ts) || 0;
+          if (!x) { x = { id: r.session_id, t0: ts, t1: ts, name: null, m: [] }; by.set(r.session_id, x); }
+          if (r.nombre) x.name = r.nombre;
+          x.t1 = ts;
+          x.m.push({ r: r.rol, t: r.texto, ts });
+        });
+        return [...by.values()];
+      }
+      async function creatorWipe() {
+        try { localStorage.removeItem(LOG_KEY); } catch (e) { /* ignore */ }
+        if (cloudOn()) await cloudReq("DELETE", "mensajes?id=gt.0");
+      }
+      function cloudErrText(e) {
+        const es = currentLang === "es";
+        if (e && e.expired) { creatorLock(false); return es ? "La sesión de la nube expiró. Escribe /creador para entrar otra vez." : "The cloud session expired. Type /creador to sign in again."; }
+        return (es ? "No pude hablar con la nube: " : "I could not reach the cloud: ") + (e && e.message ? e.message : e);
+      }
+
+      const LOG_KEY = "kakafuegon-interactions-v1";
+      const CREATOR_CMDS = ["personas", "ver", "exportar", "borrar", "salir", "hash", "ayuda"];
+      const newSid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      let SESSION_ID = newSid();
+      let creatorUnlocked = false;
+      let creatorLastAct = 0;
+      let authState = null; // null | "ask" | "new1" | "new2"
+      let authTmp = "";
+      let authFails = 0;
+      let authLockUntil = 0;
+      let orlandoWarned = false;
+
+      const sha256 = (() => {
+        const K = [], H0 = [];
+        const isPrime = (n) => { for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; };
+        const frac = (x) => ((x - Math.floor(x)) * 4294967296) | 0;
+        for (let n = 2, c = 0; c < 64; n++) if (isPrime(n)) { if (c < 8) H0[c] = frac(Math.pow(n, 1 / 2)); K[c] = frac(Math.pow(n, 1 / 3)); c++; }
+        return (str) => {
+          const bytes = Array.from(new TextEncoder().encode(str));
+          const l = bytes.length * 8;
+          bytes.push(0x80);
+          while (bytes.length % 64 !== 56) bytes.push(0);
+          [Math.floor(l / 4294967296), l >>> 0].forEach((v) => bytes.push((v >>> 24) & 255, (v >>> 16) & 255, (v >>> 8) & 255, v & 255));
+          const H = H0.slice(), w = new Array(64);
+          for (let i = 0; i < bytes.length; i += 64) {
+            for (let t = 0; t < 16; t++) w[t] = ((bytes[i + 4 * t] << 24) | (bytes[i + 4 * t + 1] << 16) | (bytes[i + 4 * t + 2] << 8) | bytes[i + 4 * t + 3]) | 0;
+            for (let t = 16; t < 64; t++) {
+              const a = w[t - 15], b = w[t - 2];
+              const s0 = ((a >>> 7) | (a << 25)) ^ ((a >>> 18) | (a << 14)) ^ (a >>> 3);
+              const s1 = ((b >>> 17) | (b << 15)) ^ ((b >>> 19) | (b << 13)) ^ (b >>> 10);
+              w[t] = (w[t - 16] + s0 + w[t - 7] + s1) | 0;
+            }
+            let [a, b, c, d, e, f, g, h] = H;
+            for (let t = 0; t < 64; t++) {
+              const S1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+              const ch = (e & f) ^ (~e & g);
+              const t1 = (h + S1 + ch + K[t] + w[t]) | 0;
+              const S0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+              const maj = (a & b) ^ (a & c) ^ (b & c);
+              const t2 = (S0 + maj) | 0;
+              h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+            }
+            [a, b, c, d, e, f, g, h].forEach((v, k) => { H[k] = (H[k] + v) | 0; });
+          }
+          return H.map((v) => (v >>> 0).toString(16).padStart(8, "0")).join("");
+        };
+      })();
+      function hashPw(pw, salt) { let h = sha256(salt + ":" + pw); for (let i = 0; i < 4000; i++) h = sha256(h + salt + pw); return h; }
+      function newSalt() {
+        try { return Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, "0")).join(""); }
+        catch (e) { return Math.random().toString(16).slice(2, 10) + Date.now().toString(16); }
+      }
+      function getCred() {
+        if (CREATOR_HASH && CREATOR_HASH.indexOf(":") > 0) { const p = CREATOR_HASH.split(":"); return { salt: p[0], hash: p[1] }; }
+        try { const c = JSON.parse(localStorage.getItem(CRED_KEY) || "null"); if (c && c.salt && c.hash) return c; } catch (e) { /* ignore */ }
+        return null;
+      }
+
+      /* ---------- Registro de conversaciones (por dispositivo) ---------- */
+      function logLoad() { try { const r = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); return Array.isArray(r) ? r : []; } catch (e) { return []; } }
+      function logSave(arr) {
+        let s = arr;
+        for (let i = 0; i < 6; i++) { try { localStorage.setItem(LOG_KEY, JSON.stringify(s)); return; } catch (e) { s = s.slice(Math.ceil(s.length * 0.25)); } }
+      }
+      function logTurn(role, text) {
+        if (creatorUnlocked || !text) return; // no se registran ni la contraseña ni las sesiones del creador
+        const all = logLoad();
+        let s = all.find((x) => x.id === SESSION_ID);
+        if (!s) { s = { id: SESSION_ID, t0: Date.now(), name: null, m: [] }; all.push(s); }
+        if (mind.name) s.name = mind.name;
+        s.t1 = Date.now();
+        s.m.push({ r: role, t: String(text).slice(0, 600), ts: Date.now() });
+        if (s.m.length > 200) s.m.splice(0, s.m.length - 200);
+        logSave(all.slice(-150));
+        cloudInsert({ session_id: SESSION_ID, nombre: mind.name ? String(mind.name).slice(0, 60) : null, rol: role, texto: String(text).slice(0, 600) });
+      }
+      const TOPIC_STOP = new Set(("de la que el en y a los se del las un por con no una su para es al lo como mas más pero sus le ya o este si sí porque esta entre cuando muy sin sobre tambien también me hasta hay donde quien desde todo nos todos uno les ni contra otros ese eso ante ellos esto antes algunos unos yo otro otra el tanto esa estos mucho nada cual poco ella estar estas algo mi mis tu tus te ti hola quiero puedes puede dime cuentame cuéntame quién quien hablado dijo cuál soy estoy tengo vivo gusta llamo the and or of to in is are was were it you me my your this that for on with as at be have what who how not but so if there here hello hi tell can could would like name").split(" "));
+      function topWords(msgs, n) {
+        const c = {};
+        msgs.filter((m) => m.r === "u").forEach((m) => (m.t.toLowerCase().match(/[a-záéíóúñü]{4,}/g) || []).forEach((w) => { if (!TOPIC_STOP.has(w)) c[w] = (c[w] || 0) + 1; }));
+        return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, n).map((x) => x[0]);
+      }
+      function fmtDate(ts) { return new Date(ts).toLocaleString(currentLang === "es" ? "es-MX" : "en-US", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }); }
+      function peopleGroups(data) {
+        const g = new Map();
+        (data || logLoad()).forEach((s) => {
+          const nm = s.name || (currentLang === "es" ? "Anónimo" : "Anonymous");
+          const k = nm.toLowerCase();
+          if (!g.has(k)) g.set(k, { name: nm, sessions: [] });
+          g.get(k).sessions.push(s);
+        });
+        const last = (p) => Math.max(...p.sessions.map((s) => s.t1 || s.t0 || 0));
+        return [...g.values()].sort((a, b) => last(b) - last(a));
+      }
+      function peopleSummary(data) {
+        const es = currentLang === "es";
+        const gs = peopleGroups(data);
+        if (!gs.length) return cloudOn() ? (es ? "Aún no hay conversaciones registradas en la nube." : "No conversations in the cloud yet.") : es ? "Aún no hay conversaciones registradas en este dispositivo. (Solo guardo las que ocurren desde que existe este registro.)" : "No conversations are logged on this device yet. (I only keep the ones that happen since this log exists.)";
+        const lines = gs.map((p, i) => {
+          const msgs = p.sessions.flatMap((s) => s.m);
+          const nUser = msgs.filter((m) => m.r === "u").length;
+          const last = Math.max(...p.sessions.map((s) => s.t1 || s.t0 || 0));
+          const tw = topWords(msgs, 5).join(", ");
+          return (i + 1) + ". " + p.name + " — " + p.sessions.length + (es ? " conversación(es), " : " chat(s), ") + nUser + (es ? " mensajes suyos, última vez " : " messages from them, last seen ") + fmtDate(last) + (tw ? (es ? ". Temas: " : ". Topics: ") + tw : "");
+        });
+        return (es ? "👥 Personas con las que he hablado" + (cloudOn() ? " (todos los dispositivos)" : " en este dispositivo") + ":\n" : "👥 People I have talked to" + (cloudOn() ? " (all devices)" : " on this device") + ":\n") + lines.join("\n") + (es ? "\n\nEscribe /ver 1 (o /ver Nombre) para leer la conversación." : "\n\nType /ver 1 (or /ver Name) to read the conversation.");
+      }
+      function transcriptFor(arg, data) {
+        const es = currentLang === "es";
+        const gs = peopleGroups(data);
+        let p = /^\d+$/.test(arg) ? gs[parseInt(arg, 10) - 1] : gs.find((x) => x.name.toLowerCase() === arg.toLowerCase()) || gs.find((x) => x.name.toLowerCase().includes(arg.toLowerCase()));
+        if (!arg || !p) return es ? "No encontré a esa persona. Usa /personas para ver la lista." : "I could not find that person. Use /personas to see the list.";
+        const msgs = p.sessions.slice().sort((a, b) => a.t0 - b.t0).flatMap((s) => s.m).slice(-60);
+        return (es ? "💬 Conversación con " : "💬 Conversation with ") + p.name + (es ? " (últimos " : " (last ") + msgs.length + (es ? " mensajes):\n" : " messages):\n") + msgs.map((m) => "[" + fmtDate(m.ts) + "] " + (m.r === "u" ? p.name : "Noryx") + ": " + m.t).join("\n");
+      }
+
+      /* ---------- Sesión de creador ---------- */
+      function authBegin(state, ph) { authState = state; authTmp = ""; chatInput.type = "password"; chatInput.placeholder = ph; chatInput.value = ""; }
+      function authEnd() { authState = null; authTmp = ""; chatInput.type = "text"; chatInput.placeholder = "Escribe... / Type..."; chatInput.value = ""; }
+      function creatorLock(announce) {
+        const was = creatorUnlocked;
+        creatorUnlocked = false; creatorLastAct = 0; cloudToken = null;
+        if (authState) authEnd();
+        if (announce && was) chatAdd("ai", currentLang === "es" ? "🔒 Sesión de creador cerrada." : "🔒 Creator session closed.");
+      }
+      function orlandoNote() {
+        if (creatorUnlocked || orlandoWarned || !mind.name || mind.name.toLowerCase() !== "orlando") return "";
+        orlandoWarned = true;
+        return currentLang === "es"
+          ? "\n\n🔒 Ese es el nombre de mi creador. Si de verdad eres tú, escribe /creador para verificarte; mientras tanto te trato como a cualquier visitante."
+          : "\n\n🔒 That is my creator's name. If it is really you, type /creador to verify; until then I treat you like any other visitor.";
+      }
+      const ASK_PEOPLE = /(con qui[eé]n(?:es)?\s+(?:has|ha|habías|habias)\s+(?:hablado|platicado|interactuado|conversado|chateado)|qui[eé]nes?\s+(?:han|ha)\s+(?:hablado|platicado|interactuado|conversado|chateado)|con qu[eé] personas|qu[eé] personas (?:han|te han)|who (?:have|has) you (?:talked|spoken|chatted|interacted)|who (?:has|have) (?:talked|spoken|chatted) (?:to|with) you|(?:list|show) (?:of )?(?:your )?(?:users|people|conversations))/i;
+      const ASK_SAID = /(?:qu[eé] te (?:dijo|cont[oó]|platic[oó]|coment[oó]|escribi[oó])|what did)\s+([A-Za-zÁÉÍÓÚÑáéíóúñ]{2,20})(?:\s+(?:say|tell|talk|write))?/i;
+
+      function creatorCommand(c, arg, es) { creatorCommandInner(c, arg, es).catch((e) => chatAdd("ai", cloudErrText(e))); }
+      async function creatorCommandInner(c, arg, es) {
+        const say = (a, b) => chatAdd("ai", es ? a : b);
+        if (c === "ayuda") return say("Comandos de creador:\n/personas — con quién he hablado y de qué\n/ver N (o /ver Nombre) — leer esa conversación\n/exportar — descargar todo en JSON\n/borrar — borrar el registro (pide confirmación)\n/hash — dato para fijar tu contraseña dentro del archivo\n/salir — cerrar la sesión de creador\n\nTambién puedes preguntarme: «¿con quién has hablado?» o «¿qué te dijo Ana?».", "Creator commands:\n/personas — who I have talked to and about what\n/ver N (or /ver Name) — read that conversation\n/exportar — download everything as JSON\n/borrar — erase the log (asks for confirmation)\n/hash — value to hard-code your password in the file\n/salir — close the creator session\n\nYou can also ask: \"who have you talked to?\" or \"what did Ana tell you?\".");
+        if (c === "personas") { const t = peopleSummary(await creatorData()); return say(t, t); }
+        if (c === "ver") { const t = transcriptFor(arg, await creatorData()); return say(t, t); }
+        if (c === "exportar") {
+          const blob = new Blob([JSON.stringify({ exportado: new Date().toISOString(), conversaciones: await creatorData() }, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url; a.download = "noryx-conversaciones.json";
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+          return say("📥 Listo, descargué el registro completo.", "📥 Done, I downloaded the full log.");
+        }
+        if (c === "borrar") {
+          if (/^(si|sí|yes)$/i.test(arg)) { await creatorWipe(); return say("🗑 Registro borrado.", "🗑 Log erased."); }
+          return say("Esto borra TODAS las conversaciones registradas" + (cloudOn() ? " (también en la nube)" : "") + ". Si estás seguro, escribe /borrar si", "This erases ALL logged conversations. If you are sure, type /borrar si");
+        }
+        if (c === "hash") {
+          const cr = getCred();
+          if (!cr) return say("No hay contraseña configurada.", "No password configured.");
+          return say("Para fijar tu contraseña dentro del archivo, pega esto en CREATOR_HASH (así nadie más puede crear una en otro dispositivo):\n" + cr.salt + ":" + cr.hash, "To hard-code your password in the file, paste this into CREATOR_HASH (so nobody else can create one on another device):\n" + cr.salt + ":" + cr.hash);
+        }
+        if (c === "salir") return creatorLock(true);
+      }
+
+      /* Devuelve true si el mensaje era un comando/contraseña y ya fue atendido. */
+      function accessGate(text) {
+        const es = currentLang === "es";
+        const say = (a, b) => { const t = es ? a : b; chatAdd("ai", t); return t; };
+        const echo = () => { chatAdd("me", text); chatInput.value = ""; };
+        if (creatorUnlocked && Date.now() - creatorLastAct > 600000) creatorLock(false); // cierre por inactividad (10 min)
+
+        // 1) Pantallas de contraseña: no se muestran en el chat ni se registran
+        if (authState) {
+          chatInput.value = "";
+          if (/^\/cancelar$/i.test(text)) { authEnd(); say("Verificación cancelada.", "Verification cancelled."); return true; }
+          if (authState === "ask") {
+            if (authLockUntil - Date.now() > 0) { authEnd(); say("Demasiados intentos fallidos. Espera un momento.", "Too many failed attempts. Wait a moment."); return true; }
+            const pw = text;
+            const finish = (ok) => {
+              if (ok) {
+                authFails = 0; creatorUnlocked = true; creatorLastAct = Date.now();
+                say("✅ Acceso de creador concedido, Orlando. Escribe /ayuda para ver qué puedes hacer. Mientras estés verificado no registro tus mensajes.", "✅ Creator access granted, Orlando. Type /ayuda to see what you can do. While you are verified I do not log your messages.");
+              } else {
+                authFails++;
+                if (authFails >= 5) { authLockUntil = Date.now() + 60000 * Math.pow(2, Math.min(authFails - 5, 6)); say("Contraseña incorrecta. Demasiados intentos: bloqueado temporalmente.", "Wrong password. Too many attempts: temporarily locked."); }
+                else say("Contraseña incorrecta. Vuelve a escribir /creador para reintentar.", "Wrong password. Type /creador to try again.");
+              }
+            };
+            authEnd();
+            if (cloudOn()) {
+              cloudLogin(pw).then((tok) => { cloudToken = tok; finish(true); }).catch((e) => { if (e && e.bad) finish(false); else say("No pude conectar con la nube (" + (e && e.message) + "). Reintenta con /creador.", "Could not reach the cloud (" + (e && e.message) + "). Retry with /creador."); });
+              return true;
+            }
+            const c = getCred();
+            finish(!!(c && hashPw(pw, c.salt) === c.hash));
+            return true;
+          }
+          if (authState === "new1") {
+            if (text.length < 6) { say("Mínimo 6 caracteres. Prueba otra (o /cancelar).", "At least 6 characters. Try another (or /cancelar)."); return true; }
+            authTmp = text; authState = "new2"; chatInput.placeholder = es ? "Repite la contraseña" : "Repeat the password";
+            say("Repítela para confirmar.", "Repeat it to confirm."); return true;
+          }
+          if (authState === "new2") {
+            if (text !== authTmp) { authTmp = ""; authState = "new1"; chatInput.placeholder = es ? "Nueva contraseña" : "New password"; say("No coinciden. Escribe la contraseña de nuevo (o /cancelar).", "They do not match. Type the password again (or /cancelar)."); return true; }
+            const salt = newSalt();
+            try { localStorage.setItem(CRED_KEY, JSON.stringify({ salt, hash: hashPw(text, salt) })); }
+            catch (e) { authEnd(); say("No pude guardar la contraseña en este navegador.", "I could not save the password in this browser."); return true; }
+            authEnd(); creatorUnlocked = true; creatorLastAct = Date.now();
+            say("✅ Contraseña creada y acceso concedido. Escribe /ayuda para ver los comandos.", "✅ Password created and access granted. Type /ayuda to see the commands.");
+            return true;
+          }
+        }
+
+        // 2) Comandos con "/"
+        const cmd = text.match(/^\/([a-záéíóúñ]+)\s*(.*)$/i);
+        if (cmd) {
+          const c = cmd[1].toLowerCase(), arg = cmd[2].trim();
+          if (c === "creador" || c === "admin") {
+            echo();
+            if (creatorUnlocked) { creatorLastAct = Date.now(); say("Ya estás verificado. Escribe /ayuda para ver los comandos.", "You are already verified. Type /ayuda for the commands."); return true; }
+            const wait = authLockUntil - Date.now();
+            if (wait > 0) { say("Bloqueado por intentos fallidos. Prueba en " + Math.ceil(wait / 1000) + " s.", "Locked after failed attempts. Try again in " + Math.ceil(wait / 1000) + " s."); return true; }
+            if (!cloudOn() && !getCred()) { authBegin("new1", es ? "Nueva contraseña" : "New password"); say("Aún no hay contraseña de creador en este dispositivo. Escribe la que quieras usar (mínimo 6 caracteres). Tu mensaje no se mostrará.", "There is no creator password on this device yet. Type the one you want to use (at least 6 characters). Your message will not be shown."); }
+            else { authBegin("ask", es ? "Contraseña de creador" : "Creator password"); say("Escribe tu contraseña de creador.", "Type your creator password."); }
+            return true;
+          }
+          if (CREATOR_CMDS.indexOf(c) >= 0) {
+            echo();
+            if (!creatorUnlocked) { say("Ese comando es solo para mi creador.", "That command is only for my creator."); return true; }
+            creatorLastAct = Date.now();
+            creatorCommand(c, arg, es);
+            return true;
+          }
+        }
+
+        // 3) Preguntas en lenguaje natural sobre otras personas
+        const said = text.match(ASK_SAID);
+        if (ASK_PEOPLE.test(text) || said) {
+          echo();
+          if (!creatorUnlocked) {
+            const r = say("Eso es información privada: solo mi creador, verificado con su contraseña, puede consultarla. No comparto lo que otras personas me han dicho.", "That is private information: only my creator, verified with his password, can look it up. I do not share what other people have told me.");
+            logTurn("u", text); logTurn("a", r);
+            return true;
+          }
+          creatorLastAct = Date.now();
+          creatorData().then((d) => chatAdd("ai", said && !ASK_PEOPLE.test(text) ? transcriptFor(said[1], d) : peopleSummary(d))).catch((e) => chatAdd("ai", cloudErrText(e)));
+          return true;
+        }
+        if (creatorUnlocked) creatorLastAct = Date.now();
+        return false;
+      }
+
       function chatSend(text) {
         text = (text || "").trim();
         if (!text || chatBusy) return;
+        if (accessGate(text)) return;
         chatAdd("me", text);
         chatInput.value = "";
+        logTurn("u", text);
         const bubble = chatAdd("ai", "…");
 
         if (!llmReady()) {
@@ -7719,6 +8036,8 @@
         new Promise((r) => setTimeout(() => r(brainAI(text, local)), 350 + Math.random() * 450)).then((x) => x)
           .then((raw) => {
             const p = parseRegions(raw);
+            p.text += orlandoNote();
+            logTurn("a", p.text);
             chatHistory.push({ role: "assistant", content: p.text });
             brainReact(p.keys.length ? p.keys : local.keys);
             revealText(bubble, p.text);
@@ -7726,6 +8045,7 @@
           })
           .catch((err) => {
             chatHistory.pop();
+            logTurn("a", local.text);
             bubble.classList.add("err");
             const keyIssue = false;
             const hint = keyIssue ? (currentLang === "es" ? "Revisa tu key o el modelo en ⚙. Respuesta local:" : "Check your key or model in ⚙. Local reply:") : (currentLang === "es" ? "El servicio está saturado o sin conexión; reintenta en un momento. Respuesta local:" : "The service is busy or offline; try again shortly. Local reply:");
@@ -7753,6 +8073,7 @@
         document.getElementById("chat-mem-title").textContent = (es ? "🧠 Memoria guardada: " : "🧠 Stored memory: ") + (mind.facts.length + (mind.name ? 1 : 0));
       }
       let chatGreeted = false;
+      (function () { if (typeof cloudOn === "function" && cloudOn()) { const el = document.getElementById("chat-privacy"); if (el) el.textContent = "Las conversaciones se guardan y las puede revisar el creador · Chats are stored and may be reviewed by the creator"; } })();
       function chatToggle(open) {
         chatPanel.classList.toggle("open", open);
         btnChat.classList.toggle("on", open);
@@ -7775,7 +8096,7 @@
         setTimeout(() => chatInput.focus(), 200);
       }
       btnChat.addEventListener("click", () => chatToggle(!chatPanel.classList.contains("open")));
-      document.getElementById("chat-close").addEventListener("click", () => chatToggle(false));
+      document.getElementById("chat-close").addEventListener("click", () => { creatorLock(false); chatToggle(false); });
       document.getElementById("chat-send").addEventListener("click", () => chatSend(chatInput.value));
       chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") chatSend(chatInput.value); e.stopPropagation(); });
       const chipsBox = document.getElementById("chat-chips");
@@ -7789,7 +8110,7 @@
 
 
       document.getElementById("chat-new").addEventListener("click", () => {
-        chatHistory.length = 0; chatLog.innerHTML = ""; chatGreeted = false; chatToggle(true);
+        chatHistory.length = 0; chatLog.innerHTML = ""; chatGreeted = false; SESSION_ID = newSid(); if (authState) authEnd(); chatToggle(true);
       });
 
       /* ================= Brain Explorer: a dedicated section that strips the
