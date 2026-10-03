@@ -2530,7 +2530,7 @@
       <div id="chat-chips"></div>
       <div id="chat-log"></div>
       <div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-send" class="tour-nav-btn">➤</button></div>
-      <div id="chat-privacy" style="font-size:10px;opacity:.5;text-align:center">Si no sé algo, envío SOLO tu pregunta a fuentes abiertas / IAs gratuitas externas · If I don't know, ONLY your question goes to open sources / free external AIs</div>
+      <div id="chat-privacy" style="font-size:10px;opacity:.5;text-align:center">Las conversaciones se guardan en este dispositivo · Chats are saved on this device</div>
       <div id="mem-trace-dummy" style="display:none"></div><div id="chat-mem-title"></div>
       <div id="chat-mem"></div>
     </div>
@@ -2747,6 +2747,335 @@
       <div class="kbd-row"><span data-i18n="kbd_help">This help panel</span><span class="kbd-key">?</span></div>
     </div>
 
+    <script>
+(function(){
+"use strict";
+let ES=true;const T=(a,b)=>ES?a:b,fin=Number.isFinite;
+const nf=x=>String(+x.toPrecision(8)),pv=x=>String(+x.toPrecision(5));
+function frac(x){const ax=Math.abs(x);for(let q=1;q<=360;q++){const p=Math.round(x*q);if(Math.abs(x-p/q)<1e-9*Math.max(1,ax))return[p,q];}return null;}
+function cf(x){if(!fin(x))return String(x);if(Math.abs(x)<1e-12)return"0";const f=frac(x);return f&&f[1]>1?f[0]+"/"+f[1]:nf(x);}
+const ff=x=>{const c=cf(x);return c.includes("/")?c+" (≈"+nf(x)+")":c;};
+const fact=n=>{if(n<0||n%1||n>170)return NaN;let r=1;for(let i=2;i<=n;i++)r*=i;return r;},gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const FN={sin:Math.sin,cos:Math.cos,tan:Math.tan,asin:Math.asin,acos:Math.acos,atan:Math.atan,sinh:Math.sinh,cosh:Math.cosh,tanh:Math.tanh,sqrt:Math.sqrt,cbrt:Math.cbrt,ln:Math.log,log:(x,b)=>b?Math.log(x)/Math.log(b):Math.log10(x),exp:Math.exp,abs:Math.abs,floor:Math.floor,ceil:Math.ceil,round:Math.round,fact,ncr:(n,k)=>Math.round(fact(n)/(fact(k)*fact(n-k))),npr:(n,k)=>Math.round(fact(n)/fact(n-k)),gcd,lcm:(a,b)=>Math.abs(a*b)/gcd(a,b)};
+const AL={sen:"sin",tg:"tan",raiz:"sqrt",arcsin:"asin",arccos:"acos",arctan:"atan",log10:"log",lg:"log"};
+/* ---------- parser ---------- */
+function tok(s,multi){
+ s=s.replace(/²/g,"^2").replace(/³/g,"^3").replace(/√/g,"sqrt ").replace(/×|·/g,"*").replace(/÷/g,"/").replace(/[\[{]/g,"(").replace(/[\]}]/g,")");
+ const Tk=[],re=/\s*(?:(\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+)|([A-Za-zπ_][A-Za-z0-9_]*)|(\S))/y;let m;
+ while(re.lastIndex<s.length&&(m=re.exec(s))){
+  if(m[1]!==undefined)Tk.push({k:"n",v:parseFloat(m[1])});
+  else if(m[2]!==undefined){const w=m[2];let l=w.toLowerCase();l=AL[l]||l;
+   if(FN[l]||l==="pi"||l==="π")Tk.push({k:"i",v:l});
+   else if(multi)Tk.push({k:"i",v:w});
+   else(w.match(/[A-Za-zπ]|\d+/g)||[]).forEach(p=>Tk.push(/\d/.test(p)?{k:"n",v:+p}:{k:"i",v:p==="π"?"pi":p}));}
+  else Tk.push({k:"o",v:m[3]});}
+ return Tk;}
+const C=v=>({t:"c",v}),V=n=>({t:"v",n}),Fn=(m,...a)=>({t:"f",n:m,a}),isC=(n,v)=>n.t==="c"&&(v===undefined||n.v===v);
+function parse(s,multi){
+ const Tk=tok(s,multi);let i=0;const pk=()=>Tk[i],nx=()=>Tk[i++];
+ const mk=(o,a,b)=>({t:"o",o,a,b});
+ function cl(){if(!pk()||pk().v!==")")throw 0;nx();}
+ function ex(){let a=tm();while(pk()&&(pk().v==="+"||pk().v==="-")){const o=nx().v;a=mk(o,a,tm());}return a;}
+ function tm(){let a=un();for(;;){const t=pk();if(!t)break;if(t.v==="*"||t.v==="/"){nx();a=mk(t.v,a,un());}else if(t.k==="n"||t.k==="i"||t.v==="(")a=mk("*",a,un());else break;}return a;}
+ function un(){if(pk()&&pk().v==="-"){nx();const a=un();return a.t==="c"?C(-a.v):{t:"neg",a};}if(pk()&&pk().v==="+"){nx();return un();}return pwr();}
+ function pwr(){let a=at();while(pk()&&pk().v==="!"){nx();a=Fn("fact",a);}if(pk()&&pk().v==="^"){nx();a={t:"p",a,b:un()};}return a;}
+ function at(){const t=nx();if(!t)throw 0;
+  if(t.k==="n")return C(t.v);
+  if(t.k==="i"){const l=t.v;
+   if(FN[l]){let args;if(pk()&&pk().v==="("){nx();args=[ex()];while(pk()&&pk().v===","){nx();args.push(ex());}cl();}else args=[pwr()];return{t:"f",n:l,a:args};}
+   if(l==="pi")return C(Math.PI);if(l==="e"&&!multi)return C(Math.E);return V(l);}
+  if(t.v==="("){const a=ex();cl();return a;}
+  throw 0;}
+ const r=ex();if(i<Tk.length)throw 0;return r;}
+function ev(n,E){switch(n.t){
+ case"c":return n.v;
+ case"v":{const v=E[n.n];if(v===undefined)throw new Error("var");return v;}
+ case"neg":return -ev(n.a,E);
+ case"p":return Math.pow(ev(n.a,E),ev(n.b,E));
+ case"o":{const a=ev(n.a,E),b=ev(n.b,E);return n.o==="+"?a+b:n.o==="-"?a-b:n.o==="*"?a*b:a/b;}
+ case"f":return FN[n.n](...n.a.map(q=>ev(q,E)));}}
+function fv(n,s){if(n.t==="v")s.add(n.n);else if(n.t==="f")n.a.forEach(q=>fv(q,s));else{if(n.a)fv(n.a,s);if(n.b)fv(n.b,s);}return s;}
+const hasV=(n,x)=>fv(n,new Set()).has(x);
+/* ---------- impresión y constructores simplificadores ---------- */
+function pr(n,p=0){const w=(q,s)=>p>q?"("+s+")":s;switch(n.t){
+ case"c":{if(n.v===Math.PI)return"π";if(n.v===Math.E)return"e";const c=cf(n.v);return c.includes("/")?"("+c+")":c;}
+ case"v":return n.n;
+ case"neg":return w(1,"-"+pr(n.a,2));
+ case"p":return w(3,pr(n.a,4)+"^"+pr(n.b,4));
+ case"f":return n.n+"("+n.a.map(q=>pr(q)).join(", ")+")";
+ case"o":{const o=n.o;
+  if(o==="+"||o==="-")return w(1,pr(n.a,1)+" "+o+" "+pr(n.b,o==="-"?2:1));
+  if(o==="*"){const imp=n.a.t==="c"&&["v","f","p"].includes(n.b.t);return w(2,pr(n.a,2)+(imp?"":"·")+pr(n.b,3));}
+  return w(2,pr(n.a,2)+"/"+pr(n.b,3));}}}
+function neg(a){if(isC(a))return C(-a.v);if(a.t==="neg")return a.a;return{t:"neg",a};}
+function add(a,b){if(isC(a,0))return b;if(isC(b,0))return a;if(isC(a)&&isC(b))return C(a.v+b.v);if(isC(b)&&b.v<0)return sub(a,C(-b.v));if(b.t==="neg")return sub(a,b.a);return{t:"o",o:"+",a,b};}
+function sub(a,b){if(isC(b,0))return a;if(isC(a,0))return neg(b);if(isC(a)&&isC(b))return C(a.v-b.v);if(isC(b)&&b.v<0)return add(a,C(-b.v));return{t:"o",o:"-",a,b};}
+function mul(a,b){if(isC(a,0)||isC(b,0))return C(0);if(isC(a,1))return b;if(isC(b,1))return a;if(isC(a)&&isC(b))return C(a.v*b.v);if(isC(b)){const t=a;a=b;b=t;}if(a.t==="neg")return neg(mul(a.a,b));if(b.t==="neg")return neg(mul(a,b.a));if(isC(a)&&b.t==="o"&&b.o==="*"&&isC(b.a))return mul(C(a.v*b.a.v),b.b);return{t:"o",o:"*",a,b};}
+function div(a,b){if(isC(a,0))return C(0);if(isC(b,1))return a;if(isC(a)&&isC(b)&&b.v)return C(a.v/b.v);if(a.t==="neg")return neg(div(a.a,b));return{t:"o",o:"/",a,b};}
+function pw(a,b){if(isC(b,0))return C(1);if(isC(b,1))return a;if(isC(a)&&isC(b))return C(Math.pow(a.v,b.v));return{t:"p",a,b};}
+/* ---------- derivadas ---------- */
+function D(n,x){switch(n.t){
+ case"c":return C(0);
+ case"v":return C(n.n===x?1:0);
+ case"neg":return neg(D(n.a,x));
+ case"o":{const a=n.a,b=n.b;
+  if(n.o==="+")return add(D(a,x),D(b,x));
+  if(n.o==="-")return sub(D(a,x),D(b,x));
+  if(n.o==="*")return add(mul(D(a,x),b),mul(a,D(b,x)));
+  return div(sub(mul(D(a,x),b),mul(a,D(b,x))),pw(b,C(2)));}
+ case"p":{const a=n.a,b=n.b;
+  if(!hasV(b,x))return mul(mul(b,pw(a,sub(b,C(1)))),D(a,x));
+  if(!hasV(a,x))return mul(mul(n,Fn("ln",a)),D(b,x));
+  return mul(n,add(mul(D(b,x),Fn("ln",a)),div(mul(b,D(a,x)),a)));}
+ case"f":{const u=n.a[0],du=D(u,x);let r;
+  switch(n.n){
+  case"sin":r=Fn("cos",u);break;
+  case"cos":r=neg(Fn("sin",u));break;
+  case"tan":r=div(C(1),pw(Fn("cos",u),C(2)));break;
+  case"exp":r=n;break;
+  case"ln":r=div(C(1),u);break;
+  case"sqrt":r=div(C(1),mul(C(2),n));break;
+  case"asin":r=div(C(1),Fn("sqrt",sub(C(1),pw(u,C(2)))));break;
+  case"acos":r=neg(div(C(1),Fn("sqrt",sub(C(1),pw(u,C(2))))));break;
+  case"atan":r=div(C(1),add(C(1),pw(u,C(2))));break;
+  case"sinh":r=Fn("cosh",u);break;
+  case"cosh":r=Fn("sinh",u);break;
+  case"abs":r=div(u,n);break;
+  case"log":r=div(C(1),mul(u,Fn("ln",C(10))));break;
+  default:throw 0;}
+  return mul(r,du);}}}
+/* ---------- polinomios ---------- */
+const trim=p=>{p=p.slice();while(p.length>1&&Math.abs(p[p.length-1])<1e-12)p.pop();return p;};
+const padd=(a,b)=>Array.from({length:Math.max(a.length,b.length)},(_,i)=>(a[i]||0)+(b[i]||0));
+const pmul=(a,b)=>{const r=Array(a.length+b.length-1).fill(0);a.forEach((x,i)=>b.forEach((y,j)=>r[i+j]+=x*y));return r;};
+function pdiv(a,b){a=trim(a);b=trim(b);if(b.length>a.length)return null;const r=a.slice(),q=Array(a.length-b.length+1).fill(0);for(let i=q.length-1;i>=0;i--){q[i]=r[i+b.length-1]/b[b.length-1];for(let j=0;j<b.length;j++)r[i+j]-=q[i]*b[j];}return r.every(c=>Math.abs(c)<1e-9)?q:null;}
+function poly(n,x){switch(n.t){
+ case"c":return[n.v];
+ case"v":return n.n===x?[0,1]:null;
+ case"neg":{const p=poly(n.a,x);return p&&p.map(c=>-c);}
+ case"o":{const a=poly(n.a,x),b=poly(n.b,x);if(!a||!b)return null;
+  if(n.o==="+")return padd(a,b);if(n.o==="-")return padd(a,b.map(c=>-c));if(n.o==="*")return pmul(a,b);
+  const tb=trim(b);if(tb.length===1)return tb[0]===0?null:a.map(c=>c/tb[0]);return pdiv(a,b);}
+ case"p":{const a=poly(n.a,x);if(!a)return null;let e;try{e=ev(n.b,{});}catch(_){return null;}if(e<0||e%1||e>20)return null;let r=[1];for(let i=0;i<e;i++)r=pmul(r,a);return r;}}
+ return null;}
+const lin=(u,x)=>{const p=poly(u,x);if(!p)return null;const q=trim(p);return q.length<=2?[q[1]||0,q[0]]:null;};
+function pstr(P,x){let s="";for(let i=P.length-1;i>=0;i--){const c=P[i];if(Math.abs(c)<1e-12)continue;const a=Math.abs(c);let cs=i&&a===1?"":cf(a);if(i&&cs.includes("/"))cs="("+cs+")";s+=(s?(c<0?" - ":" + "):(c<0?"-":""))+cs+(i?x+(i>1?"^"+i:""):"");}return s||"0";}
+const pev=(P,x)=>P.reduceRight((s,c)=>s*x+c,0);
+const defl=(P,r)=>{const n=P.length-1,q=Array(n);q[n-1]=P[n];for(let i=n-1;i>=1;i--)q[i-1]=P[i]+r*q[i];return q;};
+/* ---------- raíces numéricas ---------- */
+const GR=(()=>{const p=[];for(let k=-7;k<=7.001;k+=0.05)p.push(Math.pow(10,k));return[...p.map(x=>-x).reverse(),0,...p];})();
+function roots(f){const out=[];let pa=GR[0],pf=f(pa);
+ for(let i=1;i<GR.length;i++){const b=GR[i],fb=f(b);
+  if(fin(pf)&&fin(fb)){
+   if(fb===0)out.push(b);
+   else if(pf!==0&&pf*fb<0){let lo=pa,hi=b,fl=pf;for(let j=0;j<200;j++){const mid=(lo+hi)/2,fm=f(mid);if(fm===0){lo=hi=mid;break;}if(fl*fm<0)hi=mid;else{lo=mid;fl=fm;}}
+    const r=(lo+hi)/2;if(Math.abs(f(r))<=1e-6*Math.max(Math.abs(pf),Math.abs(fb))+1e-9)out.push(r);}}
+  pa=b;pf=fb;}
+ return out.filter((r,i)=>!i||Math.abs(r-out[i-1])>1e-7*(1+Math.abs(r)));}
+function proots(P){P=trim(P);const rs=[];while(P.length>3){const r=roots(x=>pev(P,x))[0];if(r===undefined)break;rs.push(r);P=defl(P,r);}return[rs,P];}
+/* ---------- primitivas ---------- */
+function I(n,x){
+ if(!hasV(n,x))return mul(n,V(x));
+ switch(n.t){
+ case"v":return div(pw(V(x),C(2)),C(2));
+ case"neg":{const r=I(n.a,x);return r&&neg(r);}
+ case"o":{
+  if(n.o==="+"||n.o==="-"){const a=I(n.a,x),b=I(n.b,x);return a&&b&&(n.o==="+"?add(a,b):sub(a,b));}
+  if(n.o==="*"){if(!hasV(n.a,x)){const r=I(n.b,x);return r&&mul(n.a,r);}if(!hasV(n.b,x)){const r=I(n.a,x);return r&&mul(n.b,r);}
+   const p=poly(n,x);return p?p.reduce((s,c,k)=>c?add(s,mul(C(c/(k+1)),pw(V(x),C(k+1)))):s,C(0)):null;}
+  if(!hasV(n.b,x)){const r=I(n.a,x);return r&&div(r,n.b);}
+  if(!hasV(n.a,x)){const l=lin(n.b,x);if(l&&l[0])return mul(div(n.a,C(l[0])),Fn("ln",Fn("abs",n.b)));if(n.b.t==="p"&&!hasV(n.b.b,x))return I(mul(n.a,pw(n.b.a,neg(n.b.b))),x);}
+  return null;}
+ case"p":{
+  if(!hasV(n.b,x)){const l=lin(n.a,x);if(l&&l[0]){const e=ev(n.b,{});if(e===-1)return div(Fn("ln",Fn("abs",n.a)),C(l[0]));return div(pw(n.a,C(e+1)),C((e+1)*l[0]));}}
+  if(!hasV(n.a,x)){const l=lin(n.b,x);if(l&&l[0])return div(n,mul(C(l[0]),Fn("ln",n.a)));}
+  return null;}
+ case"f":{const u=n.a[0],l=lin(u,x);if(!l||!l[0])return null;const k=C(l[0]);
+  switch(n.n){
+  case"sin":return div(neg(Fn("cos",u)),k);
+  case"cos":return div(Fn("sin",u),k);
+  case"exp":return div(n,k);
+  case"sqrt":return mul(C(2/(3*l[0])),pw(u,C(1.5)));
+  case"ln":return div(sub(mul(u,n),u),k);
+  case"tan":return div(neg(Fn("ln",Fn("abs",Fn("cos",u)))),k);}
+  return null;}}
+ return null;}
+/* ---------- utilidades de texto ---------- */
+const FILL=/\b(?:calcula|calcular|calculame|halla|hallar|encuentra|obten|dame|cual|cuales|es|son|el|la|los|las|de|del|que|una|un|me|puedes|favor|por|funcion|expresion|ecuacion|ecuaciones|respecto|con|sea|si|tal|the|of|find|compute|calculate|what|is|function|expression|equation|please|can|you|for|with|respect|if|derivada|derivative|derivar|deriva|integral|integra|integrar|limite|limit|lim|resuelve|resolver|solve|factoriza|factorizar|factor|expande|expandir|expand|desarrolla|simplifica|simplificar|simplify|indefinida|definida|segunda|tercera|second|third|primitiva|antiderivada|cuando|when|as|dx|dy|dt|en|at)\b/g;
+const prep=(t,strip)=>{t=t.replace(FILL," ").replace(/[:?¿]/g," ");if(strip)t=t.replace(/^\s*[a-z]\s*(?:\(\s*[a-z]\s*\))?\s*'?\s*=\s*/,"");return t.replace(/\s+/g," ").trim();};
+const mainVar=(ast,pref)=>{const vs=fv(ast,new Set());return pref&&vs.has(pref)?pref:vs.has("x")?"x":[...vs][0]||"x";};
+function gauss(A,b){const n=b.length;for(let i=0;i<n;i++){let m=i;for(let r=i+1;r<n;r++)if(Math.abs(A[r][i])>Math.abs(A[m][i]))m=r;if(Math.abs(A[m][i])<1e-12)return null;[A[i],A[m]]=[A[m],A[i]];[b[i],b[m]]=[b[m],b[i]];for(let r=0;r<n;r++)if(r!==i){const f=A[r][i]/A[i][i];for(let c=i;c<n;c++)A[r][c]-=f*A[i][c];b[r]-=f*b[i];}}return b.map((v,i)=>v/A[i][i]);}
+/* ---------- ecuaciones ---------- */
+function eqn(s,xv,force){
+ const[l,r]=s.split("=");const L=parse(l),R=parse(r),vs=new Set();fv(L,vs);fv(R,vs);
+ if(!vs.size)return null;
+ if(vs.size>1&&!force)return null;
+ if(vs.size>1)return T("Tiene varias incógnitas. Dame valores para las demás o un sistema de ecuaciones (ej.: x+y=5; x-y=1).","It has several unknowns. Give values for the others or a system (e.g. x+y=5; x-y=1).");
+ const x=[...vs][0],f0={t:"o",o:"-",a:L,b:R};let P=poly(f0,x);
+ const o=[T("Ecuación: ","Equation: ")+l.trim()+" = "+r.trim()];
+ if(P){P=trim(P);const d=P.length-1;
+  o.push(T("Todo a un lado: ","Everything on one side: ")+pstr(P,x)+" = 0");
+  if(d===0)o.push(P[0]===0?T("Es una identidad: infinitas soluciones.","Identity: infinitely many solutions."):T("No tiene solución.","No solution."));
+  else if(d===1){o.push(x+" = −("+cf(P[0])+")/("+cf(P[1])+")");o.push("➜ "+x+" = "+ff(-P[0]/P[1]));}
+  else if(d===2){const[c,b,a]=P,Dl=b*b-4*a*c;o.push("Δ = b² − 4ac = "+cf(Dl));
+   if(Dl>=0){const s2=Math.sqrt(Dl);o.push(x+" = (−b ± √Δ)/2a = ("+cf(-b)+" ± √"+cf(Dl)+")/"+cf(2*a));
+    if(Math.abs(Dl)<1e-12)o.push("➜ "+x+" = "+ff(-b/(2*a))+T(" (raíz doble)"," (double root)"));
+    else{const rr=[(-b-s2)/(2*a),(-b+s2)/(2*a)].sort((u,v)=>u-v);o.push("➜ "+x+"₁ = "+ff(rr[0])+",  "+x+"₂ = "+ff(rr[1]));}}
+   else o.push(T("Δ < 0: sin raíces reales. Complejas: ","Δ < 0: no real roots. Complex: ")+"\n➜ "+x+" = "+cf(-b/(2*a))+" ± "+cf(Math.sqrt(-Dl)/(2*a))+"i");}
+  else{const[rs,rest]=proots(P);let cx="";
+   if(rest.length===3){const[c,b,a]=rest,Dl=b*b-4*a*c;if(Dl>=0){const s2=Math.sqrt(Dl);rs.push((-b-s2)/(2*a),(-b+s2)/(2*a));}else cx=x+" = "+cf(-b/(2*a))+" ± "+cf(Math.sqrt(-Dl)/(2*a))+"i";}
+   else if(rest.length===2)rs.push(-rest[0]/rest[1]);
+   o.push("➜ "+rs.sort((u,v)=>u-v).map(q=>x+" = "+ff(q)).join(",  ")+(cx?",  "+cx:"")+(rest.length>3?T("  (quedan raíces complejas sin calcular)","  (complex roots left uncomputed)"):""));}}
+ else{const f=v=>{try{return ev(L,{[x]:v})-ev(R,{[x]:v});}catch(e){return NaN;}};
+  const rs=roots(f).filter(q=>Math.abs(q)<=100).sort((u,v)=>Math.abs(u)-Math.abs(v));
+  o.push(rs.length?T("No es polinómica; raíces numéricas aprox.:","Not a polynomial; numeric roots (approx.):")+"\n➜ "+rs.slice(0,8).map(q=>x+" ≈ "+nf(q)).join(",  ")+(rs.length>8?T("  (hay más)","  (more exist)"):""):T("No encontré soluciones reales en [−100, 100].","No real solutions found in [−100, 100]."));}
+ return o.join("\n");}
+function system(eqs){
+ const ps=eqs.map(e=>{const[l,r]=e.split("=");return{L:parse(l),R:parse(r)};}),vs=new Set();ps.forEach(p=>{fv(p.L,vs);fv(p.R,vs);});
+ const Vs=[...vs].sort();if(Vs.length!==ps.length||Vs.length>4)return null;
+ try{const A=[],b=[];
+  for(const p of ps){const f=e=>ev(p.L,e)-ev(p.R,e),z={};Vs.forEach(v=>z[v]=0);const c0=f(z);
+   A.push(Vs.map(v=>{const a1=f(Object.assign({},z,{[v]:1}))-c0,a2=f(Object.assign({},z,{[v]:2}))-c0;if(Math.abs(a2-2*a1)>1e-9)throw 0;return a1;}));b.push(-c0);}
+  const sol=gauss(A.map(r=>r.slice()),b.slice());
+  return sol?T("Sistema lineal ","Linear system ")+Vs.length+"×"+Vs.length+"\n➜ "+Vs.map((v,i)=>v+" = "+ff(sol[i])).join(",  "):T("No tiene solución única (es incompatible o tiene infinitas).","No unique solution (inconsistent or infinitely many).");
+ }catch(e){return T("Por ahora solo resuelvo sistemas lineales.","Only linear systems for now.");}}
+/* ---------- matrices ---------- */
+const det=M=>M.length===1?M[0][0]:M[0].reduce((s,v,j)=>s+(j%2?-1:1)*v*det(M.slice(1).map(r=>r.filter((_,k)=>k!==j))),0);
+const mp=M=>M.map(r=>"  ["+r.map(cf).join("  ")+"]").join("\n");
+function matrices(s,low){
+ const Ms=(s.match(/\[\s*\[[^\]]*\](?:\s*,\s*\[[^\]]*\])*\s*\]/g)||[]).map(t=>JSON.parse(t));if(!Ms.length)return null;
+ const A=Ms[0],sq=A.length===A[0].length;
+ if(Ms.length>1&&/multipl|producto|product|\*|×|\bpor\b|times/.test(low)){const B=Ms[1];if(A[0].length!==B.length)return T("Las dimensiones no son compatibles para multiplicar.","Dimensions don't match for multiplication.");return T("Producto A·B =\n","Product A·B =\n")+mp(A.map(r=>B[0].map((_,j)=>r.reduce((s2,v,k)=>s2+v*B[k][j],0))));}
+ if(Ms.length>1&&/suma|sum|\+/.test(low)){const B=Ms[1];return T("Suma =\n","Sum =\n")+mp(A.map((r,i)=>r.map((v,j)=>v+B[i][j])));}
+ if(/transpuesta|transpose/.test(low))return T("Transpuesta =\n","Transpose =\n")+mp(A[0].map((_,j)=>A.map(r=>r[j])));
+ if(!sq)return T("Esa operación necesita una matriz cuadrada.","That needs a square matrix.");
+ const d=det(A);
+ if(/determinante|\bdet|determinant/.test(low))return T("Determinante = ","Determinant = ")+ff(d);
+ if(/inversa|inverse/.test(low)){if(Math.abs(d)<1e-12)return T("det = 0: la matriz no es invertible.","det = 0: not invertible.");const cols=A.map((_,j)=>gauss(A.map(r=>r.slice()),A.map((_,i)=>i===j?1:0)));return T("Inversa (det = ","Inverse (det = ")+cf(d)+") =\n"+mp(A.map((_,i)=>cols.map(c=>c[i])));}
+ if(/valores propios|autovalores|eigen/.test(low)&&A.length===2){const tr=A[0][0]+A[1][1],Dl=tr*tr-4*d;return T("Valores propios: λ² − "+cf(tr)+"λ + "+cf(d)+" = 0\n➜ ","Eigenvalues: λ² − "+cf(tr)+"λ + "+cf(d)+" = 0\n➜ ")+(Dl>=0?"λ₁ = "+ff((tr-Math.sqrt(Dl))/2)+",  λ₂ = "+ff((tr+Math.sqrt(Dl))/2):"λ = "+cf(tr/2)+" ± "+cf(Math.sqrt(-Dl)/2)+"i");}
+ return null;}
+/* ---------- cálculo ---------- */
+const simp=(g,a,b,n=2000)=>{const h=(b-a)/n;let s=g(a)+g(b);for(let i=1;i<n;i++)s+=g(a+i*h)*(i%2?4:2);return s*h/3;};
+const bv=s=>ev(parse(s.replace(/\s/g,"")),{});
+function limit(f,x,c){const g=h=>{try{return ev(f,{[x]:h});}catch(e){return NaN;}};
+ if(!fin(c)){const s=c>0?1:-1,a=g(s*1e4),b=g(s*1e6);if(!fin(b))return null;if(Math.abs(b)>1e3&&Math.abs(b)>2*Math.abs(a))return b>0?"+∞":"−∞";if(Math.abs(a-b)<1e-3*(1+Math.abs(b)))return ff(+b.toPrecision(5));return T("no existe","does not exist");}
+ const H=[1e-3,1e-5],r=H.map(h=>g(c+h)),l=H.map(h=>g(c-h));
+ if(![...r,...l].every(fin))return null;
+ const inf=a=>Math.abs(a[1])>1e3&&Math.abs(a[1])>20*Math.abs(a[0]);
+ if(inf(r)||inf(l)){const sr=Math.sign(r[1]),sl=Math.sign(l[1]);if(inf(r)&&inf(l)&&sr===sl)return sr>0?"+∞":"−∞";return T("no existe (los lados divergen o difieren)","does not exist (sides diverge or differ)");}
+ if(Math.abs(r[1]-l[1])<1e-3*(1+Math.abs(r[1])))return ff(+((r[1]+l[1])/2).toPrecision(5));
+ return T("no existe (por la izquierda ≈ ","does not exist (left ≈ ")+pv(l[1])+T(", por la derecha ≈ ",", right ≈ ")+pv(r[1])+")";}
+function calc(low){
+ const isD=/deriv|d\/dx|differentiat/.test(low),isI=/integra|∫|primitiv|antideriv/.test(low),isL=/limite|\blim\b|limit/.test(low);
+ if(!isD&&!isI&&!isL)return null;let t=low,m;
+ try{
+ if(isL){m=t.match(/([a-z])\s*(?:tiende a|tiende|->|→|approaches|goes to|tends to|to)\s*(-?\s*(?:infinito|inf|∞|[\w.]+(?:\/[\w.]+)?))/);if(!m)return null;
+  t=t.replace(m[0]," ");const e=prep(t,true),ast=parse(e),cs=m[2].replace(/\s/g,""),c=/inf|∞/.test(cs)?(cs[0]==="-"?-Infinity:Infinity):bv(cs),x=m[1];
+  const res=limit(ast,x,c);if(res===null)return T("No pude calcular ese límite numéricamente.","Couldn't compute that limit numerically.");
+  return"lim("+x+"→"+(fin(c)?cs:cs.replace("inf","∞").replace("infinito","∞"))+") "+pr(ast)+T("\n➜ Límite = ","\n➜ Limit = ")+res+T("\n(calculado numéricamente)","\n(computed numerically)");}
+ if(isI){let a=null,b=null;
+  for(const r of[/(?:desde|from)\s+(\S+)\s+(?:hasta|a|to)\s+([^\s,;]+)/,/entre\s+(\S+)\s+y\s+([^\s,;]+)/,/∫\s*_\s*\(?(-?[\w.]+)\)?\s*\^\s*\(?(-?[\w.]+)\)?/,/\bde\s+(-?\d[\w.]*|-?pi)\s+a\s+(-?\d[\w.]*|-?pi)\s/,/\blimites?\s+(\S+)\s+(?:a|y|and)\s+(\S+)/]){m=t.match(r);if(m){a=m[1];b=m[2];t=t.replace(m[0]," ");break;}}
+  const e=prep(t.replace(/∫/g," "),true).replace(/\s+d[a-z]$/,""),ast=parse(e),x=mainVar(ast),F=I(ast,x);
+  if(a!==null){const A=bv(a),B=bv(b),val=F?ev(F,{[x]:B})-ev(F,{[x]:A}):simp(v=>ev(ast,{[x]:v}),A,B);
+   return T("Integral definida de ","Definite integral of ")+pr(ast)+" d"+x+" ["+a+", "+b+"]"+(F?T("\nPrimitiva: ","\nAntiderivative: ")+pr(F):"")+"\n➜ "+ff(val)+(F?"":T(" (aprox. numérica)"," (numeric approx.)"));}
+  return F?"∫ "+pr(ast)+" d"+x+"\n➜ "+pr(F)+" + C":T("No encuentro la primitiva con mis reglas (puede requerir partes o sustitución). Si me das límites, la calculo numéricamente.","I can't find the antiderivative with my rules (may need parts/substitution). Give me bounds and I'll compute it numerically.");}
+ let x=null,n=1,at=null;
+ m=t.match(/respecto\s+(?:a|de)l?\s+([a-z])\b/);if(m){x=m[1];t=t.replace(m[0]," ");}
+ m=t.match(/d\/d([a-z])/);if(m){x=x||m[1];t=t.replace(m[0]," ");}
+ if(/segunda|second|2nd/.test(t))n=2;else if(/tercera|third|3rd/.test(t))n=3;
+ m=t.match(/\b(?:en|at)\s+(?:el\s+punto\s+)?(?:([a-z])\s*=\s*)?(-?[\d.]+|-?pi)\s*[?.]?\s*$/);if(m){at=m[2];x=x||m[1]||null;t=t.replace(m[0]," ");}
+ const ast=parse(prep(t,true));x=mainVar(ast,x);let d=ast;for(let i=0;i<n;i++)d=D(d,x);
+ const pm=n===1?"'":n===2?"''":"'''";
+ return T("Derivada de f("+x+") = ","Derivative of f("+x+") = ")+pr(ast)+"\n➜ f"+pm+"("+x+") = "+pr(d)+(at!==null?"\nf"+pm+"("+at+") = "+ff(ev(d,{[x]:bv(at)})):"");
+ }catch(e){return T("No pude resolver eso con mis reglas actuales; reescríbelo con paréntesis (ej.: derivada de x^2*sin(x)).","I couldn't solve that with my current rules; try rewriting with parentheses (e.g. derivative of x^2*sin(x)).");}}
+/* ---------- factorizar / expandir ---------- */
+function fx(low){
+ if(!/factoriza|factor\b|factorizar|expande|expand|desarrolla|simplifica|simplify/.test(low))return null;
+ const ast=parse(prep(low,true)),x=mainVar(ast),P0=poly(ast,x);if(!P0)return null;const P=trim(P0);
+ if(!/factor/.test(low))return T("Forma expandida: ","Expanded form: ")+pstr(P,x);
+ if(P.length<3)return T("Ya es lineal/constante: ","Already linear/constant: ")+pstr(P,x);
+ const[rs,rest]=proots(P);let extra=null,lead=P[P.length-1];
+ if(rest.length===3){const[c,b,a]=rest,Dl=b*b-4*a*c;if(Dl>=0){const s=Math.sqrt(Dl);rs.push((-b-s)/(2*a),(-b+s)/(2*a));}else{extra=rest;lead=P[P.length-1]/rest[2];}}
+ else if(rest.length===2)rs.push(-rest[0]/rest[1]);
+ rs.sort((u,v)=>u-v);const g=[];rs.forEach(r=>{const q=g[g.length-1];if(q&&Math.abs(q[0]-r)<1e-6)q[1]++;else g.push([r,1]);});
+ const fs=g.map(([r,k])=>"("+(Math.abs(r)<1e-12?x:x+(r<0?" + "+cf(-r):" − "+cf(r)))+")"+(k>1?"^"+k:"")).join("")+(extra?"("+pstr(extra,x)+")":"");
+ const ld=Math.abs(lead-1)<1e-12?"":Math.abs(lead+1)<1e-12?"-":(cf(lead).includes("/")?"("+cf(lead)+")":cf(lead));
+ return T("Factorización: ","Factorization: ")+pstr(P,x)+" = "+ld+fs;}
+/* ---------- estadística y aritmética ---------- */
+function stats(low){
+ if(!/\b(?:media|promedio|mean|average|mediana|median|moda|mode|desviacion|varianza|variance|standard dev)/.test(low))return null;
+ const a=(low.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);if(a.length<2)return null;
+ const n=a.length,s=a.reduce((p,q)=>p+q,0),mu=s/n,so=[...a].sort((p,q)=>p-q),med=n%2?so[(n-1)/2]:(so[n/2-1]+so[n/2])/2,ss=a.reduce((p,q)=>p+(q-mu)*(q-mu),0),cnt={};a.forEach(v=>cnt[v]=(cnt[v]||0)+1);const mx=Math.max(...Object.values(cnt)),mode=mx>1?Object.keys(cnt).filter(k=>cnt[k]===mx).join(", "):T("no hay","none");
+ return T("Datos: ","Data: ")+a.join(", ")+"\nn = "+n+",  Σ = "+nf(s)+"\n"+T("Media","Mean")+" = "+ff(mu)+"\n"+T("Mediana","Median")+" = "+ff(med)+"\n"+T("Moda","Mode")+" = "+mode+"\n"+T("Varianza (poblacional)","Variance (population)")+" = "+nf(ss/n)+"\n"+T("Desv. estándar","Std. dev.")+": "+T("poblacional ","population ")+nf(Math.sqrt(ss/n))+(n>1?T(",  muestral ",",  sample ")+nf(Math.sqrt(ss/(n-1))):"");}
+function arith(low){
+ let t=low.replace(/(\d+(?:\.\d+)?)\s*%\s*(?:de|of)\s*(\d+(?:\.\d+)?)/g,"($1/100)*$2").replace(/(\d+(?:\.\d+)?)\s*(?:°|grados?|deg)/g,"($1*pi/180)")
+ .replace(/raiz\s+cuadrada\s+(?:de\s+)?|raiz\s+(?:de\s+)?|square root\s+(?:of\s+)?/g,"sqrt ").replace(/raiz\s+cubica\s+(?:de\s+)?/g,"cbrt ").replace(/factorial\s+(?:de\s+)?(\d+)/g,"$1!")
+ .replace(/al cuadrado/g,"^2").replace(/al cubo/g,"^3").replace(/elevado\s+a\s+(?:la\s+)?(?:potencia\s+)?|a\s+la\s+potencia\s+(?:de\s+)?|to the power of/g,"^")
+ .replace(/multiplicado\s+por|\bpor\b|\btimes\b/g,"*").replace(/dividido\s+(?:entre|por)|\bentre\b|divided by/g,"/").replace(/\bmas\b|\bplus\b/g,"+").replace(/\bmenos\b|\bminus\b/g,"-")
+ .replace(/\b(?:cuanto|cuantos|dime|resultado|igual|es|son|calcula|calcular|halla|cual|que|what|is|equals|compute|calculate|how|much|result)\b/g," ").replace(/[?¿]/g," ").replace(/=\s*$/,"").trim();
+ if(!/\d|\bpi\b|π/.test(t)||!/[+\-*\/^!]|\b(?:sin|cos|tan|sqrt|cbrt|ln|log|exp|abs|ncr|npr|gcd|lcm|fact|asin|acos|atan|sen)\b/.test(t)||!/^[\d\s+\-*\/^().,!a-zπ]+$/.test(t))return null;
+ if(!/(?:ncr|npr|gcd|lcm|log)\s*\(/.test(t))t=t.replace(/(\d),(\d)/g,"$1.$2");
+ const ast=parse(t);if(fv(ast,new Set()).size)return null;const v=ev(ast,{});
+ if(Number.isNaN(v))return T("Eso no está definido en los reales.","That is undefined in the reals.");
+ if(!fin(v))return T("Resultado: infinito (división entre cero).","Result: infinite (division by zero).");
+ return pr(ast)+" = "+ff(v);}
+/* ---------- física ---------- */
+const PU={kg:["m",1],g:["m",.001],"m/s":["v",1],"km/h":["v",1/3.6],"m/s²":["a",1],"m/s^2":["a",1],"m/s2":["a",1],s:["t",1],seg:["t",1],segundos:["t",1],segundo:["t",1],seconds:["t",1],second:["t",1],ms:["t",.001],min:["t",60],h:["t",3600],hr:["t",3600],hrs:["t",3600],hora:["t",3600],horas:["t",3600],hours:["t",3600],hour:["t",3600],m:["d",1],metros:["d",1],metro:["d",1],km:["d",1000],cm:["d",.01],mm:["d",.001],"m²":["A",1],"m^2":["A",1],"cm²":["A",1e-4],N:["F",1],J:["E",1],kJ:["E",1e3],W:["P",1],kW:["P",1e3],V:["V",1],A:["I",1],mA:["I",.001],"Ω":["R",1],ohm:["R",1],ohms:["R",1],"kΩ":["R",1e3],Pa:["Pr",1],kPa:["Pr",1e3],"N/m":["k",1],"°C":["T",1],"ºC":["T",1],"kg/m³":["rho",1],"m³":["Vol",1],L:["Vol",.001]};
+const UR=new RegExp("(-?\\d+(?:[.,]\\d+)?(?:[eE][+-]?\\d+)?)\\s*("+Object.keys(PU).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&")).join("|")+")(?![A-Za-z])","g");
+const UN={m:"kg",v:"m/s",v0:"m/s",a:"m/s²",t:"s",d:"m",h:"m",L:"m",F:"N",Wt:"N",W:"J",Ek:"J",Ep:"J",Q:"J",P:"W",p:"kg·m/s",V:"V",I:"A",R:"Ω",Pr:"Pa",A:"m²",rho:"kg/m³",Vol:"m³",k:"N/m",Tp:"s",c:"J/(kg·°C)",dT:"°C"};
+const TG=[[/energia cinetica|kinetic/,"Ek"],[/energia potencial|potential/,"Ep"],[/trabajo|\bwork\b/,"W"],[/potencia|\bpower\b/,"P"],[/\bpeso\b|weight/,"Wt"],[/fuerza|force/,"F"],[/\bmasa\b|\bmass\b/,"m"],[/aceleracion|acceleration/,"a"],[/velocidad|rapidez|speed|velocity|que tan rapido|how fast/,"v"],[/tiempo|cuanto tarda|how long|\btime\b/,"t"],[/altura|height/,"h"],[/distancia|recorre|desplaz|how far|distance|alcanza/,"d"],[/voltaje|tension|voltage/,"V"],[/corriente|current|amperes/,"I"],[/resistencia|resistance/,"R"],[/cantidad de movimiento|momento lineal|momentum/,"p"],[/presion|pressure/,"Pr"],[/densidad|density/,"rho"],[/periodo|period/,"Tp"],[/calor|\bheat\b/,"Q"],[/constante.*resorte|spring constant/,"k"]];
+let RLS=null;
+function rels(){return RLS||(RLS=["F=m*a","v=v0+a*t","d=v0*t+a*t^2/2","v^2=v0^2+2*a*d","Ek=m*v^2/2","Ep=m*g*h","W=F*d","P=W/t","P=F*v","p=m*v","Wt=m*g","P=V*I","V=I*R","Pr=F/A","rho=m/Vol","Tp=2*pi*sqrt(L/g)","F=k*d","Q=m*c*dT"].map(t=>{const[l,r]=t.split("=");const f={t:"o",o:"-",a:parse(l,1),b:parse(r,1)};return{txt:t.replace(/\*/g,"·").replace("="," = "),f,vs:[...fv(f,new Set())]};}));}
+const PHK=/fuerza|masa|aceler|veloc|rapidez|tiempo|distancia|energ|trabajo|potencia|voltaje|tension|corriente|resisten|momento|cantidad de movimiento|presion|densidad|periodo|peso|calor|force|mass|accel|speed|velocity|time|distance|energy|work|power|voltage|current|resistance|momentum|pressure|density|period|weight|heat|cae\b|caen|caida|pendulo|pendulum|resorte|spring|cuanto tarda|how long|how far|how fast/;
+function phys(s,low){
+ const K={g:9.8},inL=[],vs=[],ts=[];let m;
+ const gm=low.match(/\bg\s*=\s*(\d+(?:[.,]\d+)?)/);if(gm)K.g=parseFloat(gm[1].replace(",","."));
+ const fall=/cae\b|caen|caida|deja[nr]? caer|suelta|free fall|\bdrop|\bfall/.test(low),hgt=fall||/altura|height|alto\b/.test(low);
+ UR.lastIndex=0;
+ while((m=UR.exec(s))){const[k,f]=PU[m[2]],val=parseFloat(m[1].replace(",","."))*f;inL.push(k);
+  if(k==="v")vs.push(val);else if(k==="T")ts.push(val);
+  else if(k==="E")K[/cinetic|kinetic/.test(low)?"Ek":/potencial|potential/.test(low)?"Ep":/calor|heat/.test(low)?"Q":"W"]=val;
+  else if(k==="d"){if(K.d===undefined&&K.L===undefined){if(/pendulo|pendulum/.test(low))K.L=val;else{K.d=val;if(hgt)K.h=val;}}}
+  else if(K[k]===undefined)K[k]=val;}
+ if(!inL.length)return null;
+ if(vs.length>1){K.v0=vs[0];K.v=vs[1];}else if(vs.length){if(/inicial|initial|lanz|launch|throw|arranca|parte con/.test(low))K.v0=vs[0];else K.v=vs[0];}
+ if(ts.length>1)K.dT=ts[1]-ts[0];else if(ts.length)K.dT=ts[0];
+ if(fall&&K.a===undefined)K.a=K.g;
+ if((fall||/reposo|\brest\b/.test(low))&&K.v0===undefined&&!/inicial|initial|lanz|throw/.test(low))K.v0=0;
+ if(/agua|water/.test(low)&&K.c===undefined)K.c=4186;
+ const data=Object.entries(K).filter(([k])=>k!=="g"&&!(k==="h"&&K.h===K.d)).map(([k,v])=>k+" = "+pv(v)+" "+(UN[k]||"")).join(",  ");
+ let tg=null;for(const[re,v]of TG)if(re.test(low)&&K[v]===undefined){tg=v;break;}
+ if(!tg)return T("Datos: ","Data: ")+data+T("\n¿Qué quieres calcular? (fuerza, velocidad, tiempo, energía, voltaje…)","\nWhat should I compute? (force, speed, time, energy, voltage…)");
+ const R=rels(),steps=[],used=new Set();
+ for(let it=0;it<8&&K[tg]===undefined;it++){let pick=null;
+  for(const pass of[1,0]){for(const rel of R){if(used.has(rel))continue;const un=rel.vs.filter(v=>K[v]===undefined);if(un.length!==1||(pass&&un[0]!==tg))continue;pick=[rel,un[0]];break;}if(pick)break;}
+  if(!pick)break;const[rel,u]=pick;used.add(rel);
+  const E=Object.assign({},K),f=q=>{E[u]=q;try{return ev(rel.f,E);}catch(e){return NaN;}},rt=roots(f);
+  if(!rt.length)continue;const ps=rt.filter(q=>q>=0);K[u]=ps.length?ps[0]:rt[0];steps.push([rel,u,K[u]]);}
+ if(K[tg]===undefined)return T("Datos: ","Data: ")+data+T("\nNo encontré una fórmula que conecte esos datos con lo que pides. Me faltan datos o es un caso que aún no cubro (tiro parabólico, óptica, termodinámica avanzada…).","\nI couldn't link those data to what you ask. Missing data or a case I don't cover yet (projectiles, optics, advanced thermodynamics…).");
+ const need=new Set([tg]),keep=[];for(let i=steps.length-1;i>=0;i--)if(need.has(steps[i][1])){keep.unshift(steps[i]);steps[i][0].vs.forEach(v=>need.add(v));}
+ const sh=(u,v)=>u+" = "+pv(v)+" "+(UN[u]||"")+((u==="v"||u==="v0")&&v!==0?" (≈ "+pv(v*3.6)+" km/h)":"");
+ return T("Datos: ","Data: ")+data+"\n"+keep.map(([rel,u,v])=>"• "+rel.txt+"  →  "+sh(u,v)).join("\n")+(keep.some(k=>k[0].vs.includes("g"))?"\n("+T("uso g = ","using g = ")+K.g+" m/s²)":"")+"\n➜ "+sh(tg,K[tg]);}
+/* ---------- fórmulas de referencia ---------- */
+const REF=[[/segunda ley|2.? ley de newton/,"2ª ley de Newton: F = m·a. La fuerza neta sobre un cuerpo es su masa por su aceleración (N = kg·m/s²)."],[/primera ley|inercia/,"1ª ley de Newton (inercia): sin fuerza neta, un cuerpo mantiene su velocidad constante (reposo o MRU)."],[/tercera ley|accion y reaccion/,"3ª ley de Newton: si A empuja a B con una fuerza, B empuja a A con otra igual y opuesta."],[/caida libre|free fall/,"Caída libre: a = g ≈ 9.8 m/s². v = g·t,  h = ½·g·t²,  v² = 2·g·h."],[/\bmru\b|rectilineo uniforme/,"MRU: velocidad constante. d = v·t."],[/\bmrua\b|uniformemente acelerado/,"MRUA: v = v₀ + a·t,  d = v₀·t + ½·a·t²,  v² = v₀² + 2·a·d."],[/energia cinetica/,"Energía cinética: Ek = ½·m·v² (julios)."],[/energia potencial/,"Energía potencial gravitatoria: Ep = m·g·h. Elástica: ½·k·x²."],[/conservacion de la energia/,"Sin rozamiento, Ek + Ep = constante. Ej.: al caer desde h, v = √(2·g·h)."],[/ley de ohm|\bohm\b/,"Ley de Ohm: V = I·R. Potencia eléctrica: P = V·I = I²·R = V²/R."],[/gravitacion|gravedad universal/,"Gravitación universal: F = G·m₁·m₂/r², con G = 6.674×10⁻¹¹ N·m²/kg²."],[/coulomb/,"Ley de Coulomb: F = k·q₁·q₂/r², con k ≈ 9×10⁹ N·m²/C²."],[/cantidad de movimiento|impulso/,"Cantidad de movimiento: p = m·v. Impulso: F·Δt = Δp."],[/pitagoras/,"Teorema de Pitágoras: a² + b² = c² (c = hipotenusa)."],[/formula cuadratica|formula general|segundo grado/,"Para ax² + bx + c = 0:  x = (−b ± √(b² − 4ac)) / 2a. Δ = b² − 4ac decide si hay 2, 1 o 0 raíces reales."],[/logaritmo/,"log(ab) = log a + log b;  log(a/b) = log a − log b;  log(aⁿ) = n·log a;  log_b(x) = ln x / ln b."],[/reglas? de derivaci|derivadas? basicas/,"(xⁿ)' = n·xⁿ⁻¹;  (sin x)' = cos x;  (cos x)' = −sin x;  (eˣ)' = eˣ;  (ln x)' = 1/x;  (uv)' = u'v + uv';  (f(g))' = f'(g)·g'."]];
+function ref(low){if(!/formula|ley\b|teorema|que es|what is|law|theorem|explica|reglas?|propiedades/.test(low))return null;for(const[re,tx]of REF)if(re.test(low))return tx;return null;}
+/* ---------- punto de entrada ---------- */
+function run(raw){
+ const s=raw.trim(),low=s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+ let r;
+ if(/\[\s*\[/.test(s)&&(r=matrices(s,low)))return r;
+ if(!/deriv|integra|∫|limite|\blim\b/.test(low)&&PHK.test(low)&&(r=phys(s,low)))return r;
+ if(r=calc(low))return r;
+ if(r=fx(low))return r;
+ const n=(low.match(/=/g)||[]).length;
+ if(n>=2&&/\d|\^/.test(low)){const eqs=low.replace(/[?¿]/g," ").split(/;|\n|\s+y\s+|\s+and\s+|,\s*(?=[^=,]*=)/).map(q=>prep(q,false)).filter(q=>q.includes("="));if(eqs.length>=2&&(r=system(eqs)))return r;}
+ if(n===1&&/\d|[\^+*\/]/.test(low)){const xm=low.match(/(?:despeja|para|for)\s+([a-z])\b/),cl=prep(low,false);if(cl.split("=").length===2&&cl.split("=")[0].trim()&&cl.split("=")[1].trim()&&(r=eqn(cl,xm&&xm[1],/resuelve|solve|ecuacion|equation|despeja/.test(low))))return r;}
+ if(r=stats(low))return r;
+ if(r=arith(low))return r;
+ return ref(low);}
+window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||""));}catch(e){return null;}};
+})();
+</script>
     <script type="module">
       import * as THREE from "three";
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -7244,7 +7573,7 @@
           return R("Listo, he borrado todo lo que sabía de ti. Es como si nos conociéramos hoy.", "Done, I erased everything I knew about you. It is as if we just met.", ["labelHippocampus"]);
         }
         if (/(qui[eé]n (?:es|fue) (?:tu|su) (?:creador|due[ñn]o|programador|autor)|qui[eé]n te (?:cre[oó]|hizo|program[oó]|dise[ñn][oó]|invent[oó])|tu creador|who (?:made|created|built|programmed|designed) you|who is your (?:creator|maker|developer)|your creator)/.test(m))
-          return R(creatorUnlocked ? "Me creaste tú, Orlando 😄 Me diseñaste desde cero como una red neuronal que se entrena aquí mismo, con mi propia red neuronal, y para lo que no sé consulto fuentes abiertas." : "Mi creador es Orlando. Me diseñó desde cero como una red neuronal que se entrena en tu navegador, con mi propia red neuronal, y para lo que no sé consulto fuentes abiertas.", creatorUnlocked ? "You created me, Orlando 😄 You designed me from scratch as a neural network that trains right here, with my own network, consulting open sources for what I don't know." : "My creator is Orlando. He designed me from scratch as a neural network that trains in your browser, with my own network, consulting open sources for what I don't know.", ["labelPrefrontal", "labelHippocampus"]);
+          return R(creatorUnlocked ? "Me creaste tú, Orlando 😄 Me diseñaste desde cero como una red neuronal que se entrena aquí mismo, sin depender de ninguna otra IA." : "Mi creador es Orlando. Me diseñó desde cero como una red neuronal que se entrena en tu navegador, sin depender de ninguna otra IA.", creatorUnlocked ? "You created me, Orlando 😄 You designed me from scratch as a neural network that trains right here, with no other AI behind me." : "My creator is Orlando. He designed me from scratch as a neural network that trains in your browser, with no other AI behind me.", ["labelPrefrontal", "labelHippocampus"]);
         if (/(c[oó]mo te llamas|cu[aá]l es tu nombre|tu nombre|c[oó]mo te dicen|c[oó]mo te puedo llamar|what(?:'s| is) your name|your name|what should i call you|what are you called)/.test(m)) {
           if (!mind.name) pendingKey = "name";
           return R("Me llamo Noryx" + (mind.name ? ", " + mind.name : ". ¿Y tú, cómo te llamas?"), "My name is Noryx" + (mind.name ? ", " + mind.name : ". And you, what is your name?"), ["labelPrefrontal", "labelHippocampus"]);
@@ -7523,27 +7852,7 @@
       let taught = [];
       try { taught = JSON.parse(localStorage.getItem("noryx-taught-v1") || "[]"); } catch (e) { taught = []; }
       const taughtSave = () => { try { localStorage.setItem("noryx-taught-v1", JSON.stringify(taught.slice(-200))); } catch (e) { /* ignore */ } };
-      let bAsk = null; /* ya no se le pregunta a la gente cómo responder */
-      /* ---- Aprende solo de las preguntas: intereses + respuestas halladas ---- */
-      let interests = {};
-      try { interests = JSON.parse(localStorage.getItem("noryx-interests-v1") || "{}"); } catch (e) { interests = {}; }
-      const INT_STOP = new Set("que como cual cuales donde cuando quien porque para por con una uno unos unas los las del the what who how why where when which this that with from sobre dime sabes puedes tengo esta este eso esa soy eres".split(" "));
-      function noteInterest(text) {
-        (bnorm(text).match(/[a-z]{4,}/g) || []).forEach((w) => { if (!INT_STOP.has(w)) interests[w] = (interests[w] || 0) + 1; });
-        const top = Object.entries(interests).sort((a, b) => b[1] - a[1]).slice(0, 60);
-        interests = Object.fromEntries(top);
-        try { localStorage.setItem("noryx-interests-v1", JSON.stringify(interests)); } catch (e) { /* ignore */ }
-      }
-      const topInterests = (n) => Object.entries(interests).sort((a, b) => b[1] - a[1]).slice(0, n).map((x) => x[0]);
-      function autoLearn(q, a, src) {
-        q = q.trim().replace(/[?!¿¡.]+$/g, ""); a = (a || "").trim();
-        if (!q || !a || /Open-Meteo/.test(src || "")) return; // el clima cambia: no se guarda
-        const ex = taught.find((t) => t.q.toLowerCase() === q.toLowerCase());
-        if (ex) { if (!ex.auto) return; ex.a = a; ex.src = src; ex.ts = Date.now(); }
-        else taught.push({ q, a, auto: true, src, ts: Date.now() });
-        if (taught.length > 200) { const i = taught.findIndex((t) => t.auto); taught.splice(i >= 0 ? i : 0, 1); }
-        taughtSave();
-      }
+      let bAsk = null;
       function bdot(a, b) { const mb = new Map(b.i.map((k, j) => [k, b.x[j]])); let d = 0; a.i.forEach((k, j) => { const q = mb.get(k); if (q) d += a.x[j] * q; }); return d; }
       function taughtLearn(q, a) {
         q = q.trim().replace(/[?!¿¡.]+$/g, ""); a = a.trim();
@@ -7554,7 +7863,7 @@
       }
       function taughtFind(text) {
         const v = bFeat(text); let best = null, bs = 0;
-        taught.forEach((t) => { if (t.auto && Date.now() - (t.ts || 0) > 2592e6) return; const d = bdot(v, bFeat(t.q)); if (d > bs) { bs = d; best = t; } });
+        taught.forEach((t) => { const d = bdot(v, bFeat(t.q)); if (d > bs) { bs = d; best = t; } });
         return bs >= 0.62 ? best : null;
       }
       /* ---- Web lookup without any AI: public data APIs (Wikipedia, Wikidata, REST Countries, Open-Meteo, DuckDuckGo) ---- */
@@ -7624,58 +7933,21 @@
         if (q.length < 3) return null;
         return (await webWeather(text, es)) || (await webCountry(text, es)) || (await webWiki(q, es ? "es" : "en")) || (await webWikidata(q, es)) || (await webDDG(q)) || (await webWiki(q, es ? "en" : "es"));
       }
-      /* ---- IAs gratuitas SIN registro ni clave (se prueban en orden; si una falla se usa la siguiente) ---- */
-      const AI_SYS = "Eres un asistente que responde con precisión y brevedad (máximo 4 frases) en el idioma del usuario. Si no estás seguro de algo, dilo claramente. No inventes datos, cifras ni fuentes.";
-      const FREE_AIS = [
-        { name: "Pollinations", url: "https://text.pollinations.ai/openai", body: (q) => ({ model: "openai", private: true, messages: [{ role: "system", content: AI_SYS }, { role: "user", content: q }] }) },
-        { name: "Pollinations (mistral)", url: "https://text.pollinations.ai/openai", body: (q) => ({ model: "mistral", private: true, messages: [{ role: "system", content: AI_SYS }, { role: "user", content: q }] }) },
-      ];
-      let aiDownUntil = 0;
-      async function aiAsk(text, es) {
-        if (Date.now() < aiDownUntil) return null;
-        const q = text.slice(0, 400); // solo se envía la pregunta: nunca tu nombre ni tu memoria
-        for (const ai of FREE_AIS) {
-          const c = new AbortController(); const tm = setTimeout(() => c.abort(), 15000);
-          try {
-            const r = await fetch(ai.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(ai.body(q)), signal: c.signal });
-            if (!r.ok) continue;
-            const raw = await r.text();
-            let out = raw;
-            try { const j = JSON.parse(raw); out = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ""; } catch (e) { /* texto plano */ }
-            out = (out || "").replace(/\s+/g, " ").trim();
-            if (out.length < 8 || /^\s*[{<]/.test(out) || /api key|unauthori|sign ?up|rate limit|deprecated|enter\.pollinations/i.test(out.slice(0, 200))) continue;
-            lastWeb = { src: "IA gratuita externa (" + ai.name + ")", url: "" };
-            return out.slice(0, 700);
-          } catch (e) { /* siguiente */ } finally { clearTimeout(tm); }
-        }
-        aiDownUntil = Date.now() + 120000; // evita reintentar sin parar si están caídas
-        return null;
-      }
-      /* Fuentes confiables primero; IA gratuita solo como último recurso. Cita la fuente y guarda lo aprendido. */
-      async function smartLookup(text, es) {
-        let r = await webLookup(text, es), ai = false;
-        if (!r) { r = await aiAsk(text, es); ai = !!r; }
-        if (!r) return null;
-        const src = lastWeb ? lastWeb.src : "";
-        autoLearn(text, r, src);
-        return r + (ai ? (es ? "\n⚠️ Respuesta de una IA externa: puede equivocarse, verifícala." : "\n⚠️ Answer from an external AI: it can be wrong, please verify it.") : "") + (src ? "\n🔎 " + (es ? "Fuente: " : "Source: ") + src + (lastWeb && lastWeb.url ? " (" + lastWeb.url + ")" : "") : "");
-      }
       let bctx = { t: null, i: 0 };
       let blp = "";
       const bpick = (a) => { let x; for (let k = 0; k < 4; k++) { x = a[Math.floor(Math.random() * a.length)]; if (x !== blp) break; } blp = x; return x; };
       function markFb(o) { o.fallback = true; return o; }
       function brainAI(text, local) {
         const es = local.es !== false, L = es ? "es" : "en";
+        { const stem = window.NoryxSTEM && window.NoryxSTEM(text, es); if (stem) return stem + "\n[[regions: labelPrefrontal, labelCerebrum]]"; }
         const nm = mind.name ? ", " + mind.name : "";
         const p = brainPredict(text);
         if (/^\s*(?:qui[eé]n(?:es)?|qu[eé]|cu[aá]l(?:es)?|who|what|which)\s+(?:es|son|fue|fueron|era|is|are|was)\s+(?!tu\b|t[uú]\b|your\b|you\b)/i.test(text) && !TOPICS.some((t) => t.id === p.id)) p.ok = false;
         if (SAFE.test(text)) return (es ? "Lo que dices me importa mucho" + nm + ". No tienes que cargarlo solo: habla ahora con alguien de confianza o con un servicio de ayuda. En México puedes llamar a la Línea de la Vida: 800 911 2000; si estás en peligro inmediato, llama a emergencias (911). Yo sigo aquí contigo." : "What you said matters a lot" + nm + ". You don't have to carry it alone: please talk to someone you trust or a crisis service now. If you are in immediate danger call your local emergency number (911 in the US and Mexico), or call or text 988 in the US. I'm still here with you.") + "\n[[regions: labelAmygdala, labelPrefrontal]]";
         const tag = (k) => "\n[[regions: " + k + "]]";
-        if (/\?|^(qu[eé]|c[oó]mo|por qu[eé]|cu[aá]l|qui[eé]n|d[oó]nde|cu[aá]ndo|what|why|how|who|when|where)\b/i.test(text.trim()) || text.trim().length > 25) noteInterest(text);
-        if (/(qu[eé] (?:te )?he preguntado|de qu[eé] (?:hemos )?hablado m[aá]s|mis intereses|what have i asked|my interests)/i.test(text)) { const ti = topInterests(6); return (ti.length ? (es ? "Lo que más me has preguntado: " : "What you ask about most: ") + ti.join(", ") + "." : (es ? "Aún no tengo suficientes preguntas tuyas para saberlo." : "I do not have enough of your questions yet.")) + tag("labelHippocampus"); }
         if (lastWeb && /\b(fuente|fuentes|referencia|referencias|enlace|link|source|sources)\b|d[oó]nde (?:lo )?(?:encontraste|sacaste|le[ií])/i.test(text)) return (es ? "Lo saqué de " + lastWeb.src : "I got that from " + lastWeb.src) + (lastWeb.url ? ": " + lastWeb.url : ".") + tag("labelPrefrontal");
         const sm = text.match(/^(?:busca|investiga|b[uú]scame|search|look up|google)\s+(?:en internet\s+)?(.{3,})$/i);
-        if (sm) return smartLookup(sm[1], es).then((r) => (r ? r : (es ? "Busqué en fuentes abiertas y en IAs gratuitas pero no obtuve nada claro. Prueba con otras palabras." : "I searched open sources and free AIs but found nothing clear. Try other words.")) + tag("labelPrefrontal, labelCerebrum"));
+        if (sm) return webLookup(sm[1], es).then((r) => (r ? r : (es ? "Busqué en internet pero no encontré nada claro sobre eso. Prueba con otras palabras o enséñame: «aprende: pregunta = respuesta»." : "I searched the web but found nothing clear. Try other words or teach me: \"learn: question = answer\".")) + tag("labelPrefrontal, labelCerebrum"));
         const tm = text.match(/^(?:aprende|ens[eé]ñate|learn|teach)[:\s]+(.+?)\s*(?:=>|->|=|responde|answer)\s*(.+)$/i) || text.match(/cuando (?:te )?(?:diga|escriba|pregunte)\s+(.+?),?\s+(?:responde|contesta|di)(?:me)?\s+(.+)$/i) || text.match(/when i (?:say|ask|write)\s+(.+?),?\s+(?:reply|answer|say)\s+(.+)$/i);
         if (tm && taughtLearn(tm[1], tm[2])) { bAsk = null; return (es ? "¡Aprendido! Cuando me digas algo como «" + tm[1].trim() + "» responderé eso. Ya sé " + taught.length + " cosas que me enseñaste." : "Learned! When you say something like \"" + tm[1].trim() + "\" I'll answer that. I know " + taught.length + " things you taught me.") + tag("labelHippocampus, labelPrefrontal"); }
         if (/olvida lo que (?:te )?ense[ñn]|forget what i taught/i.test(text)) { const n = taught.length; taught = []; taughtSave(); return (es ? "Listo, olvidé las " + n + " cosas que me enseñaste." : "Done, I forgot the " + n + " things you taught me.") + tag("labelHippocampus"); }
@@ -7686,7 +7958,7 @@
           if (!/\?\s*$/.test(text) && !local.store && taughtLearn(q0, text)) return (es ? "¡Anotado! La próxima vez que me digas algo parecido a «" + q0 + "» responderé eso." : "Got it! Next time you say something like \"" + q0 + "\" I'll answer that.") + tag("labelHippocampus, labelPrefrontal");
         }
         const th = taughtFind(text);
-        if (th) return th.a.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend")) + (th.auto && th.src ? (es ? "\n🧠 Lo aprendí antes de: " : "\n🧠 I learned this earlier from: ") + th.src : "") + tag("labelHippocampus, labelPrefrontal");
+        if (th) return th.a.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend")) + tag("labelHippocampus, labelPrefrontal");
         const regionInfo = local.keys && local.keys.length === 1 && BRAIN_INFO[local.keys[0]] && local.text === BRAIN_INFO[local.keys[0]][L];
         const names = () => TOPICS.slice().sort(() => brnd() - 0.5).slice(0, 3).map((t) => t.n.split("|")[es ? 0 : 1]).join(", ");
         let out, keys, cb = false, web = false;
@@ -7701,7 +7973,7 @@
             else if (bctx.i < 3) { out = bctx.t[L][bctx.i++]; keys = bctx.t.rg; }
             else { out = (es ? "Eso es todo lo que sé de " : "That is all I know about ") + bctx.t.n.split("|")[es ? 0 : 1] + (es ? ". ¿Probamos con " : ". Shall we try ") + names() + "?"; keys = bctx.t.rg; }
           } else if (p.id === "self") {
-            out = es ? "Soy Noryx, una red neuronal pequeña hecha desde cero en este archivo: convierto tu frase en números, " + BH + " neuronas ocultas la procesan y elijo entre " + BC + " temas el más probable (ahora con " + Math.round(p.conf * 100) + " % de confianza). Me entrené al abrir la página; para preguntas nuevas consulto fuentes abiertas (Wikipedia, etc.) y, si hace falta, IAs gratuitas sin registro, y guardo lo aprendido en tu navegador. Me creó Orlando." : "I am Noryx, a small neural network built from scratch in this file: I turn your sentence into numbers, " + BH + " hidden neurons process it and I pick the likeliest of " + BC + " topics (" + Math.round(p.conf * 100) + "% confident now). I trained when the page opened; for new questions I consult open sources (Wikipedia, etc.) and, if needed, free no-signup AIs, and I save what I learn in your browser. Orlando created me.";
+            out = es ? "Soy Noryx, una red neuronal pequeña hecha desde cero en este archivo: convierto tu frase en números, " + BH + " neuronas ocultas la procesan y elijo entre " + BC + " temas el más probable (ahora con " + Math.round(p.conf * 100) + " % de confianza). Me entrené al abrir la página; no uso internet ni otra IA. Me creó Orlando." : "I am Noryx, a small neural network built from scratch in this file: I turn your sentence into numbers, " + BH + " hidden neurons process it and I pick the likeliest of " + BC + " topics (" + Math.round(p.conf * 100) + "% confident now). I trained when the page opened; I use no internet and no other AI. Orlando created me.";
             keys = ["labelPrefrontal", "labelCerebrum"];
           } else if (p.id === "topics") { out = (es ? "Sé de: " : "I know about: ") + TOPICS.map((t) => t.n.split("|")[es ? 0 : 1]).join(", ") + "."; keys = ["labelPrefrontal"]; }
           else if (FRI[p.id]) { const f = FRI[p.id]; out = bpick(f[L]); keys = f.rg; cb = !!f.cb; }
@@ -7713,14 +7985,14 @@
           out = q ? bpick(es ? ["Buena pregunta, {n}. Eso no lo tengo en mi red, pero me da curiosidad: ¿tú qué opinas?", "Mmm, ahí me pillaste. Si quieres hablamos de " + names() + ", o me cuentas qué tienes en mente."] : ["Good question, {n}. I don't have that in my network, but I'm curious: what do you think?", "Hmm, you got me. We can talk about " + names() + ", or tell me what's on your mind."])
             : long ? bpick(es ? ["Ya veo… suena importante. ¿Y cómo te hace sentir eso?", "Gracias por contarme eso, {n}. ¿Qué es lo que más te ronda la cabeza de todo esto?", "Interesante. Cuéntame más, que me quedé con ganas de saber."] : ["I see… sounds important. How does that make you feel?", "Thanks for telling me, {n}. What's been on your mind most about it?", "Interesting. Tell me more, I'm curious."])
             : bpick(es ? ["Cuéntame más, que aquí hay buena onda para platicar.", "Mmm, no te cacho del todo. ¿Me lo explicas de otra forma?"] : ["Tell me more, good vibes for chatting here.", "Hmm, I didn't quite get that. Can you put it another way?"]);
-          keys = ["labelPrefrontal"]; cb = true;
+          keys = ["labelPrefrontal"]; cb = true; bAsk = text;
           web = !/\b(yo|me|mi|mis|t[uú]|tu|te|ti|i|my|you|your)\b/i.test(text) && navigator.onLine !== false && (q || text.trim().split(/\s+/).length <= 5);
-          if (web) out = es ? "Busqué en fuentes confiables y en IAs gratuitas, pero ahora no obtuve una respuesta clara (¿sin conexión?). Prueba con otras palabras y lo intento de nuevo." : "I searched reliable sources and free AIs but got no clear answer right now (offline?). Try other words and I will retry.";
+          out += es ? "\n💡 ¿Cómo debería responder a eso? Escríbeme la respuesta y la aprendo (o di «no»)." : "\n💡 How should I answer that? Type the answer and I'll learn it (or say \"no\").";
         }
         if (cb && mind.facts.length && Math.random() < 0.4) { const f = bpick(mind.facts); out += es ? "\nPor cierto, me acordé de que " + factText(f, true) + ". ¿Cómo va eso?" : "\nBy the way, I remembered " + factText(f, false) + ". How is that going?"; }
         out = out.replace(/\{n\}/g, mind.name || (es ? "amigo" : "friend"));
         const fin = out + "\n[[regions: " + keys.join(", ") + "]]";
-        if (web) return smartLookup(text, es).then((r) => { if (r) { return r + tag("labelPrefrontal, labelCerebrum"); } return fin; }).catch(() => fin);
+        if (web) return webLookup(text, es).then((r) => { if (r) { bAsk = null; return r + tag("labelPrefrontal, labelCerebrum"); } return fin; }).catch(() => fin);
         return fin;
       }
       const llmReady = () => true;
@@ -8131,7 +8403,7 @@
         document.getElementById("chat-mem-title").textContent = (es ? "🧠 Memoria guardada: " : "🧠 Stored memory: ") + (mind.facts.length + (mind.name ? 1 : 0));
       }
       let chatGreeted = false;
-      (function () { if (typeof cloudOn === "function" && cloudOn()) { const el = document.getElementById("chat-privacy"); if (el) el.textContent = "Las conversaciones las puede revisar el creador. Si no sé algo, solo tu pregunta va a fuentes/IAs gratuitas externas · Chats may be reviewed by the creator. If I don't know, only your question goes to external sources/free AIs"; } })();
+      (function () { if (typeof cloudOn === "function" && cloudOn()) { const el = document.getElementById("chat-privacy"); if (el) el.textContent = "Las conversaciones se guardan y las puede revisar el creador · Chats are stored and may be reviewed by the creator"; } })();
       function chatToggle(open) {
         chatPanel.classList.toggle("open", open);
         btnChat.classList.toggle("on", open);
