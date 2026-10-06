@@ -1744,6 +1744,18 @@
       #chat-send:disabled{opacity:.4}
       #chat-mic.on{background:rgba(255,90,90,.45);animation:micPulse 1.1s infinite}
       @keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(255,90,90,.6)}70%{box-shadow:0 0 0 10px rgba(255,90,90,0)}100%{box-shadow:0 0 0 0 rgba(255,90,90,0)}}
+      #chat-live.on{background:rgba(61,220,151,.45)}
+      #live-bar{display:none;align-items:center;gap:10px;padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(61,220,151,.4);font-size:12px;cursor:pointer;user-select:none}
+      #live-bar.on{display:flex}
+      #live-orb{width:14px;height:14px;border-radius:50%;flex:none;background:#3ddc97}
+      #live-bar[data-s="listening"] #live-orb{animation:liveListen 1.2s infinite}
+      #live-bar[data-s="thinking"] #live-orb{background:#ffd166;animation:liveThink .8s ease-in-out infinite alternate}
+      #live-bar[data-s="speaking"] #live-orb{background:#7ad9ff;animation:liveSpeak .55s ease-in-out infinite alternate}
+      #live-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      #live-stop{flex:none;background:none;border:1px solid rgba(255,255,255,.25);border-radius:50%;width:24px;height:24px;color:inherit;cursor:pointer;font-size:11px;line-height:1}
+      @keyframes liveListen{0%{box-shadow:0 0 0 0 rgba(61,220,151,.65)}70%{box-shadow:0 0 0 10px rgba(61,220,151,0)}100%{box-shadow:0 0 0 0 rgba(61,220,151,0)}}
+      @keyframes liveThink{from{opacity:.35}to{opacity:1}}
+      @keyframes liveSpeak{from{transform:scale(.8)}to{transform:scale(1.35)}}
       #mem-trace{position:absolute;top:clamp(64px,10vw,84px);left:50%;transform:translate(-50%,-8px);width:min(420px,calc(100vw - 28px));padding:10px 14px;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;z-index:32;font-size:12px}
       #mem-trace.show{opacity:1;transform:translate(-50%,0)}
       #mem-trace-title{font-weight:600;color:#ffd166;margin-bottom:6px;word-break:break-word}
@@ -2530,7 +2542,7 @@
       <div id="chat-title">💬 Noryx</div>
       <div id="chat-chips"></div>
       <div id="chat-log"></div>
-      <div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-mic" class="tour-nav-btn" type="button" title="Hablar / Speak" aria-label="Hablar / Speak">🎤</button><button id="chat-send" class="tour-nav-btn">➤</button></div>
+      <div id="live-bar" data-s="idle" role="status" aria-live="polite"><span id="live-orb"></span><span id="live-text"></span><button id="live-stop" type="button" title="Terminar conversación / End" aria-label="Terminar conversación / End">✕</button></div><div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-mic" class="tour-nav-btn" type="button" title="Hablar / Speak" aria-label="Hablar / Speak">🎤</button><button id="chat-live" class="tour-nav-btn" type="button" title="Conversar en tiempo real / Live talk" aria-label="Conversar en tiempo real / Live talk" aria-pressed="false">🎧</button><button id="chat-send" class="tour-nav-btn">➤</button></div>
       <div id="chat-privacy" style="font-size:10px;opacity:.5;text-align:center">Las conversaciones se guardan en este dispositivo · Chats are saved on this device</div>
       <div id="mem-trace-dummy" style="display:none"></div><div id="chat-mem-title"></div>
       <div id="chat-mem"></div>
@@ -8740,7 +8752,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
       function chatSend(text) {
         text = (text || "").trim();
         if (!text || chatBusy) return;
-        if (accessGate(text)) return;
+        if (accessGate(text)) { if (window.NoryxVoice) window.NoryxVoice.onGate(); return; }
         chatAdd("me", text);
         chatInput.value = "";
         logTurn("u", text);
@@ -8753,14 +8765,15 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         while (hist.length && hist[0].role !== "user") hist.shift();
         chatBusy = true;
         chatSendBtn.disabled = true;
-        new Promise((r) => setTimeout(() => r(brainAI(text, local)), 350 + Math.random() * 450)).then((x) => x)
+        new Promise((r) => setTimeout(() => r(brainAI(text, local)), (window.NoryxVoice && window.NoryxVoice.live() ? 60 : 350 + Math.random() * 450))).then((x) => x)
           .then((raw) => {
             const p = parseRegions(raw);
             logTurn("a", p.text);
             chatHistory.push({ role: "assistant", content: p.text });
             brainReact(p.keys.length ? p.keys : local.keys);
             revealText(bubble, p.text);
-            if (typeof narrationEnabled !== "undefined" && narrationEnabled) speak(speakClean(p.text), () => {});
+            if (window.NoryxVoice && window.NoryxVoice.live()) window.NoryxVoice.onReply(p.text);
+            else if (typeof narrationEnabled !== "undefined" && narrationEnabled) speak(speakClean(p.text), () => {});
           })
           .catch((err) => {
             chatHistory.pop();
@@ -8771,7 +8784,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
             bubble.textContent = "⚠️ " + err.message + "\n" + hint + "\n" + local.text;
             chatLog.scrollTop = chatLog.scrollHeight;
           })
-          .finally(() => { chatBusy = false; chatSendBtn.disabled = false; chatInput.focus(); });
+          .finally(() => { chatBusy = false; chatSendBtn.disabled = false; if (window.NoryxVoice && window.NoryxVoice.live()) window.NoryxVoice.afterTurn(); else chatInput.focus(); });
       }
       function renderMemories() {
         const box = document.getElementById("chat-mem");
@@ -8796,7 +8809,7 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
       function chatToggle(open) {
         chatPanel.classList.toggle("open", open);
         btnChat.classList.toggle("on", open);
-        if (!open) return;
+        if (!open) { if (window.NoryxVoice) window.NoryxVoice.stop(); return; }
         if (hebbPanel.classList.contains("open")) hebbToggle(false);
         renderMemories();
         if (!chatGreeted) {
@@ -8817,44 +8830,231 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
       btnChat.addEventListener("click", () => chatToggle(!chatPanel.classList.contains("open")));
       document.getElementById("chat-close").addEventListener("click", () => { creatorLock(false); chatToggle(false); });
       document.getElementById("chat-send").addEventListener("click", () => chatSend(chatInput.value));
-      /* ---- Micrófono: háblale a Noryx (reconocimiento de voz del navegador; al terminar de hablar se envía solo) ---- */
-      (function chatMic() {
-        const btn = document.getElementById("chat-mic");
+      /* ---- Voz: micrófono (dictado de una frase) + CONVERSACIÓN EN TIEMPO REAL (manos libres) ----
+         Dictado 🎤: habla una frase y se envía sola al terminar.
+         Conversar 🎧: bucle continuo escuchar → pensar → hablar → escuchar. Mientras Noryx habla el micrófono
+         se pausa (así no se escucha a sí misma); toca la barra para interrumpirla. Di "adiós" para terminar. ---- */
+      const NoryxVoice = (function () {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!btn) return;
-        if (!SR) { btn.style.display = "none"; return; }
+        const micBtn = document.getElementById("chat-mic");
+        const liveBtn = document.getElementById("chat-live");
+        const bar = document.getElementById("live-bar");
+        const barTxt = document.getElementById("live-text");
+        const barStop = document.getElementById("live-stop");
         const ph0 = chatInput.placeholder;
-        let rec = null, listening = false, heard = "";
-        const esL = () => currentLang === "es";
-        const setOn = (v) => { listening = v; btn.classList.toggle("on", v); btn.setAttribute("aria-pressed", v ? "true" : "false"); };
-        function start() {
-          try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) { /* ignore */ }
-          rec = new SR();
-          rec.lang = esL() ? "es-MX" : "en-US";
-          rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
-          heard = "";
-          rec.onstart = () => { setOn(true); chatInput.value = ""; chatInput.placeholder = esL() ? "Te escucho... habla ahora" : "Listening... speak now"; };
-          rec.onresult = (e) => {
-            let interim = "";
-            for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) heard += r[0].transcript; else interim += r[0].transcript; }
-            chatInput.value = (heard + " " + interim).trim();
-          };
-          rec.onerror = (e) => {
-            setOn(false); chatInput.placeholder = ph0;
-            if (e.error === "not-allowed" || e.error === "service-not-allowed") chatAdd("ai", esL() ? "No tengo permiso para usar el micrófono. Permítelo en el candado de la barra de direcciones y vuelve a tocar 🎤." : "I do not have permission to use the microphone. Allow it from the padlock in the address bar and tap 🎤 again.");
-            else if (e.error === "no-speech") chatInput.placeholder = esL() ? "No te escuché, intenta de nuevo" : "I did not hear you, try again";
-            else if (e.error === "audio-capture") chatAdd("ai", esL() ? "No encuentro un micrófono conectado." : "I cannot find a connected microphone.");
-          };
-          rec.onend = () => {
-            setOn(false);
-            if (chatInput.placeholder !== ph0 && !/escucho|Listening/.test(chatInput.placeholder)) { setTimeout(() => { chatInput.placeholder = ph0; }, 2500); } else chatInput.placeholder = ph0;
-            const t = (heard || chatInput.value).trim();
-            if (t) chatSend(t);
-          };
-          try { rec.start(); } catch (e) { setOn(false); }
+        const es = () => currentLang === "es";
+        const L = (a, b) => (es() ? a : b);
+        const BYE = /^\s*(?:adi[oó]s|hasta luego|terminar(?: conversaci[oó]n)?|det[eé]n(?:te)?|ya basta|stop|goodbye|bye|that'?s all)\s*[.!]?\s*$/i;
+        let rec = null, mode = "off", state = "idle", permOk = false, empties = 0, startFails = 0, restartT = null, gen = 0;
+        let langIdx = 0, langKey = "", wake = null, lastNote = "", lastNoteT = 0, deliverTries = 0, spkTok = 0;
+
+        function note(msg, plain) {
+          const now = Date.now();
+          if (msg === lastNote && now - lastNoteT < 4000) return;
+          lastNote = msg; lastNoteT = now;
+          const d = chatAdd("ai", msg);
+          if (!plain) d.classList.add("err");
         }
-        btn.addEventListener("click", () => { if (listening && rec) { try { rec.stop(); } catch (e) { /* ignore */ } } else start(); });
+        const LABEL = () => ({ idle: "", listening: L("Escuchando… habla con naturalidad", "Listening… speak naturally"), thinking: L("Pensando…", "Thinking…"), speaking: L("Hablando… toca para interrumpir", "Speaking… tap to interrupt") });
+        function paint(interim) {
+          bar.classList.toggle("on", mode === "live");
+          bar.dataset.s = state;
+          liveBtn.classList.toggle("on", mode === "live");
+          liveBtn.setAttribute("aria-pressed", mode === "live" ? "true" : "false");
+          const dictating = mode === "dictate" && state === "listening";
+          micBtn.classList.toggle("on", dictating);
+          micBtn.setAttribute("aria-pressed", dictating ? "true" : "false");
+          barTxt.textContent = state === "listening" && interim ? "🎧 " + interim : LABEL()[state] || "";
+        }
+        function setState(s, interim) { state = s; paint(interim); }
+        const langs = () => (es() ? ["es-MX", "es-ES", "es-US"] : ["en-US", "en-GB"]);
+
+        /* ---- permiso del micrófono: se pide explícitamente para ver el error real (antes fallaba en silencio) ---- */
+        async function ensureMic() {
+          if (permOk) return true;
+          if (window.isSecureContext === false) {
+            note(L("El micrófono solo funciona en una página segura (https o localhost). Abre Noryx desde su dirección web, no como archivo suelto.", "The microphone only works on a secure page (https or localhost). Open Noryx from its web address, not as a loose file."));
+            return false;
+          }
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            try {
+              const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+              s.getTracks().forEach((t) => t.stop());
+              permOk = true;
+              await new Promise((r) => setTimeout(r, 150)); // deja que el sistema libere el micrófono antes de usar el reconocimiento
+              return true;
+            } catch (e) {
+              const n = (e && e.name) || "";
+              if (n === "NotFoundError" || n === "OverconstrainedError") note(L("No encuentro un micrófono conectado.", "I cannot find a connected microphone."));
+              else if (n === "NotReadableError" || n === "AbortError") note(L("El micrófono está ocupado por otra aplicación. Ciérrala e inténtalo de nuevo.", "The microphone is busy in another app. Close it and try again."));
+              else note(L("No tengo permiso para usar el micrófono. Permítelo en el candado de la barra de direcciones (o en Ajustes del navegador) y vuelve a tocar.", "I do not have permission to use the microphone. Allow it from the padlock in the address bar (or browser settings) and tap again."));
+              return false;
+            }
+          }
+          return true;
+        }
+
+        function fatal(msg) { stopAll(true); note(msg); }
+
+        function stopAll() {
+          gen++; clearTimeout(restartT); stopSpeakLive();
+          if (rec) { try { rec.abort(); } catch (e) { /* ignore */ } rec = null; }
+          mode = "off"; state = "idle"; empties = 0; startFails = 0; deliverTries = 0;
+          chatInput.placeholder = ph0;
+          try { if (wake) wake.release(); } catch (e) { /* ignore */ }
+          wake = null;
+          paint();
+        }
+
+        async function listen() {
+          if (mode === "off" || state === "thinking" || state === "speaking" || rec) return;
+          if (!(await ensureMic())) { stopAll(); return; }
+          if (mode === "off" || state === "thinking" || state === "speaking" || rec) return;
+          if (langKey !== currentLang) { langKey = currentLang; langIdx = 0; }
+          const my = ++gen;
+          let r;
+          try { r = new SR(); } catch (e) { fatal(L("No pude iniciar el reconocimiento de voz en este navegador.", "I could not start speech recognition in this browser.")); return; }
+          rec = r;
+          const lg = langs();
+          r.lang = lg[Math.min(langIdx, lg.length - 1)];
+          r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+          let text = "", err = null;
+          r.onstart = () => { if (my !== gen) return; startFails = 0; setState("listening"); chatInput.value = ""; chatInput.placeholder = L("Te escucho... habla ahora", "Listening... speak now"); };
+          r.onresult = (e) => {
+            if (my !== gen) return;
+            let s = "";
+            for (let i = 0; i < e.results.length; i++) s += e.results[i][0].transcript + " "; // se reconstruye todo el resultado (evita textos duplicados en Android)
+            text = s.replace(/\s+/g, " ").trim();
+            chatInput.value = text; paint(text);
+          };
+          r.onerror = (e) => { if (my !== gen) return; err = (e && e.error) || "unknown"; };
+          r.onend = () => { if (my !== gen) return; rec = null; chatInput.placeholder = ph0; afterListen(text, err); };
+          try { r.start(); } catch (e) {
+            rec = null;
+            if (my === gen) { if (++startFails >= 3) fatal(L("No logro activar el micrófono. Recarga la página e inténtalo de nuevo.", "I cannot start the microphone. Reload the page and try again.")); else restartT = setTimeout(listen, 400); }
+          }
+        }
+
+        function afterListen(text, err) {
+          if (err === "not-allowed" || err === "service-not-allowed") { permOk = false; return fatal(L("No tengo permiso para usar el micrófono. Permítelo en el candado de la barra de direcciones y vuelve a tocar.", "I do not have permission to use the microphone. Allow it from the padlock in the address bar and tap again.")); }
+          if (err === "audio-capture") return fatal(L("No encuentro un micrófono disponible.", "I cannot find an available microphone."));
+          if (err === "network") return fatal(L("El reconocimiento de voz del navegador necesita internet (usa los servidores de Google/Apple). Revisa tu conexión; en Brave, Firefox o Chromium sin soporte puede no funcionar.", "The browser's speech recognition needs internet (it uses Google/Apple servers). Check your connection; it may not work on Brave, Firefox or Chromium builds without support."));
+          if (err === "language-not-supported") {
+            if (langIdx < langs().length - 1) { langIdx++; state = "idle"; restartT = setTimeout(listen, 150); return; }
+            return fatal(L("Tu navegador no tiene reconocimiento de voz para este idioma.", "Your browser has no speech recognition for this language."));
+          }
+          if (text) { empties = 0; deliver(text); return; }
+          if (mode === "dictate") {
+            mode = "off"; setState("idle");
+            chatInput.placeholder = L("No te escuché, intenta de nuevo", "I did not hear you, try again");
+            setTimeout(() => { if (mode === "off") chatInput.placeholder = ph0; }, 2500);
+            return;
+          }
+          if (mode === "live") {
+            if (++empties >= 4) { stopAll(); note(L("Dejé de escuchar porque no te oí. Toca 🎧 para seguir hablando.", "I stopped listening because I could not hear you. Tap 🎧 to keep talking."), true); return; }
+            setState("idle"); restartT = setTimeout(listen, 200);
+          }
+        }
+
+        function deliver(text) {
+          text = text.trim();
+          if (typeof authState !== "undefined" && authState) { stopAll(); chatInput.value = ""; note(L("Por seguridad, escribe la contraseña con el teclado; no la digas en voz alta.", "For safety, type the password with the keyboard; do not say it out loud.")); return; }
+          if (mode === "live" && BYE.test(text)) { chatInput.value = ""; stopAll(); note(L("Conversación terminada. Toca 🎧 cuando quieras seguir hablando.", "Conversation ended. Tap 🎧 whenever you want to talk again."), true); return; }
+          if (chatBusy) {
+            if (++deliverTries < 12) { setState("thinking"); restartT = setTimeout(() => deliver(text), 400); return; }
+            deliverTries = 0; chatInput.value = text; if (mode === "live") { setState("idle"); restartT = setTimeout(listen, 300); } else { mode = "off"; setState("idle"); }
+            return;
+          }
+          deliverTries = 0;
+          if (mode === "live") setState("thinking"); else { mode = "off"; setState("idle"); }
+          chatSend(text);
+        }
+
+        /* ---- hablar (síntesis de voz): por frases, con vigilante para que nunca se quede colgada ---- */
+        function pickVoice() {
+          const vs = (availableVoices && availableVoices.length) ? availableVoices : (hasSpeech ? window.speechSynthesis.getVoices() : []);
+          const pre = es() ? "es" : "en";
+          const ok = (v) => (v.lang || "").toLowerCase().replace("_", "-").startsWith(pre);
+          const chosen = vs.find((v) => v.voiceURI === chosenVoiceURI);
+          if (chosen && ok(chosen)) return chosen;
+          return vs.find((v) => ok(v) && /mx|us/i.test(v.lang)) || vs.find(ok) || null;
+        }
+        function chunks(s) {
+          const out = [], sents = s.match(/[^.!?…\n]+[.!?…]*\s*/g) || [s];
+          let cur = "";
+          sents.forEach((x) => { if (cur && (cur + x).length > 180) { out.push(cur.trim()); cur = x; } else cur += x; });
+          if (cur.trim()) out.push(cur.trim());
+          return out;
+        }
+        function stopSpeakLive() { spkTok++; try { if (hasSpeech) window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } }
+        function speakLive(text, done) {
+          const tok = ++spkTok, parts = chunks(text);
+          if (!hasSpeech || !parts.length) { done(); return; }
+          try { window.speechSynthesis.cancel(); window.speechSynthesis.resume(); } catch (e) { /* ignore */ }
+          let i = 0;
+          const next = () => {
+            if (tok !== spkTok) return;
+            if (i >= parts.length) { done(); return; }
+            const part = parts[i++];
+            const u = new SpeechSynthesisUtterance(part);
+            const v = pickVoice();
+            if (v) u.voice = v;
+            u.lang = v ? v.lang : (es() ? "es-MX" : "en-US");
+            u.rate = speechRate || 1; u.pitch = 1;
+            let fin = false, wd = null;
+            const adv = () => { if (fin || tok !== spkTok) return; fin = true; clearTimeout(wd); next(); };
+            u.onend = adv; u.onerror = adv;
+            wd = setTimeout(adv, 4000 + (part.length * 90) / (speechRate || 1)); // algunas voces nunca disparan onend
+            try { window.speechSynthesis.speak(u); } catch (e) { adv(); }
+          };
+          setTimeout(next, 60); // tras cancel() Chrome necesita un respiro
+        }
+
+        function resumeListening(ms) { if (mode !== "live") return; setState("idle"); clearTimeout(restartT); restartT = setTimeout(listen, ms || 250); }
+        function onReply(text) {
+          if (mode !== "live") return;
+          let s = speakClean(text || "");
+          if (s.length > 520) { const cut = s.slice(0, 520), k = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("? "), cut.lastIndexOf("! ")); s = k > 150 ? cut.slice(0, k + 1) : cut; }
+          if (!s) { resumeListening(300); return; }
+          setState("speaking");
+          speakLive(s, () => resumeListening(250));
+        }
+        function lastAiText() { const m = chatLog.querySelectorAll(".chat-msg.ai"); return m.length ? m[m.length - 1].textContent : ""; }
+
+        function unsupported() { note(L("Tu navegador no incluye reconocimiento de voz. Usa Chrome, Edge o Safari actualizado.", "Your browser has no speech recognition. Use an updated Chrome, Edge or Safari.")); }
+        micBtn.addEventListener("click", () => {
+          if (!SR) return unsupported();
+          if (mode === "dictate") { if (rec) { try { rec.stop(); } catch (e) { /* ignore */ } } return; }
+          if (mode === "live") stopAll();
+          try { if (hasSpeech) window.speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+          mode = "dictate"; empties = 0; startFails = 0; setState("idle"); listen();
+        });
+        liveBtn.addEventListener("click", async () => {
+          if (!SR) return unsupported();
+          if (mode === "live") { stopAll(); return; }
+          stopAll();
+          mode = "live"; empties = 0; startFails = 0; deliverTries = 0;
+          try { if (navigator.wakeLock) { wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => { wake = null; }); } } catch (e) { /* ignore */ }
+          if (mode !== "live") return;
+          setState("idle");
+          const before = chatLog.children.length;
+          if (!chatPanel.classList.contains("open")) chatToggle(true);
+          if (chatLog.children.length > before) { const g = lastAiText(); if (g && g.length < 320) { onReply(g); return; } } // lee en voz alta el saludo inicial
+          listen();
+        });
+        bar.addEventListener("click", (e) => { if (e.target === barStop) return; if (mode === "live" && state === "speaking") { stopSpeakLive(); resumeListening(150); } });
+        barStop.addEventListener("click", (e) => { e.stopPropagation(); stopAll(); });
+        document.addEventListener("visibilitychange", () => { if (document.hidden && mode !== "off") stopAll(); });
+
+        return {
+          live: () => mode === "live",
+          onReply,
+          afterTurn: () => { if (mode === "live" && state === "thinking" && deliverTries === 0) resumeListening(300); },
+          onGate: () => { if (mode !== "live" || state !== "thinking") return; setTimeout(() => { const g = lastAiText(); if (g) onReply(g); else resumeListening(300); }, 80); },
+          stop: () => stopAll(),
+        };
       })();
+      window.NoryxVoice = NoryxVoice;
       chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") chatSend(chatInput.value); e.stopPropagation(); });
       const chipsBox = document.getElementById("chat-chips");
       CHAT_CHIPS.forEach((k) => {
