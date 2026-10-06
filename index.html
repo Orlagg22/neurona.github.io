@@ -1756,6 +1756,18 @@
       @keyframes liveListen{0%{box-shadow:0 0 0 0 rgba(61,220,151,.65)}70%{box-shadow:0 0 0 10px rgba(61,220,151,0)}100%{box-shadow:0 0 0 0 rgba(61,220,151,0)}}
       @keyframes liveThink{from{opacity:.35}to{opacity:1}}
       @keyframes liveSpeak{from{transform:scale(.8)}to{transform:scale(1.35)}}
+      #live-meter{flex:none;width:44px;height:6px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
+      #live-meter i,.vp-meter i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#3ddc97,#ffd166);transform-origin:left;transform:scaleX(.02)}
+      #voice-panel{display:none;flex-direction:column;gap:6px;font-size:12px;padding:10px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.14)}
+      #voice-panel.open{display:flex}
+      #voice-panel label{opacity:.75;font-size:11px}
+      #voice-panel select{width:100%;box-sizing:border-box;padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.4);color:inherit;font-size:14px;font-family:inherit}
+      #voice-panel select option{background:#0b121c;color:#fff}
+      .vp-row{display:flex;flex-direction:column;gap:3px}.vp-row.two{flex-direction:row;gap:6px}
+      .vp-row button{flex:1;padding:7px 8px;border-radius:10px;border:1px solid rgba(122,217,255,.45);background:rgba(122,217,255,.12);color:inherit;font-size:12px;cursor:pointer}
+      .vp-row button:disabled{opacity:.5}
+      .vp-meter{height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+      #vp-status{opacity:.8;line-height:1.4;font-size:11px}
       #mem-trace{position:absolute;top:clamp(64px,10vw,84px);left:50%;transform:translate(-50%,-8px);width:min(420px,calc(100vw - 28px));padding:10px 14px;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;z-index:32;font-size:12px}
       #mem-trace.show{opacity:1;transform:translate(-50%,0)}
       #mem-trace-title{font-weight:600;color:#ffd166;margin-bottom:6px;word-break:break-word}
@@ -2538,11 +2550,11 @@
     </div>
     <div id="chat-panel" class="hud-panel">
       <button id="chat-close" title="Close" style="position:absolute;top:8px;right:10px;font-size:14px;color:rgba(255,255,255,0.5);cursor:pointer;background:none;border:none">✕</button>
-      <button id="chat-new" class="chat-hbtn" style="right:34px" title="Nueva conversación / New chat">🗑</button>
+      <button id="chat-new" class="chat-hbtn" style="right:34px" title="Nueva conversación / New chat">🗑</button><button id="chat-voice-cfg" class="chat-hbtn" style="right:58px" title="Ajustes de voz y prueba del micrófono / Voice settings & mic test" aria-label="Ajustes de voz / Voice settings">🎚</button>
       <div id="chat-title">💬 Noryx</div>
       <div id="chat-chips"></div>
       <div id="chat-log"></div>
-      <div id="live-bar" data-s="idle" role="status" aria-live="polite"><span id="live-orb"></span><span id="live-text"></span><button id="live-stop" type="button" title="Terminar conversación / End" aria-label="Terminar conversación / End">✕</button></div><div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-mic" class="tour-nav-btn" type="button" title="Hablar / Speak" aria-label="Hablar / Speak">🎤</button><button id="chat-live" class="tour-nav-btn" type="button" title="Conversar en tiempo real / Live talk" aria-label="Conversar en tiempo real / Live talk" aria-pressed="false">🎧</button><button id="chat-send" class="tour-nav-btn">➤</button></div>
+      <div id="voice-panel"><div class="vp-row"><label for="vp-engine">Reconocimiento / Recognition</label><select id="vp-engine"><option value="auto">Automático / Auto</option><option value="browser">Navegador / Browser (Google, Apple)</option><option value="local">Local (Whisper, sin servidor)</option></select></div><div class="vp-row"><label for="vp-dev">Micrófono / Microphone</label><select id="vp-dev"><option value="">Predeterminado / Default</option></select></div><div class="vp-meter"><i id="vp-meter-fill"></i></div><div class="vp-row two"><button id="vp-test" type="button">🎙 Probar micrófono</button><button id="vp-load" type="button">⬇ Oído local</button></div><div id="vp-status"></div></div><div id="live-bar" data-s="idle" role="status" aria-live="polite"><span id="live-orb"></span><span id="live-meter"><i></i></span><span id="live-text"></span><button id="live-stop" type="button" title="Terminar conversación / End" aria-label="Terminar conversación / End">✕</button></div><div id="chat-row"><input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" /><button id="chat-mic" class="tour-nav-btn" type="button" title="Hablar / Speak" aria-label="Hablar / Speak">🎤</button><button id="chat-live" class="tour-nav-btn" type="button" title="Conversar en tiempo real / Live talk" aria-label="Conversar en tiempo real / Live talk" aria-pressed="false">🎧</button><button id="chat-send" class="tour-nav-btn">➤</button></div>
       <div id="chat-privacy" style="font-size:10px;opacity:.5;text-align:center">Las conversaciones se guardan en este dispositivo · Chats are saved on this device</div>
       <div id="mem-trace-dummy" style="display:none"></div><div id="chat-mem-title"></div>
       <div id="chat-mem"></div>
@@ -8830,23 +8842,28 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
       btnChat.addEventListener("click", () => chatToggle(!chatPanel.classList.contains("open")));
       document.getElementById("chat-close").addEventListener("click", () => { creatorLock(false); chatToggle(false); });
       document.getElementById("chat-send").addEventListener("click", () => chatSend(chatInput.value));
-      /* ---- Voz: micrófono (dictado de una frase) + CONVERSACIÓN EN TIEMPO REAL (manos libres) ----
-         Dictado 🎤: habla una frase y se envía sola al terminar.
-         Conversar 🎧: bucle continuo escuchar → pensar → hablar → escuchar. Mientras Noryx habla el micrófono
-         se pausa (así no se escucha a sí misma); toca la barra para interrumpirla. Di "adiós" para terminar. ---- */
+      /* ---- Voz: dictado 🎤 + CONVERSACIÓN EN TIEMPO REAL 🎧 ----
+         Dos motores de reconocimiento:
+          · "Navegador": SpeechRecognition de Chrome/Edge/Safari (usa servidores de Google/Apple).
+          · "Local": Whisper corriendo en tu equipo (WebGPU/WASM, sin servidores de voz). Se activa solo si el del navegador
+            no existe, falla o no capta tu voz; o a mano en 🎚. Primera vez descarga ~40–75 MB (queda en caché).
+         Un medidor de nivel (barra y panel 🎚) muestra si de verdad llega audio desde el micrófono. ---- */
       const NoryxVoice = (function () {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const micBtn = document.getElementById("chat-mic");
-        const liveBtn = document.getElementById("chat-live");
-        const bar = document.getElementById("live-bar");
-        const barTxt = document.getElementById("live-text");
-        const barStop = document.getElementById("live-stop");
+        const $ = (id) => document.getElementById(id);
+        const micBtn = $("chat-mic"), liveBtn = $("chat-live"), bar = $("live-bar"), barTxt = $("live-text"), barStop = $("live-stop");
+        const meterLive = $("live-meter").firstElementChild, meterVp = $("vp-meter-fill");
+        const vpPanel = $("voice-panel"), vpEngine = $("vp-engine"), vpDev = $("vp-dev"), vpStatus = $("vp-status"), vpTest = $("vp-test"), vpLoad = $("vp-load"), cfgBtn = $("chat-voice-cfg");
         const ph0 = chatInput.placeholder;
         const es = () => currentLang === "es";
         const L = (a, b) => (es() ? a : b);
         const BYE = /^\s*(?:adi[oó]s|hasta luego|terminar(?: conversaci[oó]n)?|det[eé]n(?:te)?|ya basta|stop|goodbye|bye|that'?s all)\s*[.!]?\s*$/i;
-        let rec = null, mode = "off", state = "idle", permOk = false, empties = 0, startFails = 0, restartT = null, gen = 0;
-        let langIdx = 0, langKey = "", wake = null, lastNote = "", lastNoteT = 0, deliverTries = 0, spkTok = 0;
+        const lsGet = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+        const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } };
+        let enginePref = lsGet("noryx-stt-engine", "auto"), devId = lsGet("noryx-stt-dev", ""), forceLocal = lsGet("noryx-stt-forced", "") === "1";
+        let rec = null, mode = "off", state = "idle", customLabel = "", permOk = false, empties = 0, startFails = 0, restartT = null, gen = 0;
+        let langIdx = 0, langKey = "", wake = null, lastNote = "", lastNoteT = 0, deliverTries = 0, spkTok = 0, silentCycles = 0, localStarting = false;
+        const useLocal = () => !SR || enginePref === "local" || (enginePref === "auto" && forceLocal);
 
         function note(msg, plain) {
           const now = Date.now();
@@ -8857,19 +8874,223 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
         }
         const LABEL = () => ({ idle: "", listening: L("Escuchando… habla con naturalidad", "Listening… speak naturally"), thinking: L("Pensando…", "Thinking…"), speaking: L("Hablando… toca para interrumpir", "Speaking… tap to interrupt") });
         function paint(interim) {
-          bar.classList.toggle("on", mode === "live");
+          bar.classList.toggle("on", mode !== "off");
           bar.dataset.s = state;
           liveBtn.classList.toggle("on", mode === "live");
           liveBtn.setAttribute("aria-pressed", mode === "live" ? "true" : "false");
           const dictating = mode === "dictate" && state === "listening";
           micBtn.classList.toggle("on", dictating);
           micBtn.setAttribute("aria-pressed", dictating ? "true" : "false");
-          barTxt.textContent = state === "listening" && interim ? "🎧 " + interim : LABEL()[state] || "";
+          barTxt.textContent = customLabel || (state === "listening" && interim ? "🎧 " + interim : LABEL()[state] || "");
         }
-        function setState(s, interim) { state = s; paint(interim); }
+        function setState(s, interim, custom) { state = s; customLabel = custom || ""; paint(interim); }
         const langs = () => (es() ? ["es-MX", "es-ES", "es-US"] : ["en-US", "en-GB"]);
+        const setMeter = (v) => { const s = "scaleX(" + Math.max(0.02, Math.min(1, v)).toFixed(2) + ")"; meterLive.style.transform = s; meterVp.style.transform = s; };
 
-        /* ---- permiso del micrófono: se pide explícitamente para ver el error real (antes fallaba en silencio) ---- */
+        /* ================= Motor LOCAL: captura de audio + detector de voz (VAD) + Whisper en un Worker ================= */
+        const TF_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2/dist/transformers.min.js";
+        const WORKER_SRC = [
+          'import { pipeline, env } from "' + TF_URL + '";',
+          "env.allowLocalModels = false;",
+          "let asr = null;",
+          "const prog = (p) => self.postMessage({ type: 'progress', p });",
+          "const make = (dev) => pipeline('automatic-speech-recognition', dev === 'webgpu' ? 'onnx-community/whisper-base' : 'onnx-community/whisper-tiny',",
+          "  dev === 'webgpu' ? { device: 'webgpu', dtype: { encoder_model: 'fp32', decoder_model_merged: 'q4' }, progress_callback: prog } : { device: 'wasm', dtype: 'q8', progress_callback: prog });",
+          "self.onmessage = async (e) => {",
+          "  const m = e.data;",
+          "  try {",
+          "    if (m.type === 'init') {",
+          "      let dev = 'wasm';",
+          "      try { if (self.navigator && navigator.gpu && (await navigator.gpu.requestAdapter())) dev = 'webgpu'; } catch (x) {}",
+          "      try { asr = await make(dev); } catch (x) { if (dev === 'webgpu') { dev = 'wasm'; asr = await make('wasm'); } else throw x; }",
+          "      self.postMessage({ type: 'ready', device: dev });",
+          "    } else if (m.type === 'run') {",
+          "      const out = await asr(m.audio, { language: m.lang, task: 'transcribe' });",
+          "      self.postMessage({ type: 'text', id: m.id, text: String((out && out.text) || '').trim() });",
+          "    }",
+          "  } catch (err) { self.postMessage({ type: 'error', id: m.id, message: String((err && err.message) || err).slice(0, 200) }); }",
+          "};",
+        ].join("\n");
+        const stt = { worker: null, state: "off", readyP: null, pending: new Map(), seq: 0, device: "", files: {} };
+        function sttStatus() {
+          const eng = useLocal() ? L("local (Whisper)", "local (Whisper)") : L("navegador", "browser");
+          let loc = stt.state === "ready" ? L("listo", "ready") + (stt.device ? " · " + stt.device : "") : stt.state === "loading" ? L("descargando…", "downloading…") : L("sin descargar", "not downloaded");
+          vpStatus.textContent = L("Motor activo: ", "Active engine: ") + eng + " · " + L("oído local: ", "local hearing: ") + loc;
+        }
+        function sttLoad() {
+          if (stt.state === "ready") return Promise.resolve();
+          if (stt.readyP) return stt.readyP;
+          stt.state = "loading"; sttStatus();
+          stt.readyP = new Promise((res, rej) => {
+            const fail = (e) => { stt.state = "off"; stt.readyP = null; try { if (stt.worker) stt.worker.terminate(); } catch (x) { /* ignore */ } stt.worker = null; sttStatus(); rej(e instanceof Error ? e : new Error(String(e))); };
+            let w;
+            try { w = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "text/javascript" })), { type: "module" }); } catch (e) { fail(e); return; }
+            stt.worker = w;
+            w.onmessage = (ev) => {
+              const m = ev.data;
+              if (m.type === "progress") {
+                const p = m.p || {};
+                if (p.status === "progress" && p.file) {
+                  stt.files[p.file] = { l: p.loaded || 0, t: p.total || 0 };
+                  let l = 0, t = 0; Object.keys(stt.files).forEach((k) => { l += stt.files[k].l; t += stt.files[k].t; });
+                  const pct = t ? Math.min(99, Math.round((l / t) * 100)) : 0;
+                  const txt = L("Descargando oído local… ", "Downloading local hearing… ") + pct + " %";
+                  vpStatus.textContent = txt;
+                  if (customLabel) { customLabel = txt; barTxt.textContent = txt; }
+                }
+              } else if (m.type === "ready") { stt.state = "ready"; stt.device = m.device; if (forceLocal) lsSet("noryx-stt-forced", "1"); sttStatus(); res(); }
+              else if (m.type === "text") { const q = stt.pending.get(m.id); if (q) { stt.pending.delete(m.id); q.res(m.text); } }
+              else if (m.type === "error") {
+                const q = stt.pending.get(m.id);
+                if (q) { stt.pending.delete(m.id); q.rej(new Error(m.message)); } else fail(new Error(m.message));
+              }
+            };
+            w.onerror = (ev) => fail(new Error((ev && ev.message) || "worker"));
+            w.postMessage({ type: "init" });
+          });
+          return stt.readyP;
+        }
+        function sttRun(audio, lang) {
+          return new Promise((res, rej) => { const id = ++stt.seq; stt.pending.set(id, { res, rej }); stt.worker.postMessage({ type: "run", id, audio, lang }, [audio.buffer]); });
+        }
+        const HALL = /^(?:[\s.,!¡?¿…-]*|.*(?:subt[ií]tulos?|suscr[ií]b|thanks for watching|gracias por (?:ver|mirar)|amara\.org).*|\s*you\s*[.!]?\s*)$/i;
+        function cleanWhisper(t) { t = String(t || "").replace(/[\[(][^\])]*[\])]/g, " ").replace(/\s+/g, " ").trim(); return HALL.test(t) ? "" : t; }
+
+        /* VAD por energía: segmenta frases (empieza con ~0.1 s de voz, termina tras ~0.9 s de silencio) y entrega audio a 16 kHz */
+        function makeVad(inRate, emit, level) {
+          const ratio = inRate / 16000, FR = 512;
+          let acc = 0, cnt = 0, ph = 0, frame = new Float32Array(FR), fi = 0;
+          let noise = 0.006, speaking = false, voiced = 0, silent = 0, utt = [], pre = [], lastLv = 0;
+          const api = { paused: true };
+          function onFrame(f) {
+            let s = 0; for (let i = 0; i < FR; i++) s += f[i] * f[i];
+            const rms = Math.sqrt(s / FR), v = rms > Math.max(0.012, noise * 3), now = performance.now();
+            if (now - lastLv > 60) { lastLv = now; level(rms, speaking || v); }
+            if (api.paused) { speaking = false; voiced = 0; silent = 0; utt = []; pre = []; return; }
+            if (!speaking) {
+              pre.push(f); if (pre.length > 10) pre.shift();
+              if (v) { if (++voiced >= 3) { speaking = true; silent = 0; utt = pre.slice(); pre = []; } }
+              else { voiced = 0; noise = noise * 0.95 + rms * 0.05; }
+              return;
+            }
+            utt.push(f);
+            if (v) silent = 0; else silent++;
+            if (silent >= 28 || utt.length >= 470) {
+              const trail = silent, frames = utt.length;
+              speaking = false; voiced = 0; silent = 0;
+              if (frames - trail >= 10) {
+                const out = new Float32Array(frames * FR);
+                utt.forEach((fr, i) => out.set(fr, i * FR));
+                utt = []; emit(out);
+              } else utt = [];
+            }
+          }
+          api.push = (x) => {
+            for (let i = 0; i < x.length; i++) {
+              acc += x[i]; cnt++; ph += 1;
+              if (ph >= ratio) { ph -= ratio; frame[fi++] = acc / cnt; acc = 0; cnt = 0; if (fi === FR) { const f = frame; frame = new Float32Array(FR); fi = 0; onFrame(f); } }
+            }
+          };
+          return api;
+        }
+        const WL = 'class N extends AudioWorkletProcessor{constructor(){super();this.b=new Float32Array(1024);this.i=0}process(ins){const c=ins[0]&&ins[0][0];if(c){for(let k=0;k<c.length;k++){this.b[this.i++]=c[k];if(this.i===1024){this.port.postMessage(this.b);this.b=new Float32Array(1024);this.i=0}}}return true}}registerProcessor("noryx-cap",N)';
+        const cap = { on: false, ctx: null, stream: null, node: null, vad: null, onUtt: null, onLevel: null, starting: null };
+        function capStart(onUtt, onLevel) {
+          cap.onUtt = onUtt; cap.onLevel = onLevel;
+          if (cap.on) return Promise.resolve();
+          if (cap.starting) return cap.starting;
+          cap.starting = (async () => {
+            const base = { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 };
+            let stream;
+            try { stream = await navigator.mediaDevices.getUserMedia({ audio: devId ? Object.assign({ deviceId: { exact: devId } }, base) : base }); }
+            catch (e) {
+              if (devId && (e.name === "OverconstrainedError" || e.name === "NotFoundError")) { devId = ""; lsSet("noryx-stt-dev", ""); stream = await navigator.mediaDevices.getUserMedia({ audio: base }); }
+              else throw e;
+            }
+            const AC = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AC();
+            try { if (ctx.state === "suspended") await ctx.resume(); } catch (e) { /* ignore */ }
+            const src = ctx.createMediaStreamSource(stream);
+            const vad = makeVad(ctx.sampleRate, (u) => cap.onUtt && cap.onUtt(u), (lv, sp) => { setMeter(lv * 8); if (cap.onLevel) cap.onLevel(lv, sp); });
+            const sink = ctx.createGain(); sink.gain.value = 0; sink.connect(ctx.destination);
+            let node = null;
+            try {
+              await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WL], { type: "text/javascript" })));
+              node = new AudioWorkletNode(ctx, "noryx-cap");
+              node.port.onmessage = (e) => vad.push(e.data);
+            } catch (e) {
+              node = ctx.createScriptProcessor(2048, 1, 1);
+              node.onaudioprocess = (e) => vad.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+            }
+            src.connect(node); node.connect(sink);
+            cap.ctx = ctx; cap.stream = stream; cap.node = node; cap.vad = vad; cap.on = true;
+            try { stream.getAudioTracks()[0].addEventListener("ended", () => capStop()); } catch (e) { /* ignore */ }
+            vadPaused(true);
+            permOk = true;
+          })().finally(() => { cap.starting = null; });
+          return cap.starting;
+        }
+        function vadPaused(p) { if (cap.vad) cap.vad.paused = p; }
+        function capStop() {
+          if (!cap.on && !cap.stream) return;
+          try { if (cap.node) cap.node.disconnect(); } catch (e) { /* ignore */ }
+          try { if (cap.stream) cap.stream.getTracks().forEach((t) => t.stop()); } catch (e) { /* ignore */ }
+          try { if (cap.ctx) cap.ctx.close(); } catch (e) { /* ignore */ }
+          cap.on = false; cap.ctx = null; cap.stream = null; cap.node = null; cap.vad = null; setMeter(0);
+        }
+        function micErrText(e) {
+          const n = (e && e.name) || "";
+          if (n === "NotFoundError" || n === "OverconstrainedError") return L("No encuentro un micrófono conectado.", "I cannot find a connected microphone.");
+          if (n === "NotReadableError" || n === "AbortError") return L("El micrófono está ocupado por otra aplicación. Ciérrala e inténtalo de nuevo.", "The microphone is busy in another app. Close it and try again.");
+          return L("No tengo permiso para usar el micrófono. Permítelo en el candado de la barra de direcciones (o en Ajustes del navegador) y vuelve a tocar.", "I do not have permission to use the microphone. Allow it from the padlock in the address bar (or browser settings) and tap again.");
+        }
+
+        function onUtt(audio) {
+          if (mode === "off") return;
+          vadPaused(true);
+          setState("thinking", "", L("Transcribiendo…", "Transcribing…"));
+          const my = gen;
+          sttRun(audio, es() ? "spanish" : "english").then((raw) => {
+            if (my !== gen || mode === "off") return;
+            const txt = cleanWhisper(raw);
+            if (txt) { empties = 0; chatInput.value = txt; deliver(txt); return; }
+            if (mode === "live") { setState("idle"); restartT = setTimeout(listen, 50); return; }
+            mode = "off"; capStop(); setState("idle");
+            chatInput.placeholder = L("No te entendí, intenta de nuevo", "I did not catch that, try again");
+            setTimeout(() => { if (mode === "off") chatInput.placeholder = ph0; }, 2500);
+          }).catch((e) => { if (my !== gen) return; fatal(L("Falló el reconocimiento local: ", "Local recognition failed: ") + ((e && e.message) || e)); });
+        }
+        async function listenLocal() {
+          if (localStarting) return;
+          localStarting = true;
+          const my = gen;
+          try {
+            if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) throw new Error(L("este navegador no permite acceder al micrófono", "this browser cannot access the microphone"));
+            if (stt.state !== "ready") {
+              setState("thinking", "", L("Preparando el oído local… (solo la primera vez)", "Preparing local hearing… (first time only)"));
+              await sttLoad();
+              if (my !== gen || mode === "off") return;
+            }
+            await capStart(onUtt, null);
+            if (my !== gen || mode === "off") { if (mode === "off") capStop(); return; }
+            vadPaused(false);
+            setState("listening");
+            chatInput.value = ""; chatInput.placeholder = L("Te escucho... habla ahora", "Listening... speak now");
+          } catch (e) {
+            if (my !== gen) return;
+            const n = (e && e.name) || "";
+            if (enginePref === "auto" && forceLocal) { forceLocal = false; lsSet("noryx-stt-forced", ""); }
+            if (/NotAllowed|NotFound|NotReadable|Overconstrained|Abort|Security/.test(n)) fatal(micErrText(e));
+            else fatal(L("No pude iniciar el reconocimiento local: ", "I could not start local recognition: ") + ((e && e.message) || e) + L(". Revisa tu conexión (la primera vez descarga el modelo).", ". Check your connection (the first time it downloads the model)."));
+          } finally { localStarting = false; }
+        }
+        function switchToLocal(why) {
+          forceLocal = true; silentCycles = 0; rec = null; chatInput.placeholder = ph0;
+          note(why + L(" Cambio al reconocimiento local (la primera vez descarga unos 40–75 MB; se puede volver al del navegador en 🎚).", " Switching to local recognition (first time downloads about 40–75 MB; you can go back to the browser one in 🎚)."), true);
+          setState("idle"); sttStatus(); listen();
+        }
+
+        /* ================= permiso / modo navegador ================= */
         async function ensureMic() {
           if (permOk) return true;
           if (window.isSecureContext === false) {
@@ -8881,25 +9102,17 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
               const s = await navigator.mediaDevices.getUserMedia({ audio: true });
               s.getTracks().forEach((t) => t.stop());
               permOk = true;
-              await new Promise((r) => setTimeout(r, 150)); // deja que el sistema libere el micrófono antes de usar el reconocimiento
+              await new Promise((r) => setTimeout(r, 150));
               return true;
-            } catch (e) {
-              const n = (e && e.name) || "";
-              if (n === "NotFoundError" || n === "OverconstrainedError") note(L("No encuentro un micrófono conectado.", "I cannot find a connected microphone."));
-              else if (n === "NotReadableError" || n === "AbortError") note(L("El micrófono está ocupado por otra aplicación. Ciérrala e inténtalo de nuevo.", "The microphone is busy in another app. Close it and try again."));
-              else note(L("No tengo permiso para usar el micrófono. Permítelo en el candado de la barra de direcciones (o en Ajustes del navegador) y vuelve a tocar.", "I do not have permission to use the microphone. Allow it from the padlock in the address bar (or browser settings) and tap again."));
-              return false;
-            }
+            } catch (e) { note(micErrText(e)); return false; }
           }
           return true;
         }
-
-        function fatal(msg) { stopAll(true); note(msg); }
-
+        function fatal(msg) { stopAll(); note(msg); }
         function stopAll() {
-          gen++; clearTimeout(restartT); stopSpeakLive();
+          gen++; clearTimeout(restartT); stopSpeakLive(); capStop();
           if (rec) { try { rec.abort(); } catch (e) { /* ignore */ } rec = null; }
-          mode = "off"; state = "idle"; empties = 0; startFails = 0; deliverTries = 0;
+          mode = "off"; state = "idle"; customLabel = ""; empties = 0; startFails = 0; deliverTries = 0; localStarting = false;
           chatInput.placeholder = ph0;
           try { if (wake) wake.release(); } catch (e) { /* ignore */ }
           wake = null;
@@ -8908,50 +9121,61 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
 
         async function listen() {
           if (mode === "off" || state === "thinking" || state === "speaking" || rec) return;
+          if (useLocal()) return listenLocal();
           if (!(await ensureMic())) { stopAll(); return; }
           if (mode === "off" || state === "thinking" || state === "speaking" || rec) return;
           if (langKey !== currentLang) { langKey = currentLang; langIdx = 0; }
           const my = ++gen;
           let r;
-          try { r = new SR(); } catch (e) { fatal(L("No pude iniciar el reconocimiento de voz en este navegador.", "I could not start speech recognition in this browser.")); return; }
+          try { r = new SR(); } catch (e) { if (enginePref === "auto") { switchToLocal(L("El navegador no pudo iniciar su reconocimiento de voz.", "The browser could not start its speech recognition.")); return; } fatal(L("No pude iniciar el reconocimiento de voz en este navegador.", "I could not start speech recognition in this browser.")); return; }
           rec = r;
           const lg = langs();
           r.lang = lg[Math.min(langIdx, lg.length - 1)];
           r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
-          let text = "", err = null;
+          let text = "", err = null, heardSpeech = false;
           r.onstart = () => { if (my !== gen) return; startFails = 0; setState("listening"); chatInput.value = ""; chatInput.placeholder = L("Te escucho... habla ahora", "Listening... speak now"); };
+          r.onspeechstart = () => { heardSpeech = true; };
           r.onresult = (e) => {
             if (my !== gen) return;
             let s = "";
-            for (let i = 0; i < e.results.length; i++) s += e.results[i][0].transcript + " "; // se reconstruye todo el resultado (evita textos duplicados en Android)
+            for (let i = 0; i < e.results.length; i++) s += e.results[i][0].transcript + " ";
             text = s.replace(/\s+/g, " ").trim();
             chatInput.value = text; paint(text);
           };
           r.onerror = (e) => { if (my !== gen) return; err = (e && e.error) || "unknown"; };
-          r.onend = () => { if (my !== gen) return; rec = null; chatInput.placeholder = ph0; afterListen(text, err); };
+          r.onend = () => { if (my !== gen) return; rec = null; chatInput.placeholder = ph0; afterListen(text, err, heardSpeech); };
           try { r.start(); } catch (e) {
             rec = null;
             if (my === gen) { if (++startFails >= 3) fatal(L("No logro activar el micrófono. Recarga la página e inténtalo de nuevo.", "I cannot start the microphone. Reload the page and try again.")); else restartT = setTimeout(listen, 400); }
           }
         }
 
-        function afterListen(text, err) {
-          if (err === "not-allowed" || err === "service-not-allowed") { permOk = false; return fatal(L("No tengo permiso para usar el micrófono. Permítelo en el candado de la barra de direcciones y vuelve a tocar.", "I do not have permission to use the microphone. Allow it from the padlock in the address bar and tap again.")); }
+        function afterListen(text, err, heardSpeech) {
+          const auto = enginePref === "auto";
+          if (err === "not-allowed") { permOk = false; return fatal(L("No tengo permiso para usar el micrófono. Permítelo en el candado de la barra de direcciones y vuelve a tocar.", "I do not have permission to use the microphone. Allow it from the padlock in the address bar and tap again.")); }
           if (err === "audio-capture") return fatal(L("No encuentro un micrófono disponible.", "I cannot find an available microphone."));
-          if (err === "network") return fatal(L("El reconocimiento de voz del navegador necesita internet (usa los servidores de Google/Apple). Revisa tu conexión; en Brave, Firefox o Chromium sin soporte puede no funcionar.", "The browser's speech recognition needs internet (it uses Google/Apple servers). Check your connection; it may not work on Brave, Firefox or Chromium builds without support."));
+          if (err === "network" || err === "service-not-allowed") {
+            if (auto) return switchToLocal(L("El servicio de voz del navegador no responde (necesita internet y que el navegador lo permita).", "The browser's voice service is not responding (it needs internet and browser support)."));
+            return fatal(L("El reconocimiento de voz del navegador necesita internet y que el navegador lo permita. Prueba el modo local en 🎚.", "The browser's speech recognition needs internet and browser support. Try local mode in 🎚."));
+          }
           if (err === "language-not-supported") {
             if (langIdx < langs().length - 1) { langIdx++; state = "idle"; restartT = setTimeout(listen, 150); return; }
+            if (auto) return switchToLocal(L("El navegador no tiene reconocimiento para este idioma.", "The browser has no recognition for this language."));
             return fatal(L("Tu navegador no tiene reconocimiento de voz para este idioma.", "Your browser has no speech recognition for this language."));
           }
-          if (text) { empties = 0; deliver(text); return; }
+          if (text) { empties = 0; silentCycles = 0; deliver(text); return; }
+          silentCycles++;
+          if (auto && (heardSpeech || (mode === "dictate" && silentCycles >= 2) || (mode === "live" && silentCycles >= 3))) {
+            return switchToLocal(heardSpeech ? L("El navegador oyó voz pero no devolvió texto.", "The browser heard speech but returned no text.") : L("El navegador no está captando tu voz.", "The browser is not picking up your voice."));
+          }
           if (mode === "dictate") {
             mode = "off"; setState("idle");
-            chatInput.placeholder = L("No te escuché, intenta de nuevo", "I did not hear you, try again");
-            setTimeout(() => { if (mode === "off") chatInput.placeholder = ph0; }, 2500);
+            chatInput.placeholder = L("No te escuché. Prueba 🎚 para ver el nivel del micrófono", "I did not hear you. Try 🎚 to see the microphone level");
+            setTimeout(() => { if (mode === "off") chatInput.placeholder = ph0; }, 3500);
             return;
           }
           if (mode === "live") {
-            if (++empties >= 4) { stopAll(); note(L("Dejé de escuchar porque no te oí. Toca 🎧 para seguir hablando.", "I stopped listening because I could not hear you. Tap 🎧 to keep talking."), true); return; }
+            if (++empties >= 4) { stopAll(); note(L("Dejé de escuchar porque no te oí. Toca 🎧 para seguir, o abre 🎚 para comprobar el micrófono.", "I stopped listening because I could not hear you. Tap 🎧 to continue, or open 🎚 to check the microphone."), true); return; }
             setState("idle"); restartT = setTimeout(listen, 200);
           }
         }
@@ -8962,15 +9186,16 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
           if (mode === "live" && BYE.test(text)) { chatInput.value = ""; stopAll(); note(L("Conversación terminada. Toca 🎧 cuando quieras seguir hablando.", "Conversation ended. Tap 🎧 whenever you want to talk again."), true); return; }
           if (chatBusy) {
             if (++deliverTries < 12) { setState("thinking"); restartT = setTimeout(() => deliver(text), 400); return; }
-            deliverTries = 0; chatInput.value = text; if (mode === "live") { setState("idle"); restartT = setTimeout(listen, 300); } else { mode = "off"; setState("idle"); }
+            deliverTries = 0; chatInput.value = text;
+            if (mode === "live") { setState("idle"); restartT = setTimeout(listen, 300); } else { mode = "off"; capStop(); setState("idle"); }
             return;
           }
           deliverTries = 0;
-          if (mode === "live") setState("thinking"); else { mode = "off"; setState("idle"); }
+          if (mode === "live") setState("thinking"); else { mode = "off"; capStop(); setState("idle"); }
           chatSend(text);
         }
 
-        /* ---- hablar (síntesis de voz): por frases, con vigilante para que nunca se quede colgada ---- */
+        /* ================= hablar (síntesis): por frases, con vigilante ================= */
         function pickVoice() {
           const vs = (availableVoices && availableVoices.length) ? availableVoices : (hasSpeech ? window.speechSynthesis.getVoices() : []);
           const pre = es() ? "es" : "en";
@@ -9004,52 +9229,84 @@ window.NoryxSTEM=function(text,es){ES=es!==false;try{return run(String(text||"")
             let fin = false, wd = null;
             const adv = () => { if (fin || tok !== spkTok) return; fin = true; clearTimeout(wd); next(); };
             u.onend = adv; u.onerror = adv;
-            wd = setTimeout(adv, 4000 + (part.length * 90) / (speechRate || 1)); // algunas voces nunca disparan onend
+            wd = setTimeout(adv, 4000 + (part.length * 90) / (speechRate || 1));
             try { window.speechSynthesis.speak(u); } catch (e) { adv(); }
           };
-          setTimeout(next, 60); // tras cancel() Chrome necesita un respiro
+          setTimeout(next, 60);
         }
-
         function resumeListening(ms) { if (mode !== "live") return; setState("idle"); clearTimeout(restartT); restartT = setTimeout(listen, ms || 250); }
         function onReply(text) {
           if (mode !== "live") return;
           let s = speakClean(text || "");
           if (s.length > 520) { const cut = s.slice(0, 520), k = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("? "), cut.lastIndexOf("! ")); s = k > 150 ? cut.slice(0, k + 1) : cut; }
           if (!s) { resumeListening(300); return; }
+          vadPaused(true);
           setState("speaking");
           speakLive(s, () => resumeListening(250));
         }
         function lastAiText() { const m = chatLog.querySelectorAll(".chat-msg.ai"); return m.length ? m[m.length - 1].textContent : ""; }
 
-        function unsupported() { note(L("Tu navegador no incluye reconocimiento de voz. Usa Chrome, Edge o Safari actualizado.", "Your browser has no speech recognition. Use an updated Chrome, Edge or Safari.")); }
+        /* ================= botones ================= */
+        const canRecord = () => !!(SR || (navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+        const unsupported = () => note(L("Este navegador no permite usar el micrófono. Usa Chrome, Edge, Firefox o Safari actualizado.", "This browser cannot use the microphone. Use an updated Chrome, Edge, Firefox or Safari."));
         micBtn.addEventListener("click", () => {
-          if (!SR) return unsupported();
-          if (mode === "dictate") { if (rec) { try { rec.stop(); } catch (e) { /* ignore */ } } return; }
+          if (!canRecord()) return unsupported();
+          if (mode === "dictate") { if (rec) { try { rec.stop(); } catch (e) { /* ignore */ } } else stopAll(); return; }
           if (mode === "live") stopAll();
           try { if (hasSpeech) window.speechSynthesis.cancel(); } catch (e) { /* ignore */ }
           mode = "dictate"; empties = 0; startFails = 0; setState("idle"); listen();
         });
         liveBtn.addEventListener("click", async () => {
-          if (!SR) return unsupported();
+          if (!canRecord()) return unsupported();
           if (mode === "live") { stopAll(); return; }
           stopAll();
-          mode = "live"; empties = 0; startFails = 0; deliverTries = 0;
+          mode = "live"; empties = 0; startFails = 0; deliverTries = 0; silentCycles = 0;
           try { if (navigator.wakeLock) { wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => { wake = null; }); } } catch (e) { /* ignore */ }
           if (mode !== "live") return;
           setState("idle");
           const before = chatLog.children.length;
           if (!chatPanel.classList.contains("open")) chatToggle(true);
-          if (chatLog.children.length > before) { const g = lastAiText(); if (g && g.length < 320) { onReply(g); return; } } // lee en voz alta el saludo inicial
+          if (chatLog.children.length > before) { const g = lastAiText(); if (g && g.length < 320) { onReply(g); return; } }
           listen();
         });
         bar.addEventListener("click", (e) => { if (e.target === barStop) return; if (mode === "live" && state === "speaking") { stopSpeakLive(); resumeListening(150); } });
         barStop.addEventListener("click", (e) => { e.stopPropagation(); stopAll(); });
         document.addEventListener("visibilitychange", () => { if (document.hidden && mode !== "off") stopAll(); });
 
+        /* ================= panel 🎚: motor, micrófono, prueba de nivel ================= */
+        async function fillDevices() {
+          try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+            const ds = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput");
+            vpDev.innerHTML = "";
+            const o0 = document.createElement("option"); o0.value = ""; o0.textContent = L("Predeterminado del sistema", "System default"); vpDev.appendChild(o0);
+            ds.forEach((d, i) => { if (!d.deviceId || d.deviceId === "default") return; const o = document.createElement("option"); o.value = d.deviceId; o.textContent = d.label || (L("Micrófono ", "Microphone ") + (i + 1)); vpDev.appendChild(o); });
+            vpDev.value = devId;
+          } catch (e) { /* ignore */ }
+        }
+        cfgBtn.addEventListener("click", () => { const open = !vpPanel.classList.contains("open"); vpPanel.classList.toggle("open", open); if (open) { vpEngine.value = enginePref; sttStatus(); fillDevices(); } });
+        vpEngine.addEventListener("change", () => { enginePref = vpEngine.value; lsSet("noryx-stt-engine", enginePref); if (enginePref !== "auto") { forceLocal = false; lsSet("noryx-stt-forced", ""); } if (enginePref === "auto") { forceLocal = false; lsSet("noryx-stt-forced", ""); } stopAll(); sttStatus(); });
+        vpDev.addEventListener("change", () => { devId = vpDev.value; lsSet("noryx-stt-dev", devId); const was = cap.on; capStop(); if (was && mode !== "off") listen(); });
+        vpLoad.addEventListener("click", () => { sttLoad().then(() => note(L("Oído local listo.", "Local hearing ready."), true)).catch((e) => note(L("No pude descargar el oído local: ", "Could not download local hearing: ") + ((e && e.message) || e) + L(". Revisa tu conexión.", ". Check your connection."))); });
+        vpTest.addEventListener("click", async () => {
+          if (mode !== "off") stopAll();
+          if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return unsupported();
+          let peak = 0;
+          vpTest.disabled = true; vpStatus.textContent = L("Habla ahora… (8 s)", "Speak now… (8 s)");
+          try {
+            await capStart(null, (lv) => { if (lv > peak) peak = lv; });
+            fillDevices();
+            await new Promise((r) => setTimeout(r, 8000));
+            capStop();
+            vpStatus.textContent = peak < 0.01 ? L("❌ No llega audio de este micrófono (nivel " + Math.round(peak * 800) + " %). Elige otro micrófono arriba o revisa el volumen/silencio en el sistema.", "❌ No audio reaches this microphone (level " + Math.round(peak * 800) + "%). Pick another microphone above or check system volume/mute.") : L("✅ El micrófono se oye bien (nivel máx. " + Math.min(100, Math.round(peak * 800)) + " %).", "✅ The microphone sounds fine (peak level " + Math.min(100, Math.round(peak * 800)) + "%).");
+          } catch (e) { capStop(); vpStatus.textContent = micErrText(e); }
+          vpTest.disabled = false;
+        });
+
         return {
           live: () => mode === "live",
           onReply,
-          afterTurn: () => { if (mode === "live" && state === "thinking" && deliverTries === 0) resumeListening(300); },
+          afterTurn: () => { if (mode === "live" && state === "thinking" && deliverTries === 0 && !customLabel) resumeListening(300); },
           onGate: () => { if (mode !== "live" || state !== "thinking") return; setTimeout(() => { const g = lastAiText(); if (g) onReply(g); else resumeListening(300); }, 80); },
           stop: () => stopAll(),
         };
