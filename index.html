@@ -1723,29 +1723,20 @@
       #hebb-fill{height:100%;width:0;background:linear-gradient(90deg,#7ad9ff,#ffd166);transition:width .6s}
       #hebb-actions{display:flex;gap:8px;margin-top:10px}
       #hebb-actions .tour-nav-btn{width:auto;padding:0 12px;font-size:12px;border-radius:14px}
-      #chat-panel{position:absolute;right:14px;bottom:clamp(44px,8vw,64px);width:min(400px,calc(100vw - 28px));max-height:80vh;max-height:80dvh;display:flex;flex-direction:column;gap:8px;padding:12px 14px;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .3s,transform .3s;z-index:31}
+      #chat-panel{position:absolute;right:14px;bottom:clamp(44px,8vw,64px);width:min(420px,calc(100vw - 28px));height:min(620px,78vh);height:min(620px,78dvh);display:flex;flex-direction:column;gap:6px;padding:10px;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .3s,transform .3s;z-index:31}
       #chat-panel.open{opacity:1;pointer-events:auto;transform:none}
-      #chat-bar{display:flex;align-items:center;gap:8px}
+      #chat-bar{display:flex;align-items:center;gap:8px;padding:2px 4px}
       #chat-title{flex:1;font-weight:600;color:#7ad9ff}
-      #chat-close{font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;background:none;border:none;padding:2px 4px}
-      #chat-close:hover{color:#fff}
-      #chat-status{font-size:10px;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.55)}
-      #chat-status::before{content:"";width:7px;height:7px;border-radius:50%;background:#ffd166;box-shadow:0 0 6px currentColor}
-      #chat-status[data-state="online"]::before{background:#3ddc97}
-      #chat-status[data-state="nobridge"]::before,#chat-status[data-state="error"]::before{background:#ff6b6b}
-      #chat-log{flex:1;min-height:140px;max-height:44vh;max-height:44dvh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;touch-action:pan-y;user-select:text;-webkit-user-select:text}
-      .chat-msg{padding:7px 10px;border-radius:12px;max-width:88%;white-space:pre-wrap;word-break:break-word}
-      .chat-msg.me{align-self:flex-end;background:rgba(255,209,102,.18)}
-      .chat-msg.ai{align-self:flex-start;background:rgba(122,217,255,.14)}
-      .chat-msg.err{align-self:flex-start;background:rgba(255,120,120,.16)}
-      .chat-msg.typing{opacity:.7;font-style:italic}
-      .chat-msg a{color:#7ad9ff}
-      #chat-chips{display:flex;flex-wrap:wrap;gap:5px}
-      .chat-chip-btn{font-size:11px;padding:3px 9px;border-radius:12px;border:1px solid rgba(122,217,255,.4);background:rgba(122,217,255,.08);color:inherit;cursor:pointer}
-      #chat-row{display:flex;gap:6px}
-      #chat-input{flex:1;min-width:0;padding:8px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.35);color:inherit;font-size:16px;user-select:text;-webkit-user-select:text}
-      #chat-send:disabled{opacity:.4}
-      #chat-mic.on{background:rgba(255,90,90,.45)}
+      #chat-status{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:background .3s,box-shadow .3s}
+      #chat-status.linked{background:#3ddc97;box-shadow:0 0 6px #3ddc97}
+      #chat-bar a,#chat-bar button{font-size:14px;color:rgba(255,255,255,.6);cursor:pointer;background:none;border:none;text-decoration:none;padding:2px 4px}
+      #chat-bar a:hover,#chat-bar button:hover{color:#fff}
+      #chat-frame-wrap{position:relative;flex:1;min-height:0;border-radius:12px;overflow:hidden;background:rgba(0,0,0,.35)}
+      #chat-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#0b121c}
+      #chat-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center;font-size:13px;color:rgba(255,255,255,.7);pointer-events:none}
+      #chat-loading a{pointer-events:auto;color:#7ad9ff}
+      #chat-frame-wrap.ready #chat-loading{display:none}
+      @media (max-width:720px){#chat-panel{right:8px;left:8px;width:auto;height:72dvh}}
       /* ---------- Swipe hint (mobile, shown briefly during either tour) ---------- */
       #tour-swipe-hint {
         position: absolute;
@@ -2558,16 +2549,12 @@
     <div id="chat-panel" class="hud-panel">
       <div id="chat-bar">
         <span id="chat-title">💬 Noryx</span>
-        <span id="chat-status" data-state="connecting"></span>
+        <span id="chat-status" title="Sin enlace / Not linked"></span>
+        <button id="chat-reload" type="button" title="Reconectar / Reconnect" aria-label="Reconectar / Reconnect">↻</button>
+        <a id="chat-ext" href="https://orlagg22.github.io/Norix.orlagg22.github.io/" target="_blank" rel="noopener" title="Abrir en pestaña nueva / Open in new tab">↗</a>
         <button id="chat-close" type="button" title="Cerrar / Close" aria-label="Cerrar / Close">✕</button>
       </div>
-      <div id="chat-log" aria-live="polite"></div>
-      <div id="chat-chips"></div>
-      <div id="chat-row">
-        <input id="chat-input" type="text" autocomplete="off" placeholder="Escribe... / Type..." maxlength="1500" />
-        <button id="chat-mic" class="tour-nav-btn" type="button" title="Hablar / Speak" aria-label="Hablar / Speak">🎤</button>
-        <button id="chat-send" class="tour-nav-btn" type="button" title="Enviar / Send" aria-label="Enviar / Send">➤</button>
-      </div>
+      <div id="chat-frame-wrap"><div id="chat-loading"><span id="chat-loading-txt">Conectando con Noryx…</span></div></div>
     </div>
     <div id="hebb-panel" class="hud-panel">
       <button id="hebb-close" title="Close" style="position:absolute;top:8px;right:10px;font-size:14px;color:rgba(255,255,255,0.5);cursor:pointer;background:none;border:none">✕</button>
@@ -7159,107 +7146,150 @@
       });
 
       
-      /* ================= Noryx: interfaz propia + motor remoto =================
-         La pantalla de chat es de este archivo. Las respuestas las genera la página de
-         Noryx, cargada en un iframe invisible y consultada por postMessage (ver
-         noryx-bridge.js, que va en esa página). No se carga nada hasta abrir el chat. ================= */
+      /* ================= Noryx (remote) =================
+         La IA vive en su propia página y se embebe solo al abrir el panel.
+         Puente bidireccional por postMessage:
+           cerebro -> Noryx : brain-hello {lang, region, regions[]}, brain-lang {lang}, brain-region {key, name, mode}
+           Noryx -> cerebro : noryx-ready, noryx-regions {keys:[...]}, noryx-lang {lang}
+         ================= */
       const NORYX_URL = "https://orlagg22.github.io/Norix.orlagg22.github.io/";
       const NORYX_ORIGIN = new URL(NORYX_URL).origin;
       const chatPanel = document.getElementById("chat-panel");
       const btnChat = document.getElementById("btn-chat");
-      const chatLog = document.getElementById("chat-log");
-      const chatInput = document.getElementById("chat-input");
-      const chatSendBtn = document.getElementById("chat-send");
+      const chatFrameWrap = document.getElementById("chat-frame-wrap");
       const chatStatusEl = document.getElementById("chat-status");
-      const chatHistory = [];
       let chatFocusKeys = [];
-      let chatBusy = false;
-      let chatGreeted = false;
-      let bridgeFrame = null;
-      let bridgeReady = false;
-      let bridgeSeq = 0;
-      const bridgePending = new Map();
-      const ces = () => currentLang === "es";
+      let chatFrame = null;
+      let chatSlowTimer = 0;
+      let noryxLinked = false;
+      let noryxOffline = false;
+      let noryxTargetOrigin = NORYX_ORIGIN;
+      let noryxHelloTimer = 0;
+      let noryxLastRegion = null;
 
-      const STATUS_TXT = {
-        connecting: ["Conectando…", "Connecting…"],
-        online: ["En línea", "Online"],
-        nobridge: ["Sin conexión con Noryx", "Noryx unreachable"],
-        error: ["Error", "Error"],
-      };
-      function setChatStatus(s) {
-        chatStatusEl.dataset.state = s;
-        chatStatusEl.textContent = STATUS_TXT[s][ces() ? 0 : 1];
+      function noryxLabel(key) { try { return t(key); } catch (err) { return key; } }
+      function noryxBuildUrl(bust) {
+        const u = new URL(NORYX_URL);
+        u.searchParams.set("embed", "1");
+        u.searchParams.set("from", "brain");
+        u.searchParams.set("lang", currentLang);
+        if (bust) u.searchParams.set("_", String(Date.now()));
+        return u.toString();
       }
-      setChatStatus("connecting");
-
-      /* ---- puente: iframe invisible (en pantalla pero transparente, para que el navegador no lo ahogue) ---- */
-      function bridgeLoad() {
-        if (bridgeFrame) return;
-        setChatStatus("connecting");
-        bridgeFrame = document.createElement("iframe");
-        bridgeFrame.title = "Noryx (motor)";
-        bridgeFrame.setAttribute("aria-hidden", "true");
-        bridgeFrame.tabIndex = -1;
-        bridgeFrame.allow = "clipboard-write";
-        bridgeFrame.style.cssText = "position:fixed;right:0;bottom:0;width:420px;height:640px;opacity:0;pointer-events:none;border:0;z-index:-1";
-        bridgeFrame.addEventListener("load", () => bridgePing(0));
-        bridgeFrame.src = NORYX_URL;
-        document.body.appendChild(bridgeFrame);
+      function noryxSetLinked(on) {
+        noryxLinked = on;
+        chatStatusEl.classList.toggle("linked", on);
+        const es = currentLang === "es";
+        chatStatusEl.title = on
+          ? (es ? "Conectado con el cerebro" : "Linked with the brain")
+          : (es ? "Sin enlace con el cerebro (el chat funciona igual)" : "Not linked to the brain (chat still works)");
       }
-      function bridgePing(n) {
-        if (bridgeReady || !bridgeFrame) return;
-        try { bridgeFrame.contentWindow.postMessage({ type: "noryx-hello" }, NORYX_ORIGIN); } catch (e) { /* ignore */ }
-        if (n < 10) setTimeout(() => bridgePing(n + 1), 1000);
-        else if (!bridgeReady) setChatStatus("nobridge");
+      function noryxSend(type, data) {
+        if (!chatFrame || !chatFrame.contentWindow) return;
+        const msg = Object.assign({ source: "brain", type: type }, data || {});
+        try { chatFrame.contentWindow.postMessage(msg, noryxTargetOrigin); } catch (err) { /* ignore */ }
       }
-      window.addEventListener("message", (e) => {
-        if (e.origin !== NORYX_ORIGIN || !bridgeFrame || e.source !== bridgeFrame.contentWindow || !e.data || typeof e.data !== "object") return;
-        const d = e.data;
-        if (d.type === "noryx-ready") { bridgeReady = true; setChatStatus("online"); }
-        else if (d.type === "noryx-answer" && bridgePending.has(d.id)) {
-          const w = bridgePending.get(d.id);
-          bridgePending.delete(d.id);
-          clearTimeout(w.timer);
-          if (d.ok && typeof d.text === "string" && d.text.trim()) w.resolve(d.text);
-          else w.reject(new Error(d.error || "empty"));
-        } else if (d.type === "noryx-regions" && Array.isArray(d.keys)) brainReact(d.keys.filter((k) => typeof k === "string").slice(0, 4));
-      });
-      function bridgeAsk(text) {
-        return new Promise((resolve, reject) => {
-          const t0 = Date.now();
-          (function go() {
-            if (!bridgeReady) {
-              if (Date.now() - t0 > 12000) { setChatStatus("nobridge"); reject(new Error("nobridge")); return; }
-              setTimeout(go, 250); return;
-            }
-            const id = ++bridgeSeq;
-            const timer = setTimeout(() => { bridgePending.delete(id); reject(new Error("timeout")); }, 35000);
-            bridgePending.set(id, { resolve, reject, timer });
-            bridgeFrame.contentWindow.postMessage({ type: "noryx-ask", id, text, lang: currentLang, history: chatHistory.slice(-6) }, NORYX_ORIGIN);
-          })();
+      function noryxHello() {
+        noryxSend("brain-hello", {
+          lang: currentLang,
+          region: noryxLastRegion,
+          regions: anatLabelAnchors.map((a) => ({ key: a.key, name: noryxLabel(a.key) })),
         });
       }
-
-      /* ---- el cerebro reacciona (regiones según la pregunta y la respuesta) ---- */
-      const REGION_HINTS = [
-        [/memori|recuerd|memory|remember|aprend|learn|estudi|study|olvid|forget/i, "labelHippocampus"],
-        [/miedo|emoci|fear|emotion|ansied|anxi|estr[eé]s|stress|alegr|joy/i, "labelAmygdala"],
-        [/atenci|decid|planea|plan\b|concentr|focus|decision|lenguaje|language/i, "labelPrefrontal"],
-        [/movim|motor|muscul|muscle|mover|move/i, "labelMotorCortex"],
-        [/equilibr|balance|coordin|baile|dance/i, "labelCerebellum"],
-        [/\bvista\b|\bver\b|ojo|visual|sight|vision|luz\b|light/i, "labelVisualCortex"],
-        [/hambre|sed\b|sue[ñn]o|sleep|hunger|thirst|aliment|comer|food|diet|nutri|hormon/i, "labelHypothalamus"],
-        [/respir|coraz[oó]n|heart|breath|presi[oó]n|pulso/i, "labelBrainstem"],
-        [/dopamin|recompensa|reward|h[aá]bito|habit|adicci|addict/i, "labelBasalGanglia"],
-        [/sentid|sense|tacto|touch|o[ií]do|hearing|relay|relevo/i, "labelThalamus"],
-      ];
-      function chatRegions(text) {
-        const out = [];
-        REGION_HINTS.forEach(([re, k]) => { if (re.test(text) && !out.includes(k)) out.push(k); });
-        return out.slice(0, 3);
+      /* La página remota puede tardar en tener su listener listo: reintenta el saludo hasta que responda. */
+      function noryxStartHello() {
+        clearInterval(noryxHelloTimer);
+        let n = 0;
+        noryxHelloTimer = setInterval(() => {
+          if (noryxLinked || !chatFrame || ++n > 25) { clearInterval(noryxHelloTimer); return; }
+          noryxHello();
+        }, 800);
       }
-      function brainReact(keys) {
+      function noryxRegionEvent(key, mode) {
+        noryxLastRegion = { key: key, name: noryxLabel(key) };
+        noryxSend("brain-region", { key: key, name: noryxLastRegion.name, mode: mode, lang: currentLang });
+      }
+      function noryxRegionKey(k) {
+        if (typeof k !== "string" || !k.trim()) return null;
+        const s2 = k.trim();
+        const full = /^label/i.test(s2) ? s2 : "label" + s2.charAt(0).toUpperCase() + s2.slice(1);
+        const hit = anatLabelAnchors.find((x) => x.key.toLowerCase() === full.toLowerCase());
+        return hit ? hit.key : null;
+      }
+
+      function chatShowMsg(html) {
+        chatFrameWrap.classList.remove("ready");
+        document.getElementById("chat-loading").innerHTML = html;
+      }
+      function chatMsgLink() {
+        const es = currentLang === "es";
+        return '<a href="' + NORYX_URL + '" target="_blank" rel="noopener">' + (es ? "Abrir en pestaña nueva" : "Open in a new tab") + "</a>";
+      }
+      function chatConnect(bust) {
+        const es = currentLang === "es";
+        noryxOffline = false;
+        noryxSetLinked(false);
+        clearTimeout(chatSlowTimer);
+        clearInterval(noryxHelloTimer);
+        chatShowMsg('<span id="chat-loading-txt">' + (es ? "Conectando con Noryx…" : "Connecting to Noryx…") + "</span>");
+        chatSlowTimer = setTimeout(() => {
+          if (chatFrameWrap.classList.contains("ready")) return;
+          chatShowMsg((es ? "Noryx tarda en responder. " : "Noryx is taking a while. ") + chatMsgLink());
+        }, 12000);
+        /* Comprobación de alcance: si la red/DNS falla, el iframe solo mostraría un error en blanco. */
+        fetch(NORYX_URL, { mode: "no-cors", cache: "no-store" }).catch(() => {
+          noryxOffline = true;
+          clearTimeout(chatSlowTimer);
+          chatShowMsg((es ? "No se pudo conectar con Noryx. Revisa tu conexión y pulsa ↻. " : "Could not reach Noryx. Check your connection and press ↻. ") + chatMsgLink());
+        });
+        chatFrame.src = noryxBuildUrl(bust);
+      }
+      function chatLoadFrame() {
+        if (chatFrame) return;
+        chatFrame = document.createElement("iframe");
+        chatFrame.title = "Noryx";
+        chatFrame.allow = "microphone; autoplay; clipboard-write; clipboard-read; fullscreen";
+        chatFrame.referrerPolicy = "no-referrer-when-downgrade";
+        chatFrame.addEventListener("load", () => {
+          if (noryxOffline) return;
+          chatFrameWrap.classList.add("ready");
+          clearTimeout(chatSlowTimer);
+          noryxStartHello();
+        });
+        chatConnect(false);
+        chatFrameWrap.appendChild(chatFrame);
+      }
+      function chatToggle(open) {
+        chatPanel.classList.toggle("open", open);
+        btnChat.classList.toggle("on", open);
+        if (!open) return;
+        if (hebbPanel.classList.contains("open")) hebbToggle(false);
+        chatLoadFrame();
+      }
+      btnChat.addEventListener("click", () => chatToggle(!chatPanel.classList.contains("open")));
+      document.getElementById("chat-close").addEventListener("click", () => chatToggle(false));
+      document.getElementById("chat-reload").addEventListener("click", () => {
+        if (!chatFrame) { chatLoadFrame(); return; }
+        chatConnect(true);
+      });
+      noryxSetLinked(false);
+
+      /* Noryx -> cerebro. Se confía en la ventana del iframe (e.source), no solo en el origen,
+         para que siga funcionando aunque GitHub Pages redirija a otra URL. */
+      window.addEventListener("message", (e) => {
+        if (!chatFrame || e.source !== chatFrame.contentWindow) return;
+        const d = e.data;
+        if (!d || typeof d !== "object" || typeof d.type !== "string") return;
+        if (e.origin && e.origin !== "null") noryxTargetOrigin = e.origin;
+        const wasLinked = noryxLinked;
+        if (!wasLinked) { noryxSetLinked(true); clearInterval(noryxHelloTimer); }
+        if (d.type === "noryx-ready" || d.type === "noryx-ping" || (!wasLinked && d.type !== "noryx-hello")) noryxHello();
+        if (d.type === "noryx-lang" && (d.lang === "es" || d.lang === "en") && d.lang !== currentLang) {
+          setLanguage(d.lang);
+          return;
+        }
+        if (d.type !== "noryx-regions" || !Array.isArray(d.keys)) return;
+        const keys = d.keys.map(noryxRegionKey).filter(Boolean).slice(0, 4);
         if (!keys.length) return;
         chatFocusKeys = keys;
         ensureAudio(); playZap();
@@ -7271,108 +7301,22 @@
           rippleNearRegion(wp, 3);
         });
         setTimeout(() => { chatFocusKeys = []; }, 3500);
-      }
+      });
 
-      /* ---- mensajes ---- */
-      function chatAdd(who, text, cls) {
-        const el = document.createElement("div");
-        el.className = "chat-msg " + who + (cls ? " " + cls : "");
-        el.textContent = text;
-        chatLog.appendChild(el);
-        chatLog.scrollTop = chatLog.scrollHeight;
-        return el;
-      }
-      function parseRegions(raw) {
-        const m = raw.match(/\n?\[\[regions?:([^\]]*)\]?\]?\s*$/i);
-        const keys = m ? m[1].split(/[,\s]+/).filter((k) => /^label[A-Za-z]+$/.test(k)) : [];
-        return { text: raw.replace(/\n?\[\[regions?:[^\]]*\]?\]?\s*$/i, "").trim(), keys };
-      }
-      function chatSend(text) {
-        text = (text || "").trim();
-        if (!text || chatBusy) return;
-        chatBusy = true;
-        chatSendBtn.disabled = true;
-        chatInput.value = "";
-        chatAdd("me", text);
-        chatHistory.push({ role: "user", content: text });
-        brainReact(chatRegions(text));
-        const typing = chatAdd("ai", ces() ? "Noryx está pensando…" : "Noryx is thinking…", "typing");
-        bridgeAsk(text).then((raw) => {
-          const p = parseRegions(raw);
-          typing.remove();
-          chatAdd("ai", p.text);
-          chatHistory.push({ role: "assistant", content: p.text });
-          setChatStatus("online");
-          brainReact(p.keys.length ? p.keys : chatRegions(p.text));
-        }).catch((err) => {
-          typing.remove();
-          const nb = err && err.message === "nobridge";
-          chatAdd("ai", nb
-            ? (ces() ? "No logro conectar con Noryx. Revisa que la página esté en línea y que tenga instalado el puente (noryx-bridge.js)." : "I can't reach Noryx. Check that the page is online and has the bridge (noryx-bridge.js) installed.")
-            : (ces() ? "Noryx tardó demasiado en responder. Intenta de nuevo." : "Noryx took too long to answer. Please try again."), "err");
-          if (!nb) setChatStatus(bridgeReady ? "online" : "error");
-        }).finally(() => { chatBusy = false; chatSendBtn.disabled = false; chatInput.focus(); });
-      }
-
-      function chatToggle(open) {
-        chatPanel.classList.toggle("open", open);
-        btnChat.classList.toggle("on", open);
-        if (!open) return;
-        if (hebbPanel.classList.contains("open")) hebbToggle(false);
-        bridgeLoad();
-        if (!chatGreeted) {
-          chatGreeted = true;
-          chatAdd("ai", ces() ? "Hola, soy Noryx. Pregúntame lo que quieras sobre el cerebro, el estudio, la alimentación o cualquier otra cosa." : "Hi, I'm Noryx. Ask me anything about the brain, studying, nutrition or whatever you need.");
-        }
-        setTimeout(() => chatInput.focus(), 200);
-      }
-      btnChat.addEventListener("click", () => chatToggle(!chatPanel.classList.contains("open")));
-      document.getElementById("chat-close").addEventListener("click", () => chatToggle(false));
-      chatSendBtn.addEventListener("click", () => chatSend(chatInput.value));
-      chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") chatSend(chatInput.value); e.stopPropagation(); });
-
-      /* ---- preguntas rápidas ---- */
-      (function chatChips() {
-        const box = document.getElementById("chat-chips");
-        const Q = [
-          ["¿Cómo se forman los recuerdos?", "How are memories formed?"],
-          ["¿Qué comer para cuidar el cerebro?", "What should I eat for my brain?"],
-          ["¿Qué hace la amígdala?", "What does the amygdala do?"],
-        ];
-        Q.forEach((q) => {
-          const b = document.createElement("button");
-          b.type = "button";
-          b.className = "chat-chip-btn";
-          b.textContent = ces() ? q[0] : q[1];
-          b.addEventListener("click", () => { if (!chatPanel.classList.contains("open")) chatToggle(true); chatSend(ces() ? q[0] : q[1]); });
-          box.appendChild(b);
-        });
-      })();
-
-      /* ---- micrófono (reconocimiento de voz del navegador) ---- */
-      (function chatMic() {
-        const btn = document.getElementById("chat-mic");
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SR) { btn.style.display = "none"; return; }
-        let rec = null, listening = false, heard = "";
-        const setOn = (v) => { listening = v; btn.classList.toggle("on", v); btn.setAttribute("aria-pressed", v ? "true" : "false"); };
-        btn.addEventListener("click", () => {
-          if (listening && rec) { try { rec.stop(); } catch (e) { /* ignore */ } return; }
-          rec = new SR();
-          rec.lang = ces() ? "es-MX" : "en-US";
-          rec.interimResults = true; rec.continuous = false;
-          heard = "";
-          rec.onstart = () => { setOn(true); chatInput.value = ""; };
-          rec.onresult = (e) => {
-            let interim = "";
-            for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) heard += r[0].transcript; else interim += r[0].transcript; }
-            chatInput.value = (heard + " " + interim).trim();
-          };
-          rec.onerror = () => setOn(false);
-          rec.onend = () => { setOn(false); const t = (heard || chatInput.value).trim(); if (t) chatSend(t); };
-          try { rec.start(); } catch (e) { setOn(false); }
-        });
-      })();
+      /* Cerebro -> Noryx: avisa de la región tocada y del cambio de idioma. */
+      try {
+        const _triggerAnatRegion = triggerAnatRegion;
+        triggerAnatRegion = function (key) { noryxRegionEvent(key, "tap"); return _triggerAnatRegion.apply(this, arguments); };
+        const _stimulateRegion = stimulateRegion;
+        stimulateRegion = function (key) { noryxRegionEvent(key, "explorer"); return _stimulateRegion.apply(this, arguments); };
+        const _setLanguage = setLanguage;
+        setLanguage = function () {
+          const r = _setLanguage.apply(this, arguments);
+          noryxSetLinked(noryxLinked);
+          noryxSend("brain-lang", { lang: currentLang });
+          return r;
+        };
+      } catch (err) { console.warn("Noryx bridge hooks:", err); }
 
 
       /* ================= Brain Explorer: a dedicated section that strips the
