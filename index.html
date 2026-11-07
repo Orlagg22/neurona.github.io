@@ -2768,6 +2768,116 @@
       <div class="kbd-row"><span data-i18n="kbd_help">This help panel</span><span class="kbd-key">?</span></div>
     </div>
 
+
+    <style id="nxCapCompact">
+      /* ---------- Tarjetas de texto de los tours: compactas, translúcidas y minimizables ---------- */
+      #tour-caption,
+      #brain-tour-caption,
+      #learn-tour-caption {
+        width: min(390px, calc(100vw - 32px));
+        padding: 10px 14px 8px;
+        background: rgba(6, 10, 16, 0.6) !important;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+      }
+      #tour-caption-title,
+      #brain-tour-caption-title,
+      #learn-tour-caption-title { margin-bottom: 4px; }
+      #tour-caption-text,
+      #brain-tour-caption-text,
+      #learn-tour-caption-text { line-height: 1.45; }
+      #tour-caption-progress,
+      #brain-tour-caption-progress,
+      #learn-tour-caption-progress { margin-top: 8px; }
+      #tour-caption .brain-tour-nav,
+      #brain-tour-caption .brain-tour-nav,
+      #learn-tour-caption .brain-tour-nav { margin-top: 6px; gap: 8px; }
+      #tour-caption .tour-nav-btn,
+      #brain-tour-caption .tour-nav-btn,
+      #learn-tour-caption .tour-nav-btn { width: 24px; height: 24px; font-size: 10px; }
+
+      .cap-min {
+        margin-left: auto;
+        pointer-events: auto;
+        touch-action: manipulation;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 13px;
+        line-height: 1;
+        cursor: pointer;
+      }
+      .cap-min:hover { background: rgba(255, 255, 255, 0.2); }
+
+      /* Modo minimizado: solo título y controles, el cerebro queda libre */
+      :is(#tour-caption, #brain-tour-caption, #learn-tour-caption).mini {
+        width: min(300px, calc(100vw - 32px));
+        padding: 6px 12px;
+      }
+      :is(#tour-caption, #brain-tour-caption, #learn-tour-caption).mini
+        :is([id$="-caption-text"], [id$="-caption-progress"], [id$="-caption-steps"], #learn-tour-section, #learn-meter) {
+        display: none;
+      }
+      :is(#tour-caption, #brain-tour-caption, #learn-tour-caption).mini [id$="-caption-title"] { margin-bottom: 0; }
+
+      /* Pantallas bajas: aún más compacto */
+      @media (max-height: 640px) {
+        #tour-caption,
+        #brain-tour-caption,
+        #learn-tour-caption { padding: 8px 12px 6px; }
+        #tour-caption-text,
+        #brain-tour-caption-text,
+        #learn-tour-caption-text { font-size: 10.5px; line-height: 1.4; }
+        #tour-caption-progress,
+        #brain-tour-caption-progress,
+        #learn-tour-caption-progress { margin-top: 6px; }
+        #learn-meter { transform: scale(0.9); transform-origin: left center; }
+      }
+    </style>
+    <script>
+      /* Botón – / + para minimizar el texto de los tours (se recuerda durante la sesión) */
+      (function () {
+        var ids = ["tour-caption", "brain-tour-caption", "learn-tour-caption"];
+        var mini = false;
+        try { mini = sessionStorage.getItem("nx-cap-mini") === "1"; } catch (e) {}
+        var btns = [];
+        function apply() {
+          ids.forEach(function (id) {
+            var c = document.getElementById(id);
+            if (c) c.classList.toggle("mini", mini);
+          });
+          btns.forEach(function (b) {
+            b.textContent = mini ? "+" : "–";
+            b.title = mini ? "Mostrar texto / Show text" : "Minimizar texto / Minimize text";
+            b.setAttribute("aria-label", b.title);
+          });
+        }
+        ids.forEach(function (id) {
+          var title = document.getElementById(id + "-title");
+          if (!title) return;
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "cap-min";
+          b.addEventListener("click", function (e) {
+            e.stopPropagation();
+            mini = !mini;
+            try { sessionStorage.setItem("nx-cap-mini", mini ? "1" : "0"); } catch (err) {}
+            apply();
+          });
+          title.appendChild(b);
+          btns.push(b);
+        });
+        apply();
+      })();
+    </script>
     <script type="module">
       import * as THREE from "three";
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
